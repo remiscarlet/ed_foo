@@ -1,69 +1,10 @@
+import dataclasses
 import json
-from marshmallow.exceptions import ValidationError
+import pprint
 from dataclasses_json import config, dataclass_json
-from dataclasses import dataclass, field, is_dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-from functools import partial
 
-CLASS_REGISTRY: dict[str, type] = {}
-def register(cls):
-    CLASS_REGISTRY[cls.__name__] = cls
-    return cls
-
-def default_serialize(o: Any):
-    if hasattr(o, "to_dict"):
-        d = o.to_dict()
-        d["__type__"] = o.__class__.__name__
-        return d
-    raise TypeError(f"Type {o!r} not serializable")
-
-def deserialize_hook(dct: Dict):
-    type_name = dct.pop("__type__", None)
-    if not type_name:
-        return dct
-    cls = CLASS_REGISTRY.get(type_name)
-    if not cls:
-        return dct
-
-    try:
-        return cls.schema().load(dct)
-    except ValidationError as err:
-        pass
-        # 1) See the overall error map
-        print("Error map:", err.messages)
-        # 2) See what actually got through
-        # print("Valid up to error:", err.valid_data)
-
-
-json_dump = partial(json.dump, default=default_serialize)
-json_load = partial(json.load, object_hook=deserialize_hook)
-
-
-# decorator to wrap original __init__
-def nested_dataclass(*args, **kwargs):
-    def wrapper(check_class):
-        # passing class to investigate
-        check_class = dataclass(check_class, **kwargs)
-        o_init = check_class.__init__
-
-        def __init__(self, *args, **kwargs):
-
-            for name, value in kwargs.items():
-
-                # getting field type
-                ft = check_class.__annotations__.get(name, None)
-
-                if is_dataclass(ft) and isinstance(value, dict):
-                    obj = ft(**value)
-                    kwargs[name]= obj
-                o_init(self, *args, **kwargs)
-        check_class.__init__=__init__
-
-        return check_class
-
-    return wrapper(args[0]) if args else wrapper
-
-@register
 @dataclass_json
 @dataclass
 class ControllingFaction:
@@ -71,7 +12,7 @@ class ControllingFaction:
     government: Optional[str] = None
     name: Optional[str] = None
 
-@register
+
 @dataclass_json
 @dataclass
 class Coordinates:
@@ -79,46 +20,48 @@ class Coordinates:
     y: float
     z: float
 
-    def distance_from(self, other: "Coordinates") -> float:
+    def distance_to(self, other: "Coordinates") -> float:
         dx = (self.x - other.x) ** 2
         dy = (self.y - other.y) ** 2
         dz = (self.z - other.z) ** 2
         return (dx + dy + dz) ** (0.5)
 
-@register
+
 @dataclass_json
 @dataclass
 class Timestamps:
-    powerState: str
-    powers: str
+    controllingPower: Optional[str] = None
+    powerState: Optional[str] = None
+    powers: Optional[str] = None
+
 
 @dataclass
-class CommodityPriceAndDemand:
+class CommodityPrice:
     buyPrice: int
     demand: int
     sellPrice: int
     supply: int
 
-@register
+
 @dataclass_json
-@nested_dataclass
-class Commodity(CommodityPriceAndDemand):
+@dataclass
+class Commodity(CommodityPrice):
     category: str
     commodityId: int
     name: str
     symbol: str
 
-@register
-@dataclass_json
-@nested_dataclass
-class Market:
-    commodities: List[Commodity]
-    prohibitedCommodities: List[str]
-    updateTime: str
 
-@register
 @dataclass_json
-@nested_dataclass
+@dataclass
+class Market:
+    commodities: Optional[List[Commodity]] = None
+    prohibitedCommodities: Optional[List[str]] = None
+    updateTime: Optional[str] = None
+
+
+@dataclass_json
+@dataclass
 class ShipModule:
     category: str
     cls: int = field(metadata=config(field_name="class"))
@@ -129,31 +72,31 @@ class ShipModule:
 
     ship: Optional[str] = None
 
-@register
+
 @dataclass_json
-@nested_dataclass
+@dataclass
 class Outfitting:
     modules: List[ShipModule]
     updateTime: str
 
-@register
+
 @dataclass_json
-@nested_dataclass
+@dataclass
 class Ship:
     name: str
     shipId: int
     symbol: str
 
-@register
+
 @dataclass_json
-@nested_dataclass
+@dataclass
 class Shipyard:
     ships: List[Ship]
     updateTime: str
 
-@register
+
 @dataclass_json
-@nested_dataclass
+@dataclass
 class Station:
     id: int
     name: str
@@ -177,14 +120,16 @@ class Station:
     latitude: Optional[float] = None
     longitude: Optional[float] = None
 
-    def has_commodities(self, target_commodity_names: List[str], require_all = True):
+    def has_commodities(self, target_commodity_names: List[str], require_all=True):
         if self.market is None:
             return False
         if not self.market.commodities:
             return False
 
         expected_commodities = set(target_commodity_names)
-        market_commodities = set(map(lambda commodity: commodity.name, self.market.commodities))
+        market_commodities = set(
+            map(lambda commodity: commodity.name, self.market.commodities)
+        )
 
         found_commodities = expected_commodities.intersection(market_commodities)
 
@@ -193,7 +138,9 @@ class Station:
         else:
             return len(found_commodities) > 0
 
-    def get_commodity_price(self, target_commodity_name: str) -> Optional[CommodityPriceAndDemand]:
+    def get_commodity_price(
+        self, target_commodity_name: str
+    ) -> Optional[CommodityPrice]:
         if self.market is None:
             return False
         if not self.market.commodities:
@@ -201,15 +148,30 @@ class Station:
 
         for commodity in self.market.commodities:
             if commodity.name == target_commodity_name:
-                return CommodityPriceAndDemand(commodity.buyPrice, commodity.demand, commodity.sellPrice, commodity.supply)
+                return CommodityPrice(
+                    commodity.buyPrice,
+                    commodity.demand,
+                    commodity.sellPrice,
+                    commodity.supply,
+                )
 
         return None
 
+    def has_minimum_landing_pad(self, min_landing_pad_size: str) -> bool:
+        return (
+            self.landingPads is not None
+            and min_landing_pad_size in self.landingPads
+            and self.landingPads[min_landing_pad_size] > 0
+        )
 
 
-@register
+def _default_serialize(o):
+    if hasattr(o, "to_dict"):
+        return o.to_dict()
+    raise TypeError(f"Type {o!r} not serializable")
+
 @dataclass_json
-@nested_dataclass
+@dataclass
 class System:
     allegiance: str
     bodies: List[Any]
@@ -226,30 +188,6 @@ class System:
     security: str
     stations: List[Station]
 
-    def distance_from(self, target_system: "System"):
-        return self.coords.distance_from(target_system.coords)
-
-    def is_in_powerplay(self):
-        return (
-            self.powers is not None and
-            len(self.powers) > 0
-        )
-
-    def get_stations_with_services(self, services: List[str]) -> List[Station]:
-        expected_services = set(services)
-
-        stations = []
-        for station in self.stations:
-            available_services = (
-                set()
-                if station.services is None
-                else set(station.services)
-            )
-            if expected_services.intersection(available_services):
-                stations.append(station)
-
-        return stations
-
     bodyCount: Optional[int] = None
 
     controllingPower: Optional[str] = None
@@ -263,9 +201,58 @@ class System:
     thargoidWar: Optional[int] = None
     timestamps: Optional[Timestamps] = None
 
-@register
+    def __post_init__(self):
+        self.column_names = [field.name for field in dataclasses.fields(self)]
+
+    def distance_to(self, target_system: "System"):
+        return self.coords.distance_to(target_system.coords)
+
+    def is_in_powerplay(self):
+        return self.powers is not None and len(self.powers) > 0
+
+    def get_stations_with_services(self, services: List[str]) -> List[Station]:
+        expected_services = set(services)
+
+        stations = []
+        for station in self.stations:
+            if isinstance(station, dict):
+                pprint.pprint(station, depth=2)
+            available_services = (
+                set() if station.services is None else set(station.services)
+            )
+            if expected_services.intersection(available_services):
+                stations.append(station)
+
+        return stations
+
+    def db_table_name(self):
+        return "system"
+
+    def db_column_list(self):
+        return ", ".join(self.column_names)
+
+
+    def db_values_list(self):
+        rtn = ""
+        for column_name in self.column_names:
+            col_val = getattr(self, column_name)
+            if col_val is None:
+                rtn += f"    null,\n"
+            elif isinstance(col_val, int) or isinstance(col_val, float):
+                rtn += f"    {col_val},\n"
+            else:
+                try:
+                    s = col_val.to_json()
+                except (AttributeError, TypeError):
+                    s = json.dumps(col_val, default=_default_serialize)
+                s = s.replace("'", "''")
+                rtn += f"    '{s}',\n"
+        rtn = rtn[:-2]  # Strip last newline + comma
+        return rtn
+
+
 @dataclass_json
-@nested_dataclass
+@dataclass
 class PowerplaySystem:
     power: str
     powerState: str
@@ -273,10 +260,11 @@ class PowerplaySystem:
     id64: int
     name: str
     coords: Coordinates
-    allegiance: str
-    government: str
-    state: str
     date: str
+
+    state: Optional[str] = None
+    government: Optional[str] = None
+    allegiance: Optional[str] = None
 
     def is_in_influence_range(self, other: "PowerplaySystem") -> Optional[bool]:
         """
@@ -290,25 +278,16 @@ class PowerplaySystem:
             Optional[bool]: _description_
         """
         valid_state = self.powerState in ["Fortified", "Stronghold"]
-
         if not valid_state:
             return None
 
-        if isinstance(self.coords, Coordinates):
-            self_coords = self.coords
-        else:
-            self_coords = Coordinates(**self.coords)
-
-        if isinstance(other.coords, Coordinates):
-            other_coords = other.coords
-        else:
-            other_coords = Coordinates(**other.coords)
-
         influence_range = 20.0 if self.powerState == "Fortified" else 30.0
-        in_range = (
-            True
-            if self_coords.distance_from(other_coords) <= influence_range
-            else False
+        return (
+            True if self.coords.distance_to(other.coords) <= influence_range else False
         )
 
-        return in_range
+
+@dataclass
+class AcquisitionSystemPairing:
+    acquiring_system: PowerplaySystem
+    unoccupied_system: System

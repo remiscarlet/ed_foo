@@ -1,23 +1,26 @@
-
+import json
 import pathlib
 from typing import Dict, List, Optional
 
 from constants import POWERPLAY_SYSTEMS
-from ed_types import PowerplaySystem, json_load
+from ed_types import PowerplaySystem
+
 
 class PowerplaySystems:
     systems: Dict[str, PowerplaySystem] = {}
+
     def __init__(self):
         p_in = pathlib.Path(POWERPLAY_SYSTEMS)
 
         with p_in.open("r") as f:
-            system_dicts = json_load(f)
+            system_dicts = json.load(f)
 
             for system_dict in system_dicts:
                 name = system_dict["name"]
-                self.systems[name] = PowerplaySystem(**system_dict)
+                self.systems[name] = PowerplaySystem.schema().load(system_dict)
 
     _instance: Optional["PowerplaySystems"] = None
+
     @staticmethod
     def get_powerplay_systems():
         if PowerplaySystems._instance is None:
@@ -49,6 +52,4 @@ class PowerplaySystems:
 
     def get_system_names(self, filters: Optional[Dict[str, List[str]]] = None):
         systems = self.get_systems(filters)
-        return [
-            system.name for system in systems
-        ]
+        return [system.name for system in systems]
