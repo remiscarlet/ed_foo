@@ -1,0 +1,4 @@
+from populated_galaxy_systems import PopulatedGalaxySystems
+
+populated_galaxy_systems = PopulatedGalaxySystems()
+populated_galaxy_systems.filter_and_dump_nakato_kaine_systems()
