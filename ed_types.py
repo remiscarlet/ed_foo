@@ -29,9 +29,9 @@ def nested_dataclass(*args, **kwargs):
 
 @dataclass
 class ControllingFaction:
-    allegiance: str
-    government: str
-    name: str
+    allegiance: Optional[str] = None
+    government: Optional[str] = None
+    name: Optional[str] = None
 
 @dataclass
 class Coordinates:
@@ -54,7 +54,6 @@ class Timestamps:
 class System:
     allegiance: str
     bodies: List
-    bodyCount: int
     controllingFaction: ControllingFaction
     coords: Coordinates
     date: str
@@ -77,10 +76,17 @@ class System:
             len(self.powers) > 0
         )
 
+    bodyCount: Optional[int] = None
+
     controllingPower: Optional[str] = None
-    powerState: Optional[str] = None
-    powers: Optional[List[str]] = None
     powerConflictProgress: Optional[List] = None
+    powerState: Optional[str] = None
+    powerStateControlProgress: Optional[float] = None
+    powerStateReinforcement: Optional[float] = None
+    powerStateUndermining: Optional[float] = None
+    powers: Optional[List[str]] = None
+
+    thargoidWar: Optional[int] = None
     timestamps: Optional[Timestamps] = None
 
 @nested_dataclass

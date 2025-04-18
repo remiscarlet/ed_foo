@@ -18,7 +18,7 @@ class PowerplaySystems:
                 name = system["name"]
                 self.systems[name] = PowerplaySystem(**system)
 
-    _instance: Optional["PowerplaySystems"]
+    _instance: Optional["PowerplaySystems"] = None
     @staticmethod
     def get_powerplay_systems():
         if PowerplaySystems._instance is None:

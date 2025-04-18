@@ -2,7 +2,7 @@
 from pathlib import Path
 
 PWD = Path.cwd()
-REPO_ROOT = Path(__file__)
+REPO_ROOT = Path(__file__).parent
 REL_PATH = PWD.relative_to(REPO_ROOT)
 
 DATA_DIR = REL_PATH / "data"
