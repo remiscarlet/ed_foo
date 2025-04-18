@@ -1,4 +1,7 @@
-from populated_galaxy_systems import PopulatedGalaxySystems
+from constants import GALAXY_POPULATED
+from populated_galaxy_systems_filterer import PopulatedGalaxySystemsFilterer
 
-populated_galaxy_systems = PopulatedGalaxySystems()
-populated_galaxy_systems.filter_and_dump_nakato_kaine_systems()
+filterer = PopulatedGalaxySystemsFilterer(GALAXY_POPULATED)
+filterer.filter_and_dump_all_pp_systems()
+filterer.filter_and_dump_all_nakato_kaine_systems()
+filterer.filter_and_dump_unoccupied_boom_nakato_kaine_systems()
