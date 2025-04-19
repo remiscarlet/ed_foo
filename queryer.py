@@ -11,10 +11,11 @@ TARGET_COMMODITIES = [Minerals.Platinum.value, Minerals.Monazite.value]
 MAX_DISTANCE = 250  # LY
 MIN_POPULATION = 100000
 # -5 / 117.84 / 127.69
+# 126.91 / 41.63 / 28.66
 CURRENT_COORDS = Coordinates(
-    x=-5,
-    y=117.84,
-    z=127.69,
+    x=126.91,
+    y=41.63,
+    z=28.66,
 )
 DEBUG = False  # True
 
@@ -23,30 +24,30 @@ class Queryer:
     def __init__(self):
         timer = Timer("Queryer.__init__()")
 
-        self.powerplay_systems = PowerplaySystems.get_powerplay_systems()
+        self.powerplay_systems = PowerplaySystems()
         self.populated_galaxy_systems = PopulatedGalaxySystems()
+
         pprint.pprint(self.populated_galaxy_systems.get_system("HIP 23692 A"))
 
         timer.end()
 
     def find_acquirable_systems(self):
         # Unoccupied systems in Boom state under Nakato Kaine influence sphere
-        nk_boom_unoccupied_systems = self.powerplay_systems.get_systems(
-            {"power": ["Nakato Kaine"], "powerState": ["Unoccupied"], "state": ["Boom"]}
-        )#[5:10]
+        boom_nk_unoccupied_systems = self.powerplay_systems.get_acquisition_systems(
+            "Nakato Kaine",
+            ["Boom"],
+        )  # [5:10]
 
         # Fortified or Stronghold systems under Nakato Kaine control
-        nk_f_or_s_systems = self.powerplay_systems.get_systems(
-            {
-                "power": ["Nakato Kaine"],
-                "powerState": ["Fortified", "Stronghold"],
-            }
+        nk_f_or_s_systems = self.powerplay_systems.get_reinforcement_systems(
+            "Nakato Kaine",
+            ["Fortified", "Stronghold"],
         )
 
         # Get all "acquisition pairs" to hydrate from the sqlite
         # We want to do it in one query to minimize query overhead
         system_pairs_to_hydrate: List[Tuple[PowerplaySystem, PowerplaySystem]] = []
-        for boom_unoccupied_system in nk_boom_unoccupied_systems:
+        for boom_unoccupied_system in boom_nk_unoccupied_systems:
             for f_or_s_system in nk_f_or_s_systems:
                 if (
                     f_or_s_system.is_in_influence_range(boom_unoccupied_system)
@@ -113,6 +114,13 @@ class Queryer:
             if stations:
                 print("")
                 print("===============================")
+                print("====== ACQUIRING SYSTEM ======")
+                print(
+                    f"Distance: {CURRENT_COORDS.distance_to(acquiring_system.coords):.2f}LY"
+                )
+                print(f"Name: {acquiring_system.name}")
+                print(f"Updated: {acquiring_system.date}")
+                print("")
                 print("====== UNOCCUPIED SYSTEM ======")
                 print(
                     f"Distance: {CURRENT_COORDS.distance_to(target_system.coords):.2f}LY"
@@ -120,13 +128,6 @@ class Queryer:
                 print(f"Name: {target_system.name}")
                 print(f"Updated: {target_system.date}")
                 print(f"Population: {target_system.population}")
-                print("")
-                print("====== ACQUIRING SYSTEM ======")
-                print(
-                    f"Distance: {CURRENT_COORDS.distance_to(acquiring_system.coords):.2f}LY"
-                )
-                print(f"Name: {acquiring_system.name}")
-                print(f"Updated: {acquiring_system.date}")
 
                 for ring_name, hotspots in acquiring_system.get_hotspot_rings(
                     [Minerals.Platinum, Minerals.Monazite]
@@ -140,11 +141,9 @@ class Queryer:
             for station in stations:
                 print("")
                 print("== UNOCCUPIED SYSTEM STATION")
-                print(f">> Name: {station.name}")
+                print(f">> Name: {station.name} ({station.distanceToArrival:.2f}LS)")
                 print(f">> Updated: {station.updateTime}")
-                print(f">> Distance: {station.distanceToArrival:.2f}LS")
                 print(f">> Economies: {station.economies}")
-                print(f">> Is Settlement: {'No' if station.longitude is None else 'Yes'}")
                 for commodity in TARGET_COMMODITIES:
                     print(
                         f"  !! {commodity} !! {pprint.pformat(station.get_commodity_price(commodity))}"

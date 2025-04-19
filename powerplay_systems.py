@@ -1,59 +1,61 @@
-import json
-import pathlib
+import pprint
 from typing import Dict, List, Optional
 
-from constants import POWERPLAY_SYSTEMS
+from db import SystemDB
 from ed_types import PowerplaySystem
-from timer import Timer
 
 
 class PowerplaySystems:
     systems: Dict[str, PowerplaySystem] = {}
 
     def __init__(self):
-        timer = Timer("PowerplaySystems.__init__()")
+        self.db = SystemDB()
+        self.cache = {}
 
-        p_in = pathlib.Path(POWERPLAY_SYSTEMS)
+    def get_acquisition_systems(
+        self, power: str, factionStates: Optional[List[str]] = None
+    ):
+        all_systems = self.db.get_unoccupied_powerplay_systems(power)
+        pprint.pprint(
+            {
+                "power": power,
+                "factionStates": factionStates,
+                "num_all_systems": len(all_systems),
+            }
+        )
 
-        with p_in.open("r") as f:
-            system_dicts = json.load(f)
-            systems = PowerplaySystem.schema().load(system_dicts, many=True)
-            for system in systems:
-                self.systems[system.name] = system
+        if factionStates:
+            rtn = [
+                system
+                for system in all_systems
+                if system.controlling_faction_in_states(factionStates)
+            ]
+            return rtn
+        else:
+            return all_systems
 
-        timer.end()
+    def get_reinforcement_systems(
+        self,
+        power: str,
+        powerStates: Optional[List[str]] = None,
+        factionStates: Optional[List[str]] = None,
+    ):
+        all_systems = self.db.get_powerplay_systems(power, powerStates)
+        pprint.pprint(
+            {
+                "power": power,
+                "powerStates": powerStates,
+                "factionStates": factionStates,
+                "num_all_systems": len(all_systems),
+            }
+        )
 
-    _instance: Optional["PowerplaySystems"] = None
-
-    @staticmethod
-    def get_powerplay_systems():
-        if PowerplaySystems._instance is None:
-            PowerplaySystems._instance = PowerplaySystems()
-        return PowerplaySystems._instance
-
-    def get_systems(self, filters: Optional[Dict[str, List[str]]] = None):
-        """
-        If filter is supplied, only returns systems that match all conditions
-        Each condition checks if the condition value is in the list of values supplied
-
-        Eg, filters = {
-            "power": ["Nakato Kaine"],
-            "powerState": ["Unoccupied", "Fortified"],
-        }
-        Returns all systems controlled by NK AND are either Unoccupied OR Fortified
-        """
-        system_list: List[PowerplaySystem] = []
-
-        for system in self.systems.values():
-            valid = True
-            for filterKey, filterVals in filters.items():
-                if getattr(system, filterKey) not in filterVals:
-                    valid = False
-            if valid:
-                system_list.append(system)
-
-        return system_list
-
-    def get_system_names(self, filters: Optional[Dict[str, List[str]]] = None):
-        systems = self.get_systems(filters)
-        return [system.name for system in systems]
+        if factionStates:
+            rtn = [
+                system
+                for system in all_systems
+                if system.controlling_faction_in_states(factionStates)
+            ]
+            return rtn
+        else:
+            return all_systems

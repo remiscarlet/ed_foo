@@ -39,15 +39,15 @@ class PopulatedGalaxySystemsImporter:
         filters = filters if filters is not None else {}
         timer = Timer("Outer filter_and_import_systems")
 
-        nk_systems = self.pp_systems.get_system_names(filters)
+        # nk_systems = self.pp_systems.get_system_names(filters)
 
-        log_every = 2500
+        log_every = 5000
         upserted = 0
         inner_timer = Timer("Inner filter_and_import_systems")
         for system_name, system in self.systems_by_name.items():
-            if system_name in nk_systems or system_name == "HIP 23692":
-                self.db.upsert_system(system)
-                upserted += 1
+            # if system_name in nk_systems or system_name == "HIP 23692":
+            self.db.upsert_system(system)
+            upserted += 1
 
             if upserted % log_every == 0:
                 print(

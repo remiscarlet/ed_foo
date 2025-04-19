@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List, Optional
 from db import SystemDB
 from ed_types import PowerplaySystem
 

@@ -377,18 +377,34 @@ class System:
 
 @dataclass_json
 @dataclass
+class PlayerMinorFaction:
+    name: str
+    influence: float
+
+    government: Optional[str] = None
+    allegiance: Optional[str] = None
+    state: Optional[str] = None
+
+
+@dataclass_json
+@dataclass
 class PowerplaySystem:
-    power: str
     powerState: str
-    id: int
     id64: int
     name: str
     coords: Coordinates
     date: str
+    powers: List[str]
 
-    state: Optional[str] = None
+    power: Optional[str] = None
+    factions: Optional[List[PlayerMinorFaction]] = None
+
     government: Optional[str] = None
     allegiance: Optional[str] = None
+
+    def controlling_faction_in_states(self, target_states: List[str]):
+        controlling_faction = max(self.factions, key=lambda faction: faction.influence)
+        return controlling_faction.state in target_states
 
     def is_in_influence_range(self, other: "PowerplaySystem") -> Optional[bool]:
         """

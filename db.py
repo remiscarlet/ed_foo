@@ -5,7 +5,7 @@ import sqlite3
 from typing import Dict, List, Optional
 
 from constants import DB_DATA_PATH
-from ed_types import System
+from ed_types import PowerplaySystem, System
 from timer import Timer
 
 
@@ -65,6 +65,10 @@ class SystemDB:
             );
             CREATE UNIQUE INDEX IF NOT EXISTS system_name_idx
                 ON {table_name}(name);
+            CREATE INDEX IF NOT EXISTS power_state_controlling_power_idx
+                ON {table_name}(powerState, controllingPower);
+            CREATE INDEX IF NOT EXISTS power_state_idx
+                ON {table_name}(powerState);
         """
 
         self.conn.executescript(init_schema_query.format(table_name=self.table_name))
@@ -120,9 +124,11 @@ class SystemDB:
 
     system_cols = [field.name for field in dataclasses.fields(System)]
 
-    def _convert_row_dict_to_system_params(self, sys_dict: Dict):
+    def _convert_row_dict_to_dataclass_params(
+        self, expected_cols: List[str], sys_dict: Dict
+    ):
         params = {}
-        for col in self.system_cols:
+        for col in expected_cols:
             col_val = sys_dict[col]
             if col_val is None:
                 params[col] = None
@@ -131,6 +137,8 @@ class SystemDB:
             else:
                 params[col] = json.loads(col_val)
         return params
+
+    system_cols = [field.name for field in dataclasses.fields(System)]
 
     def get_system(self, system_name: str) -> Optional[System]:
         with self.conn:
@@ -142,7 +150,9 @@ class SystemDB:
 
             if fetch is None:
                 return None
-            return System.from_dict(self._convert_row_dict_to_system_params(fetch))
+            return System.from_dict(
+                self._convert_row_dict_to_dataclass_params(self.system_cols, fetch)
+            )
 
     def get_systems(self, system_names: List[str]) -> Optional[System]:
         with self.conn:
@@ -155,6 +165,52 @@ class SystemDB:
 
             rows = []
             for fetch in fetches:
-                rows.append(self._convert_row_dict_to_system_params(fetch))
+                rows.append(
+                    self._convert_row_dict_to_dataclass_params(self.system_cols, fetch)
+                )
 
             return System.schema().load(rows, many=True)
+
+    powerplay_system_cols = [
+        field.name for field in dataclasses.fields(PowerplaySystem)
+    ]
+
+    def get_powerplay_systems(
+        self, power: str, powerStates: Optional[List[str]] = None
+    ):
+        query = (
+            "SELECT controllingPower AS power, powerState, id64, name, coords, date, government, allegiance, factions, powers "
+            f"FROM {self.table_name} "
+            f"WHERE controllingPower='\"{power}\"'"
+        )
+
+        if powerStates:
+            powerStatesStr = ", ".join(
+                list(map(lambda state: f"'\"{state}\"'", powerStates))
+            )
+            query += f" AND powerState IN ({powerStatesStr})"
+
+        return self.__execute_powerplay_system_query(query)
+
+    def get_unoccupied_powerplay_systems(self, power: str):
+        query = (
+            "SELECT controllingPower AS power, powerState, id64, name, coords, date, government, allegiance, factions, powers "
+            f"FROM {self.table_name} "
+            f"WHERE powerState='\"Unoccupied\"' AND EXISTS (SELECT 1 FROM json_each(powers) WHERE value = '{power}')"
+        )
+        return self.__execute_powerplay_system_query(query)
+
+    def __execute_powerplay_system_query(self, query: str):
+        with self.conn:
+            cur = self.conn.execute(query)
+            fetches = cur.fetchall()
+
+            rows = []
+            for fetch in fetches:
+                rows.append(
+                    self._convert_row_dict_to_dataclass_params(
+                        self.powerplay_system_cols, fetch
+                    )
+                )
+
+            return PowerplaySystem.schema().load(rows, many=True)
