@@ -20,7 +20,8 @@ class Timer:
         if return_time:
             return dur
         else:
-            print(f"[{self.__name}] Took {dur:.2f} seconds")
+            pass
+            # print(f"[{self.__name}] Took {dur:.2f} seconds")
 
     def __enter__(self):
         return self

@@ -1,7 +1,7 @@
 # Elite Dangerous Related Data Things
 
 ### Usage
-- `./update_data && ./import_data`
+- `./download_dump_data && ./import_dump_data`
 - `./find_potential_acquisition_system_stations`
 - `./find_potential_reinforcement_system_stations`
 

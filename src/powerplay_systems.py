@@ -41,13 +41,13 @@ class PowerplaySystems:
             if predicates(system)
         ]
 
-        pprint.pprint(
-            {
-                "power": power,
-                "factionStates": factionStates,
-                "num_all_systems": len(systems),
-            }
-        )
+        # pprint.pprint(
+        #     {
+        #         "power": power,
+        #         "factionStates": factionStates,
+        #         "num_all_systems": len(systems),
+        #     }
+        # )
         return systems
 
     @staticmethod
@@ -74,13 +74,13 @@ class PowerplaySystems:
             if predicates(system)
         ]
 
-        pprint.pprint(
-            {
-                "power": power,
-                "powerStates": powerStates,
-                "factionStates": factionStates,
-                "num_all_systems": len(systems),
-            }
-        )
+        # pprint.pprint(
+        #     {
+        #         "power": power,
+        #         "powerStates": powerStates,
+        #         "factionStates": factionStates,
+        #         "num_all_systems": len(systems),
+        #     }
+        # )
 
         return systems

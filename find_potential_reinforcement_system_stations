@@ -121,9 +121,9 @@ def run(args: argparse.Namespace):
             print(f">> Economies: {station.economies}")
             print(f">> Controlling Faction: {station.controllingFaction} (State: {station.controllingFactionState})")
             for commodity in args.target_commodities:
-                print(
-                    f"  !! {commodity} !! {pprint.pformat(station.get_commodity_price(commodity))}"
-                )
+                price = station.get_commodity_price(commodity)
+                if price:
+                    print(f"  !! {commodity} !! Last Known {pprint.pformat(price)}")
             if args.debug:
                 pprint.pprint(station, depth=2)
 
