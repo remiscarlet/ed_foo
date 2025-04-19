@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+import pprint
+from src.populated_galaxy_systems import PopulatedGalaxySystems
+
+
+DEBUG_SYSTEM = "Col 285 Sector FE-L b23-0"
+system = PopulatedGalaxySystems().get_system(DEBUG_SYSTEM)
+pprint.pprint(system, depth=1)
+pprint.pprint(system.factions)
+pprint.pprint(system.stations, depth=3)
