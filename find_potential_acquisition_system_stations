@@ -9,7 +9,7 @@ from src.ed_types import AcquisitionSystemPairings, Coordinates, Minerals, Power
 from src.populated_galaxy_systems import PopulatedGalaxySystems
 from src.powerplay_systems import PowerplaySystems
 from src.timer import Timer
-from src.utils import StoreSystemNameWithCoords
+from src.utils import StoreSystemNameWithCoords, get_time_since
 
 
 def parse_args():
@@ -153,11 +153,10 @@ def run(args: argparse.Namespace):
                     print("===============================")
                     print("====== ACQUIRING SYSTEM =======")
                     print("===============================")
-                    print(f"Name: {system.name}")
                     print(
-                        f"Distance: {args.current_coords.distance_to(system.coords):.2f}LY"
+                        f"Name: {system.name} (Distance: {args.current_coords.distance_to(system.coords):.2f}LY)"
                     )
-                    print(f"Updated: {system.date}")
+                    print(f"Last Updated: {get_time_since(system.date)}")
 
                     for ring_name, hotspots in ring_hotspots.items():
                         print(f"++ {ring_name} ++")
@@ -166,13 +165,12 @@ def run(args: argparse.Namespace):
 
             print("")
             print("====== UNOCCUPIED SYSTEM ======")
-            print(f"Name: {target_system.name}")
             print(
-                f"Distance: {args.current_coords.distance_to(target_system.coords):.2f}LY"
+                f"Name: {target_system.name} (Distance {args.current_coords.distance_to(target_system.coords):.2f}LY)"
             )
-            print(f"Updated: {target_system.date}")
-            print(f"Population: {target_system.population}")
-            print(f"Controlling Faction: {pprint.pformat(max(target_system.factions, key = lambda f: f.influence))}")
+            print(f"Last Updated: {get_time_since(target_system.date)}")
+            print(f"Population: {target_system.population:,}")
+            pprint.pprint(max(target_system.factions, key = lambda f: f.influence))
             if args.debug:
                 pprint.pprint(target_system, depth=2)
 
@@ -180,10 +178,9 @@ def run(args: argparse.Namespace):
             print("")
             print("== STATION")
             print(f">> Name: {station.name} ({station.distanceToArrival:.2f}LS)")
-            print(f">> Updated: {station.updateTime.isoformat()}")
+            print(f">> Last Updated: {get_time_since(station.updateTime)}")
             print(f">> Economies: {station.economies}")
-            print(f">> Controlling Faction Name: {pprint.pformat(station.controllingFaction)}")
-            print(f">> Controlling Faction State: {pprint.pformat(station.controllingFactionState)}")
+            print(f">> Controlling Faction: {station.controllingFaction} (State: {station.controllingFactionState})")
             for commodity in args.target_commodities:
                 print(
                     f"  !! {commodity} !! {pprint.pformat(station.get_commodity_price(commodity))}"

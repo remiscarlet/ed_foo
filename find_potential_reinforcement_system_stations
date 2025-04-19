@@ -8,7 +8,7 @@ from src.ed_types import Coordinates, Minerals
 from src.populated_galaxy_systems import PopulatedGalaxySystems
 from src.powerplay_systems import PowerplaySystems
 from src.timer import Timer
-from src.utils import StoreSystemNameWithCoords
+from src.utils import StoreSystemNameWithCoords, get_time_since
 
 def parse_args():
     argparser = argparse.ArgumentParser(__name__, formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
@@ -103,8 +103,8 @@ def run(args: argparse.Namespace):
             print(
                 f"Distance: {args.current_coords.distance_to(system.coords):.2f}LY"
             )
-            print(f"Updated: {system.date}")
-            print(f"Population: {system.population}")
+            print(f"Last Updated: {get_time_since(system.date)}")
+            print(f"Population: {system.population:,}")
             print(f"Controlling Faction: {pprint.pformat(max(system.factions, key = lambda f: f.influence))}")
             for ring_name, hotspots in ring_hotspots.items():
                 print(f"++ {ring_name} ++")
@@ -117,10 +117,9 @@ def run(args: argparse.Namespace):
             print("")
             print("== STATION")
             print(f">> Name: {station.name} ({station.distanceToArrival:.2f}LS)")
-            print(f">> Updated: {station.updateTime.isoformat()}")
+            print(f">> Last Updated: {get_time_since(station.updateTime)}")
             print(f">> Economies: {station.economies}")
-            print(f">> Controlling Faction Name: {pprint.pformat(station.controllingFaction)}")
-            print(f">> Controlling Faction State: {pprint.pformat(station.controllingFactionState)}")
+            print(f">> Controlling Faction: {station.controllingFaction} (State: {station.controllingFactionState})")
             for commodity in args.target_commodities:
                 print(
                     f"  !! {commodity} !! {pprint.pformat(station.get_commodity_price(commodity))}"
