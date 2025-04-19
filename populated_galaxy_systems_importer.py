@@ -14,7 +14,7 @@ class PopulatedGalaxySystemsImporter:
 
     def __init__(self, dump_file: Path):
         self.__load_data_dump(dump_file)
-        self.pp_systems = PowerplaySystems.get_powerplay_systems()
+        self.pp_systems = PowerplaySystems()
         self.db = SystemDB()
 
     def __load_data_dump(self, dump_file: Path):

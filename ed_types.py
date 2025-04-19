@@ -3,10 +3,16 @@ import dataclasses
 import enum
 import json
 import pprint
+import dataclasses_json
+from datetime import datetime
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
+from marshmallow import fields
 from typing import Any, Dict, List, Optional
 
+
+dataclasses_json.cfg.global_config.encoders[datetime] = datetime.isoformat
+dataclasses_json.cfg.global_config.decoders[datetime] = datetime.fromisoformat
 
 class Minerals(enum.Enum):
     Monazite = "Monazite"
@@ -38,11 +44,11 @@ class Coordinates:
 @dataclass_json
 @dataclass
 class Timestamps:
-    controllingPower: Optional[str] = None
-    powerState: Optional[str] = None
-    powers: Optional[str] = None
-    distanceToArrival: Optional[str] = None
-    meanAnomaly: Optional[str] = None
+    controllingPower: Optional[datetime] = None
+    powerState: Optional[datetime] = None
+    powers: Optional[datetime] = None
+    distanceToArrival: Optional[datetime] = None
+    meanAnomaly: Optional[datetime] = None
 
 
 @dataclass
@@ -67,7 +73,7 @@ class Commodity(CommodityPrice):
 class Market:
     commodities: Optional[List[Commodity]] = None
     prohibitedCommodities: Optional[List[str]] = None
-    updateTime: Optional[str] = None
+    updateTime: Optional[datetime] = None
 
 
 @dataclass_json
@@ -87,7 +93,7 @@ class ShipModule:
 @dataclass
 class Outfitting:
     modules: List[ShipModule]
-    updateTime: str
+    updateTime: datetime
 
 
 @dataclass_json
@@ -102,7 +108,7 @@ class Ship:
 @dataclass
 class Shipyard:
     ships: List[Ship]
-    updateTime: str
+    updateTime: datetime
 
 
 @dataclass_json
@@ -110,7 +116,7 @@ class Shipyard:
 class Station:
     id: int
     name: str
-    updateTime: str
+    updateTime: datetime
 
     allegiance: Optional[str] = None
     controllingFaction: Optional[str] = None
@@ -203,7 +209,7 @@ class Body:
     bodyId: int
     name: str
     stations: List[Station]
-    updateTime: str
+    updateTime: datetime
 
     absoluteMagnitude: Optional[float] = None
     age: Optional[int] = None
@@ -258,7 +264,12 @@ class System:
     bodies: List[Body]
     controllingFaction: ControllingFaction
     coords: Coordinates
-    date: str
+    date: datetime = field(
+        metadata=config(
+          decoder=datetime.fromisoformat,
+          encoder=datetime.isoformat,
+        )
+    )
     factions: List[Any]
     government: str
     id64: int
@@ -323,6 +334,8 @@ class System:
         )
 
         for body in self.bodies:
+            if body.reserveLevel != "Pristine":
+                continue
             if not body.rings:
                 continue
 
@@ -393,7 +406,12 @@ class PowerplaySystem:
     id64: int
     name: str
     coords: Coordinates
-    date: str
+    date: datetime = field(
+        metadata=config(
+          decoder=datetime.fromisoformat,
+          encoder=datetime.isoformat,
+        )
+    )
     powers: List[str]
 
     power: Optional[str] = None

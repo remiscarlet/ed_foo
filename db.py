@@ -14,8 +14,6 @@ class SystemDB:
     conn: sqlite3.Connection
 
     def __init__(self):
-        timer = Timer("SystemDB.__init__()")
-
         self.conn = sqlite3.connect(DB_DATA_PATH)
         self.conn.row_factory = sqlite3.Row
         self.conn.isolation_level = None
@@ -29,8 +27,6 @@ class SystemDB:
         self.conn.execute("PRAGMA busy_timeout = 5000;")
 
         self.init_tables()
-
-        timer.end()
 
     def init_tables(self):
         init_schema_query = """
@@ -200,7 +196,7 @@ class SystemDB:
         )
         return self.__execute_powerplay_system_query(query)
 
-    def __execute_powerplay_system_query(self, query: str):
+    def __execute_powerplay_system_query(self, query: str) -> List[PowerplaySystem]:
         with self.conn:
             cur = self.conn.execute(query)
             fetches = cur.fetchall()

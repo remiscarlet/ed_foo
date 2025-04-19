@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
 from db import SystemDB
-from ed_types import PowerplaySystem
+from ed_types import PowerplaySystem, System
 
 
 class PopulatedGalaxySystems:
@@ -11,7 +11,7 @@ class PopulatedGalaxySystems:
     def from_powerplay_system(self, powerplay_system: PowerplaySystem):
         return self.get_system(powerplay_system.name)
 
-    def get_system(self, system_name: str):
+    def get_system(self, system_name: str) -> Optional[System]:
         if system_name not in self.cache:
             self.cache[system_name] = self.db.get_system(system_name)
 

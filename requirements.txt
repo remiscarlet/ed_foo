@@ -1,6 +1,12 @@
+black==25.1.0
+click==8.1.8
 dataclasses-json==0.6.7
 marshmallow==3.26.1
 mypy-extensions==1.0.0
 packaging==24.2
+pathspec==0.12.1
+platformdirs==4.3.7
+pyzmq==26.4.0
 typing-inspect==0.9.0
 typing_extensions==4.13.2
+zmq==0.0.0
