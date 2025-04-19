@@ -1,7 +1,7 @@
 import pprint
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
-from ed_types import AcquisitionSystemPairing, Coordinates, Minerals, PowerplaySystem
+from ed_types import AcquisitionSystemPairings, Coordinates, Minerals, PowerplaySystem
 from populated_galaxy_systems import PopulatedGalaxySystems
 from powerplay_systems import PowerplaySystems
 from timer import Timer
@@ -46,7 +46,9 @@ class Queryer:
 
         # Get all "acquisition pairs" to hydrate from the sqlite
         # We want to do it in one query to minimize query overhead
-        system_pairs_to_hydrate: List[Tuple[PowerplaySystem, PowerplaySystem]] = []
+        acquisition_pairings: Dict[
+            str, Tuple[PowerplaySystem, List[PowerplaySystem]]
+        ] = {}
         for boom_unoccupied_system in boom_nk_unoccupied_systems:
             for f_or_s_system in nk_f_or_s_systems:
                 if (
@@ -54,27 +56,37 @@ class Queryer:
                     and CURRENT_COORDS.distance_to(boom_unoccupied_system.coords)
                     <= MAX_DISTANCE
                 ):
-                    system_pairs_to_hydrate.append(
-                        (f_or_s_system, boom_unoccupied_system)
-                    )
+                    target_name = boom_unoccupied_system.name
+                    if target_name not in acquisition_pairings:
+                        acquisition_pairings[target_name] = (boom_unoccupied_system, [])
+                    acquisition_pairings[target_name][1].append(f_or_s_system)
 
-        system_names_to_hydrate = set(
-            [system.name for pair in system_pairs_to_hydrate for system in pair]
-        )
+        system_names_to_hydrate = set()
+        for unoccupied_system, acquisition_systems in acquisition_pairings.values():
+            system_names_to_hydrate.add(unoccupied_system.name)
+            for acquisition_system in acquisition_systems:
+                system_names_to_hydrate.add(acquisition_system.name)
+
         db_hydration_timer = Timer(
             f"find_acquirable_systems - db_hydration_timer - {len(system_names_to_hydrate)} systems"
         )
         self.populated_galaxy_systems.get_systems(list(system_names_to_hydrate))
         db_hydration_timer.end()
 
-        acquirable_systems: List[AcquisitionSystemPairing] = [
-            AcquisitionSystemPairing(
-                self.populated_galaxy_systems.from_powerplay_system(f_or_s_system),
+        acquirable_systems: List[AcquisitionSystemPairings] = [
+            AcquisitionSystemPairings(
                 self.populated_galaxy_systems.from_powerplay_system(
                     boom_unoccupied_system
                 ),
+                [
+                    self.populated_galaxy_systems.from_powerplay_system(f_or_s_system)
+                    for f_or_s_system in f_or_s_systems
+                ],
             )
-            for (f_or_s_system, boom_unoccupied_system) in system_pairs_to_hydrate
+            for (
+                boom_unoccupied_system,
+                f_or_s_systems,
+            ) in acquisition_pairings.values()
         ]
 
         # Filter for unoccupied systems above minimum population and has at least one valid hotspot
@@ -83,9 +95,9 @@ class Queryer:
             for acquirable_system in acquirable_systems
             if acquirable_system.unoccupied_system is not None
             and acquirable_system.unoccupied_system.population > MIN_POPULATION
-            # and acquirable_system.acquiring_system.get_hotspot_rings(
-            #     [Minerals.Platinum, Minerals.Monazite]
-            # )
+            and acquirable_system.has_valid_hotspot_ring(
+                [Minerals.Platinum, Minerals.Monazite]
+            )
         ]
 
         # Sort by distance
@@ -100,7 +112,7 @@ class Queryer:
         systems_count = 0
         stations_count = 0
         for acquisition_pair in self.find_acquirable_systems():
-            acquiring_system = acquisition_pair.acquiring_system
+            acquiring_systems = acquisition_pair.acquiring_systems
             target_system = acquisition_pair.unoccupied_system
             all_stations = target_system.get_stations_with_services(["Market"])
 
@@ -114,12 +126,21 @@ class Queryer:
             if stations:
                 print("")
                 print("===============================")
-                print("====== ACQUIRING SYSTEM ======")
-                print(
-                    f"Distance: {CURRENT_COORDS.distance_to(acquiring_system.coords):.2f}LY"
-                )
-                print(f"Name: {acquiring_system.name}")
-                print(f"Updated: {acquiring_system.date}")
+                for system in acquiring_systems:
+                    print("====== ACQUIRING SYSTEM ======")
+                    print(
+                        f"Distance: {CURRENT_COORDS.distance_to(system.coords):.2f}LY"
+                    )
+                    print(f"Name: {system.name}")
+                    print(f"Updated: {system.date}")
+
+                    for ring_name, hotspots in system.get_hotspot_rings(
+                        [Minerals.Platinum, Minerals.Monazite]
+                    ).items():
+                        print(f"++ {ring_name} ++")
+                        for mineral_type, hotspot_count in hotspots.items():
+                            print(f"  > {mineral_type}: {hotspot_count} Hotspots")
+
                 print("")
                 print("====== UNOCCUPIED SYSTEM ======")
                 print(
@@ -128,15 +149,8 @@ class Queryer:
                 print(f"Name: {target_system.name}")
                 print(f"Updated: {target_system.date}")
                 print(f"Population: {target_system.population}")
-
-                for ring_name, hotspots in acquiring_system.get_hotspot_rings(
-                    [Minerals.Platinum, Minerals.Monazite]
-                ).items():
-                    print(f"++ {ring_name} ++")
-                    for mineral_type, hotspot_count in hotspots.items():
-                        print(f"  > {mineral_type}: {hotspot_count} Hotspots")
                 if DEBUG:
-                    pprint.pprint(acquiring_system, depth=2)
+                    pprint.pprint(target_system, depth=2)
 
             for station in stations:
                 print("")

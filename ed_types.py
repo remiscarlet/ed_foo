@@ -428,6 +428,12 @@ class PowerplaySystem:
 
 
 @dataclass
-class AcquisitionSystemPairing:
-    acquiring_system: System
+class AcquisitionSystemPairings:
     unoccupied_system: System
+    acquiring_systems: List[System]
+
+    def has_valid_hotspot_ring(self, minerals: List[Minerals]):
+        for system in self.acquiring_systems:
+            if system.get_hotspot_rings(minerals):
+                return True
+        return False
