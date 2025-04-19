@@ -18,7 +18,7 @@ class PopulatedGalaxySystemsImporter:
         self.db = SystemDB()
 
     def __load_data_dump(self, dump_file: Path):
-        timer = Timer()
+        timer = Timer("__load_data_dump()")
 
         systems_by_name = {}
         with dump_file.open("r") as f:

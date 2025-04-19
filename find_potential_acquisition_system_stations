@@ -14,7 +14,7 @@ from src.utils import StoreSystemNameWithCoords, get_time_since
 
 def parse_args():
     argparser = argparse.ArgumentParser(__name__, formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
-    Hypothesis: There are acquirable systems that have elevated prices but we don't know about them because of data staleness.
+    Hypothesis: There are acquirable systems that have elevated commodity prices but we don't know about them because of data staleness.
 
     Faction state (Boom) information is revealed when entering a system, which is much more likely than exact
     commodity prices which requires a CMDR to dock at a specific station.
@@ -51,7 +51,7 @@ def parse_args():
 
 def find_acquirable_systems(args: argparse.Namespace):
     # Unoccupied systems in Boom state under Nakato Kaine influence sphere
-    with Timer("powerplay_systems.get_acquisition_systems()"):
+    with Timer("powerplay_systems.get_acquisition_systems()", args.debug):
         boom_nk_unoccupied_systems = PowerplaySystems.get_acquisition_systems(
             "Nakato Kaine",
             ["Boom"],
@@ -59,7 +59,7 @@ def find_acquirable_systems(args: argparse.Namespace):
         )  # [5:10]
 
     # Fortified or Stronghold systems under Nakato Kaine control
-    with Timer("powerplay_systems.get_reinforcement_systems()"):
+    with Timer("powerplay_systems.get_reinforcement_systems()", args.debug):
         nk_f_or_s_systems = PowerplaySystems.get_reinforcement_systems(
             "Nakato Kaine",
             ["Fortified", "Stronghold"],
@@ -87,7 +87,7 @@ def find_acquirable_systems(args: argparse.Namespace):
         to_hydrate.add(target_sys.name)
         to_hydrate.update(map(lambda sys: sys.name, acquisition_systems))
 
-    with Timer(f"db_hydration_timer - {len(to_hydrate)} systems"):
+    with Timer(f"db_hydration_timer - {len(to_hydrate)} systems", args.debug):
         PopulatedGalaxySystems.get_systems(list(to_hydrate))
 
     acquirable_systems: List[AcquisitionSystemPairings] = [
@@ -200,5 +200,6 @@ def run(args: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    with Timer("Script"):
-        run(parse_args())
+    args = parse_args()
+    with Timer("Script", args.debug):
+        run(args)

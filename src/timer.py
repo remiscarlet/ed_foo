@@ -4,7 +4,8 @@ from typing import Optional
 
 
 class Timer:
-    def __init__(self, name: Optional[str] = None):
+    def __init__(self, name: Optional[str] = None, debug = True):
+        self.__debug = debug
         self.__start = time.time()
         if name:
             self.__name = name
@@ -19,9 +20,8 @@ class Timer:
 
         if return_time:
             return dur
-        else:
-            pass
-            # print(f"[{self.__name}] Took {dur:.2f} seconds")
+        elif self.__debug:
+            print(f"[{self.__name}] Took {dur:.2f} seconds")
 
     def __enter__(self):
         return self
