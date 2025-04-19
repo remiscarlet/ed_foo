@@ -1,11 +1,11 @@
 # Elite Dangerous Related Data Things
 
-Hypothesis: There are acquirable systems that have elevated commodity prices but we don't know about them because of data staleness.
+Hypothesis: There are systems that have elevated commodity prices but we don't know about them because of data staleness.
 
 Faction state (Boom) information is revealed when entering a system, which is much more likely than exact
 commodity prices which requires a CMDR to dock at a specific station.
 
-As such, there exists a time delta between freshness of faction states and known commodity market prices.
+As such, there exists a time delta between freshness of faction states and known market prices.
 This script tries to analyze this delta for potential stations to check prices at for advantageous PP2.0 play
 
 <sub>Spoiler: Turns out the hypothesis is probably not-correct-enough to be useful. There's also faction state data staleness concerns.</sub>
