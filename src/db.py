@@ -4,9 +4,8 @@ import pprint
 import sqlite3
 from typing import Dict, List, Optional
 
-from constants import DB_DATA_PATH
-from ed_types import PowerplaySystem, System
-from timer import Timer
+from .constants import DB_DATA_PATH
+from .ed_types import PowerplaySystem, System
 
 
 class SystemDB:
@@ -61,6 +60,8 @@ class SystemDB:
             );
             CREATE UNIQUE INDEX IF NOT EXISTS system_name_idx
                 ON {table_name}(name);
+            CREATE INDEX IF NOT EXISTS controlling_power_idx
+                ON {table_name}(controllingPower);
             CREATE INDEX IF NOT EXISTS power_state_controlling_power_idx
                 ON {table_name}(powerState, controllingPower);
             CREATE INDEX IF NOT EXISTS power_state_idx

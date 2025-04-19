@@ -24,3 +24,9 @@ class Timer:
             return dur
         else:
             print(f"[{self.__name}] Took {dur:.2f} seconds")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.end()

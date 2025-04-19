@@ -1,24 +1,31 @@
 from typing import Dict, List, Optional
-from db import SystemDB
-from ed_types import PowerplaySystem, System
+
+from .db import SystemDB
+from .ed_types import PowerplaySystem, System
 
 
 class PopulatedGalaxySystems:
-    def __init__(self):
-        self.db = SystemDB()
-        self.cache = {}
+    cache: Dict[str, System] = {}
+    db = SystemDB()
 
-    def from_powerplay_system(self, powerplay_system: PowerplaySystem):
-        return self.get_system(powerplay_system.name)
+    @staticmethod
+    def from_powerplay_system(powerplay_system: PowerplaySystem):
+        return PopulatedGalaxySystems.get_system(powerplay_system.name)
 
-    def get_system(self, system_name: str) -> Optional[System]:
-        if system_name not in self.cache:
-            self.cache[system_name] = self.db.get_system(system_name)
+    @staticmethod
+    def get_system(system_name: str) -> Optional[System]:
+        if system_name not in PopulatedGalaxySystems.cache:
+            PopulatedGalaxySystems.cache[system_name] = (
+                PopulatedGalaxySystems.db.get_system(system_name)
+            )
 
-        return self.cache[system_name]
+        return PopulatedGalaxySystems.cache[system_name]
 
-    def get_systems(self, system_names: List[str]):
+    @staticmethod
+    def get_systems(system_names: List[str]) -> List[System]:
         systems = []
         for system_name in system_names:
-            systems.append(self.get_system(system_name))
+            system = PopulatedGalaxySystems.get_system(system_name)
+            if system is not None:
+                systems.append(system)
         return systems

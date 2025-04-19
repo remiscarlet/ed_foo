@@ -4,7 +4,7 @@ import enum
 import json
 import pprint
 import dataclasses_json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from marshmallow import fields
@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional
 
 dataclasses_json.cfg.global_config.encoders[datetime] = datetime.isoformat
 dataclasses_json.cfg.global_config.decoders[datetime] = datetime.fromisoformat
+
 
 class Minerals(enum.Enum):
     Monazite = "Monazite"
@@ -180,6 +181,11 @@ class Station:
             and self.landingPads[min_landing_pad_size] > 0
         )
 
+    def has_min_data_age_days(self, min_age_days: int):
+        return (datetime.now(timezone.utc) - self.updateTime) > timedelta(
+            days=min_age_days
+        )
+
 
 @dataclass_json
 @dataclass
@@ -251,6 +257,17 @@ class Body:
     volcanismType: Optional[str] = None
 
 
+@dataclass_json
+@dataclass
+class PlayerMinorFaction:
+    name: str
+    influence: float
+
+    government: Optional[str] = None
+    allegiance: Optional[str] = None
+    state: Optional[str] = None
+
+
 def _default_serialize(o):
     if hasattr(o, "to_dict"):
         return o.to_dict()
@@ -266,11 +283,11 @@ class System:
     coords: Coordinates
     date: datetime = field(
         metadata=config(
-          decoder=datetime.fromisoformat,
-          encoder=datetime.isoformat,
+            decoder=datetime.fromisoformat,
+            encoder=datetime.isoformat,
         )
     )
-    factions: List[Any]
+    factions: List[PlayerMinorFaction]
     government: str
     id64: int
     name: str
@@ -390,17 +407,6 @@ class System:
 
 @dataclass_json
 @dataclass
-class PlayerMinorFaction:
-    name: str
-    influence: float
-
-    government: Optional[str] = None
-    allegiance: Optional[str] = None
-    state: Optional[str] = None
-
-
-@dataclass_json
-@dataclass
 class PowerplaySystem:
     powerState: str
     id64: int
@@ -408,8 +414,8 @@ class PowerplaySystem:
     coords: Coordinates
     date: datetime = field(
         metadata=config(
-          decoder=datetime.fromisoformat,
-          encoder=datetime.isoformat,
+            decoder=datetime.fromisoformat,
+            encoder=datetime.isoformat,
         )
     )
     powers: List[str]

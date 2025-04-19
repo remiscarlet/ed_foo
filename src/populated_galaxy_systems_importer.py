@@ -1,11 +1,11 @@
 import json
 from typing import Dict, List, Optional
-
-from db import SystemDB
-from ed_types import System
-from powerplay_systems import PowerplaySystems
-from timer import Timer
 from pathlib import Path
+
+from .db import SystemDB
+from .ed_types import System
+from .powerplay_systems import PowerplaySystems
+from .timer import Timer
 
 
 class PopulatedGalaxySystemsImporter:
