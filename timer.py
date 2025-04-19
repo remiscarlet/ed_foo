@@ -11,6 +11,16 @@ class Timer:
         else:
             self.__name = inspect.stack()[1].function
 
-    def end(self):
-        end = time.time()
-        print(f"[{self.__name}] {end - self.__start:.2f} seconds")
+        # print(f"[Timer] Starting timer for '{self.__name}'")
+
+    def restart(self):
+        self.__start = time.time()
+        # print(f"[Timer] Restarting timer for '{self.__name}'")
+
+    def end(self, return_time=False):
+        dur = time.time() - self.__start
+
+        if return_time:
+            return dur
+        else:
+            print(f"[{self.__name}] Took {dur:.2f} seconds")

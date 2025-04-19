@@ -4,20 +4,24 @@ from typing import Dict, List, Optional
 
 from constants import POWERPLAY_SYSTEMS
 from ed_types import PowerplaySystem
+from timer import Timer
 
 
 class PowerplaySystems:
     systems: Dict[str, PowerplaySystem] = {}
 
     def __init__(self):
+        timer = Timer("PowerplaySystems.__init__()")
+
         p_in = pathlib.Path(POWERPLAY_SYSTEMS)
 
         with p_in.open("r") as f:
             system_dicts = json.load(f)
+            systems = PowerplaySystem.schema().load(system_dicts, many=True)
+            for system in systems:
+                self.systems[system.name] = system
 
-            for system_dict in system_dicts:
-                name = system_dict["name"]
-                self.systems[name] = PowerplaySystem.schema().load(system_dict)
+        timer.end()
 
     _instance: Optional["PowerplaySystems"] = None
 

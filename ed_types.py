@@ -1,9 +1,17 @@
+from collections import defaultdict
 import dataclasses
+import enum
 import json
 import pprint
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+
+
+class Minerals(enum.Enum):
+    Monazite = "Monazite"
+    Platinum = "Platinum"
+
 
 @dataclass_json
 @dataclass
@@ -33,6 +41,8 @@ class Timestamps:
     controllingPower: Optional[str] = None
     powerState: Optional[str] = None
     powers: Optional[str] = None
+    distanceToArrival: Optional[str] = None
+    meanAnomaly: Optional[str] = None
 
 
 @dataclass
@@ -165,16 +175,87 @@ class Station:
         )
 
 
+@dataclass_json
+@dataclass
+class Asteroids:
+    name: str
+    type: str
+    mass: float
+    innerRadius: float
+    outerRadius: float
+
+    id64: Optional[int] = None
+    signals: Optional[Dict[str, Any]] = None
+
+    def extract_signals(self) -> Dict[Minerals, int]:
+        if not getattr(self, "signals"):
+            return {}
+        return self.signals.get("signals", {})
+
+    def is_invalid_ring_for_mineral(self, mineral: Minerals) -> bool:
+        return mineral is Minerals.Platinum and self.type != "Metallic"
+
+
+@dataclass_json
+@dataclass
+class Body:
+    id64: int
+    bodyId: int
+    name: str
+    stations: List[Station]
+    updateTime: str
+
+    absoluteMagnitude: Optional[float] = None
+    age: Optional[int] = None
+    argOfPeriapsis: Optional[float] = None
+    ascendingNode: Optional[float] = None
+    atmosphereComposition: Optional[Dict[str, Any]] = None
+    atmosphereType: Optional[str] = None
+    axialTilt: Optional[float] = None
+    belts: Optional[List[Asteroids]] = None
+    distanceToArrival: Optional[float] = None
+    earthMasses: Optional[float] = None
+    gravity: Optional[float] = None
+    isLandable: Optional[bool] = None
+    luminosity: Optional[str] = None
+    mainStar: Optional[bool] = None
+    materials: Optional[Dict[str, Any]] = None
+    meanAnomaly: Optional[float] = None
+    orbitalEccentricity: Optional[float] = None
+    orbitalInclination: Optional[float] = None
+    orbitalPeriod: Optional[float] = None
+    parents: Optional[List[Dict[str, int]]] = None
+    radius: Optional[float] = None
+    reserveLevel: Optional[str] = None
+    rings: Optional[List[Asteroids]] = None
+    rotationalPeriod: Optional[float] = None
+    rotationalPeriodTidallyLocked: Optional[bool] = None
+    semiMajorAxis: Optional[float] = None
+    signals: Optional[Dict[str, Any]] = None
+    solarMasses: Optional[float] = None
+    solarRadius: Optional[float] = None
+    solidComposition: Optional[Any] = None
+    spectralClass: Optional[str] = None
+    subType: Optional[str] = None
+    surfacePressure: Optional[float] = None
+    surfaceTemperature: Optional[float] = None
+    terraformingState: Optional[str] = None
+    timestamps: Optional[Timestamps] = None
+    type: Optional[str] = None
+    volcanismType: Optional[str] = None
+
+
 def _default_serialize(o):
     if hasattr(o, "to_dict"):
         return o.to_dict()
     raise TypeError(f"Type {o!r} not serializable")
 
+
 @dataclass_json
 @dataclass
 class System:
     allegiance: str
-    bodies: List[Any]
+    bodies: List[Body]
     controllingFaction: ControllingFaction
     coords: Coordinates
     date: str
@@ -201,9 +282,6 @@ class System:
     thargoidWar: Optional[int] = None
     timestamps: Optional[Timestamps] = None
 
-    def __post_init__(self):
-        self.column_names = [field.name for field in dataclasses.fields(self)]
-
     def distance_to(self, target_system: "System"):
         return self.coords.distance_to(target_system.coords)
 
@@ -215,8 +293,6 @@ class System:
 
         stations = []
         for station in self.stations:
-            if isinstance(station, dict):
-                pprint.pprint(station, depth=2)
             available_services = (
                 set() if station.services is None else set(station.services)
             )
@@ -225,17 +301,65 @@ class System:
 
         return stations
 
-    def db_table_name(self):
+    def get_hotspot_rings(self, target_minerals: List[Minerals]):
+        """Returns a dict of ring names, minerals, and hotspot counts
+
+        Eg,
+        {
+            "HIP 80266 6 A Ring": {
+                "Monazite": 1
+            },
+            "HIP 80266 6 B Ring": {
+                "Monazite": 1
+            }
+        }
+        """
+        if not self.bodies:
+            return {}
+
+        # ring_name -> mineral -> count
+        hotspots: defaultdict[str, defaultdict[Minerals, int]] = defaultdict(
+            lambda: defaultdict(int)
+        )
+
+        for body in self.bodies:
+            if not body.rings:
+                continue
+
+            for ring in body.rings:
+                signals = ring.extract_signals()
+                if not signals:
+                    continue
+
+                for mineral in target_minerals:
+                    count = signals.get(mineral.value, 0)
+                    if count <= 0:
+                        continue
+                    if ring.is_invalid_ring_for_mineral(mineral):
+                        continue
+
+                    hotspots[ring.name][mineral.value] += count
+
+        # Convert nested defaultdicts back to normal dicts
+        return {
+            ring: dict(mineral_hotspots) for ring, mineral_hotspots in hotspots.items()
+        }
+
+    @staticmethod
+    def db_table_name():
         return "system"
 
-    def db_column_list(self):
-        return ", ".join(self.column_names)
+    @staticmethod
+    def db_column_list():
+        cols = [field.name for field in dataclasses.fields(System)]
+        return ", ".join(cols)
 
-
-    def db_values_list(self):
+    @staticmethod
+    def db_values_list(system_dict: Dict):
+        cols = [field.name for field in dataclasses.fields(System)]
         rtn = ""
-        for column_name in self.column_names:
-            col_val = getattr(self, column_name)
+        for column_name in cols:
+            col_val = system_dict.get(column_name)
             if col_val is None:
                 rtn += f"    null,\n"
             elif isinstance(col_val, int) or isinstance(col_val, float):
@@ -289,5 +413,5 @@ class PowerplaySystem:
 
 @dataclass
 class AcquisitionSystemPairing:
-    acquiring_system: PowerplaySystem
+    acquiring_system: System
     unoccupied_system: System
