@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+
+import argparse
+import textwrap
+
+from src.ed_types import Coordinates, Minerals
+from src.populated_galaxy_systems import PopulatedGalaxySystems
+from src.timer import Timer
+from src.utils import StoreSystemNameWithCoords
+
+
+def parse_args():
+    argparser = argparse.ArgumentParser(__name__, formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
+    Looks for hotspots of the target commodities in the provided system.
+    '''))
+    argparser.set_defaults(current_system="Sol", current_coords=Coordinates(0, 0, 0))
+    argparser.add_argument("--mineral", dest="minerals", action="append", type=Minerals, help="Mineral commodities to target for mining", choices=list(Minerals), default=None)
+    argparser.add_argument("--system", action=StoreSystemNameWithCoords, type=str, help="Current system name. If we don't know about this system, will default to Sol coords", default="Sol")
+    argparser.add_argument("--debug", action="store_true")
+
+    args = argparser.parse_args()
+    if args.target_commodities is None:
+        args.target_commodities = [Minerals.Platinum, Minerals.Monazite]
+
+    return args
+
+
+def run(args: argparse.Namespace):
+    system = PopulatedGalaxySystems.get_system(args.system)
+
+    ring_hotspots = system.get_hotspot_rings(
+        args.minerals
+    )
+
+    print("")
+    print("====== SYSTEM ======")
+    print(f"Name: {system.name}")
+    print(f"Target Minerals: {[mineral.value for mineral in args.minerals]}")
+    print("")
+    if not ring_hotspots:
+        print("!! No pristine rings found with target minerals!")
+    for ring_name, hotspots in ring_hotspots.items():
+        print(f"++ {ring_name} ++")
+        for mineral_type, hotspot_count in hotspots.items():
+            print(f"  > {mineral_type}: {hotspot_count} Hotspots")
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    with Timer("Script", args.debug):
+        run(args)

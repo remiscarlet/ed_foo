@@ -15,7 +15,7 @@ dataclasses_json.cfg.global_config.encoders[datetime] = datetime.isoformat
 dataclasses_json.cfg.global_config.decoders[datetime] = datetime.fromisoformat
 
 
-class Minerals(enum.Enum):
+class Minerals(enum.StrEnum):
     Monazite = "Monazite"
     Platinum = "Platinum"
 
@@ -330,7 +330,7 @@ class System:
         return stations
 
     def get_hotspot_rings(self, target_minerals: List[Minerals]):
-        """Returns a dict of ring names, minerals, and hotspot counts
+        """Returns a dict of _pristine_ ring names, minerals, and hotspot counts
 
         Eg,
         {

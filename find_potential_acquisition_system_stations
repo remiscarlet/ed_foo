@@ -39,11 +39,15 @@ def parse_args():
     argparser.add_argument("--min-market-data-age", action="store", type=int, help="Minimum age of market data", default=3)
     argparser.add_argument("--max-system-data-age", action="store", type=int, help="Maximum age of system/faction state data", default=2)
     argparser.add_argument("--min-landing-pad-size", action="store", type=str, help="Minimum landing pad size", choices=["large", "medium", "small"], default="medium")
-    argparser.add_argument("--target-commodity", dest="target_commodities", action="append", type=Minerals, help="Mineral commodities to target for mining", choices=[ enum.value for enum in Minerals], default=["Monazite", "Platinum"])
+    argparser.add_argument("--target-commodity", dest="target_commodities", action="append", type=Minerals, help="Mineral commodities to target for mining", choices=list(Minerals), default=None)
     argparser.add_argument("--max-distance", action="store", type=int, help="Max distance in LY to search", default=250)
     argparser.add_argument("--min-population", action="store", type=int, help="Min population of target acquisition system. Higher population generally means higher commodity demand", default=100000)
     argparser.add_argument("--current-system", action=StoreSystemNameWithCoords, type=str, help="Current system name. If we don't know about this system, will default to Sol coords", default="Sol")
     argparser.add_argument("--debug", action="store_true")
+
+    args = argparser.parse_args()
+    if args.target_commodities is None:
+        args.target_commodities = [Minerals.Platinum, Minerals.Monazite]
 
     return argparser.parse_args()
 
