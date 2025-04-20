@@ -256,6 +256,14 @@ class Body:
     type: Optional[str] = None
     volcanismType: Optional[str] = None
 
+    def is_invalid_body_for_mineral(self, mineral: Minerals):
+        if mineral == Minerals.Monazite:
+            return False
+        elif mineral == Minerals.Platinum:
+            return self.reserveLevel != "Pristine"
+        else:
+            raise Exception(f"Got unknown mineral: '{mineral}'!")
+
 
 @dataclass_json
 @dataclass
@@ -351,8 +359,6 @@ class System:
         )
 
         for body in self.bodies:
-            if body.reserveLevel != "Pristine":
-                continue
             if not body.rings:
                 continue
 
@@ -362,13 +368,15 @@ class System:
                     continue
 
                 for mineral in target_minerals:
-                    count = signals.get(mineral.value, 0)
+                    count = signals.get(mineral, 0)
+                    # pprint.pprint([mineral, count, ring.name, body.reserveLevel, ring.type])
                     if count <= 0:
+                        continue
+                    if body.is_invalid_body_for_mineral(mineral):
                         continue
                     if ring.is_invalid_ring_for_mineral(mineral):
                         continue
-
-                    hotspots[ring.name][mineral.value] += count
+                    hotspots[ring.name][mineral] += count
 
         # Convert nested defaultdicts back to normal dicts
         return {

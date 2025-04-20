@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import pprint
 import textwrap
 
 from src.ed_types import Coordinates, Minerals
@@ -19,14 +20,16 @@ def parse_args():
     argparser.add_argument("--debug", action="store_true")
 
     args = argparser.parse_args()
-    if args.target_commodities is None:
-        args.target_commodities = [Minerals.Platinum, Minerals.Monazite]
+    if args.minerals is None:
+        args.minerals = [Minerals.Platinum, Minerals.Monazite]
 
     return args
 
 
 def run(args: argparse.Namespace):
     system = PopulatedGalaxySystems.get_system(args.system)
+    if system is None:
+        raise Exception(f"Did not know about the system '{args.system}'!")
 
     ring_hotspots = system.get_hotspot_rings(
         args.minerals

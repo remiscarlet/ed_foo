@@ -47,7 +47,7 @@ def parse_args():
     if args.target_commodities is None:
         args.target_commodities = [Minerals.Platinum, Minerals.Monazite]
 
-    return argparser.parse_args()
+    return args
 
 
 def find_reinforceable_systems(args: argparse.Namespace):
