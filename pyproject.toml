@@ -27,7 +27,8 @@ dependencies = [
     "typing-extensions (==4.13.2)",
     "urllib3 (==2.4.0)",
     "zmq (==0.0.0)",
-    "flake8-pyproject (>=1.2.3,<2.0.0)"
+    "flake8-pyproject (>=1.2.3,<2.0.0)",
+    "aenum (>=3.1.15,<4.0.0)"
 ]
 
 [build-system]
@@ -60,12 +61,11 @@ src_paths = ["src"]
 
 [tool.flake8]
 max-line-length = 120
-extend-ignore = ["E203", "E701"]  # black conflict
+extend-ignore = ["E203", "E701"]
 exclude = ["__pycache__", "build", "dist", ".venv"]
 
 [tool.mypy]
 python_version = "3.13"
 strict = true
 namespace_packages = true
-exclude = 'src/(?P<project>.*)/py.typed'  # if you export typed packages
-mypy_path = "./typings"
+mypy_path = "typings"

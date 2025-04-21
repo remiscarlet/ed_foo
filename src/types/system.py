@@ -1,28 +1,29 @@
-from collections import defaultdict
-import dataclasses
-import enum
 import json
-import pprint
-import dataclasses_json
-from datetime import datetime, timedelta, timezone
-from dataclasses_json import config, dataclass_json
-from dataclasses import dataclass, field
-from marshmallow import fields
+from collections import defaultdict
+from dataclasses import dataclass, field, fields
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
-dataclasses_json.cfg.global_config.encoders[datetime] = datetime.isoformat
-dataclasses_json.cfg.global_config.decoders[datetime] = datetime.fromisoformat
-
-
-class Minerals(enum.StrEnum):
-    Monazite = "Monazite"
-    Platinum = "Platinum"
+from src.types import Coordinates, Minerals, Timestamps, _default_serialize
+from src.types.station import CommodityPrice, Station
 
 
 @dataclass_json
 @dataclass
-class ControllingFaction:
+class PlayerMinorFaction(DataClassJsonMixin):
+    name: str
+    influence: float
+
+    government: Optional[str] = None
+    allegiance: Optional[str] = None
+    state: Optional[str] = None
+
+
+@dataclass_json
+@dataclass
+class ControllingFaction(DataClassJsonMixin):
     allegiance: Optional[str] = None
     government: Optional[str] = None
     name: Optional[str] = None
@@ -30,166 +31,7 @@ class ControllingFaction:
 
 @dataclass_json
 @dataclass
-class Coordinates:
-    x: float
-    y: float
-    z: float
-
-    def distance_to(self, other: "Coordinates") -> float:
-        dx = (self.x - other.x) ** 2
-        dy = (self.y - other.y) ** 2
-        dz = (self.z - other.z) ** 2
-        return (dx + dy + dz) ** (0.5)
-
-
-@dataclass_json
-@dataclass
-class Timestamps:
-    controllingPower: Optional[datetime] = None
-    powerState: Optional[datetime] = None
-    powers: Optional[datetime] = None
-    distanceToArrival: Optional[datetime] = None
-    meanAnomaly: Optional[datetime] = None
-
-
-@dataclass
-class CommodityPrice:
-    buyPrice: int
-    demand: int
-    sellPrice: int
-    supply: int
-
-
-@dataclass_json
-@dataclass
-class Commodity(CommodityPrice):
-    category: str
-    commodityId: int
-    name: str
-    symbol: str
-
-
-@dataclass_json
-@dataclass
-class Market:
-    commodities: Optional[List[Commodity]] = None
-    prohibitedCommodities: Optional[List[str]] = None
-    updateTime: Optional[datetime] = None
-
-
-@dataclass_json
-@dataclass
-class ShipModule:
-    category: str
-    cls: int = field(metadata=config(field_name="class"))
-    moduleId: int
-    name: str
-    rating: str
-    symbol: str
-
-    ship: Optional[str] = None
-
-
-@dataclass_json
-@dataclass
-class Outfitting:
-    modules: List[ShipModule]
-    updateTime: datetime
-
-
-@dataclass_json
-@dataclass
-class Ship:
-    name: str
-    shipId: int
-    symbol: str
-
-
-@dataclass_json
-@dataclass
-class Shipyard:
-    ships: List[Ship]
-    updateTime: datetime
-
-
-@dataclass_json
-@dataclass
-class Station:
-    id: int
-    name: str
-    updateTime: datetime
-
-    allegiance: Optional[str] = None
-    controllingFaction: Optional[str] = None
-    controllingFactionState: Optional[str] = None
-    distanceToArrival: Optional[float] = None
-    economies: Optional[Dict[str, float]] = None
-    government: Optional[str] = None
-    landingPads: Optional[Dict[str, int]] = None
-    market: Optional[Market] = None
-    outfitting: Optional[Outfitting] = None
-    primaryEconomy: Optional[str] = None
-    services: Optional[List[str]] = None
-    shipyard: Optional[Shipyard] = None
-    type: Optional[str] = None
-
-    carrierName: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-
-    def has_commodities(self, target_commodity_names: List[str], require_all=True):
-        if self.market is None:
-            return False
-        if not self.market.commodities:
-            return False
-
-        expected_commodities = set(target_commodity_names)
-        market_commodities = set(
-            map(lambda commodity: commodity.name, self.market.commodities)
-        )
-
-        found_commodities = expected_commodities.intersection(market_commodities)
-
-        if require_all:
-            return found_commodities == expected_commodities
-        else:
-            return len(found_commodities) > 0
-
-    def get_commodity_price(
-        self, target_commodity_name: str
-    ) -> Optional[CommodityPrice]:
-        if self.market is None:
-            return False
-        if not self.market.commodities:
-            return False
-
-        for commodity in self.market.commodities:
-            if commodity.name == target_commodity_name:
-                return CommodityPrice(
-                    commodity.buyPrice,
-                    commodity.demand,
-                    commodity.sellPrice,
-                    commodity.supply,
-                )
-
-        return None
-
-    def has_minimum_landing_pad(self, min_landing_pad_size: str) -> bool:
-        return (
-            self.landingPads is not None
-            and min_landing_pad_size in self.landingPads
-            and self.landingPads[min_landing_pad_size] > 0
-        )
-
-    def has_min_data_age_days(self, min_age_days: int):
-        return (datetime.now(timezone.utc) - self.updateTime) > timedelta(
-            days=min_age_days
-        )
-
-
-@dataclass_json
-@dataclass
-class Asteroids:
+class Asteroids(DataClassJsonMixin):
     name: str
     type: str
     mass: float
@@ -197,20 +39,22 @@ class Asteroids:
     outerRadius: float
 
     id64: Optional[int] = None
-    signals: Optional[Dict[str, Any]] = None
+    signals: Optional[Dict[str, Dict[Minerals, int]]] = None
 
     def extract_signals(self) -> Dict[Minerals, int]:
         if not getattr(self, "signals"):
             return {}
+        if self.signals is None:
+            return {}
         return self.signals.get("signals", {})
 
     def is_invalid_ring_for_mineral(self, mineral: Minerals) -> bool:
-        return mineral is Minerals.Platinum and self.type != "Metallic"
+        return mineral is Minerals.PLATINUM and self.type != "Metallic"
 
 
 @dataclass_json
 @dataclass
-class Body:
+class Body(DataClassJsonMixin):
     id64: int
     bodyId: int
     name: str
@@ -256,10 +100,12 @@ class Body:
     type: Optional[str] = None
     volcanismType: Optional[str] = None
 
-    def is_invalid_body_for_mineral(self, mineral: Minerals):
-        if mineral == Minerals.Monazite:
+    def is_invalid_body_for_mineral(self, mineral: Minerals) -> bool:
+        if mineral == Minerals.MONAZITE:
             return False
-        elif mineral == Minerals.Platinum:
+        elif mineral in [
+            Minerals.PLATINUM,
+        ]:
             return self.reserveLevel != "Pristine"
         else:
             raise Exception(f"Got unknown mineral: '{mineral}'!")
@@ -267,24 +113,7 @@ class Body:
 
 @dataclass_json
 @dataclass
-class PlayerMinorFaction:
-    name: str
-    influence: float
-
-    government: Optional[str] = None
-    allegiance: Optional[str] = None
-    state: Optional[str] = None
-
-
-def _default_serialize(o):
-    if hasattr(o, "to_dict"):
-        return o.to_dict()
-    raise TypeError(f"Type {o!r} not serializable")
-
-
-@dataclass_json
-@dataclass
-class System:
+class System(DataClassJsonMixin):
     allegiance: str
     bodies: List[Body]
     controllingFaction: ControllingFaction
@@ -318,10 +147,10 @@ class System:
     thargoidWar: Optional[int] = None
     timestamps: Optional[Timestamps] = None
 
-    def distance_to(self, target_system: "System"):
+    def distance_to(self, target_system: "System") -> float:
         return self.coords.distance_to(target_system.coords)
 
-    def is_in_powerplay(self):
+    def is_in_powerplay(self) -> bool:
         return self.powers is not None and len(self.powers) > 0
 
     def get_stations_with_services(self, services: List[str]) -> List[Station]:
@@ -329,15 +158,13 @@ class System:
 
         stations = []
         for station in self.stations:
-            available_services = (
-                set() if station.services is None else set(station.services)
-            )
+            available_services = set() if station.services is None else set(station.services)
             if expected_services.intersection(available_services):
                 stations.append(station)
 
         return stations
 
-    def get_hotspot_rings(self, target_minerals: List[Minerals]):
+    def get_hotspot_rings(self, target_minerals: List[Minerals]) -> Dict[str, Dict[Minerals, int]]:
         """Returns a dict of _pristine_ ring names, minerals, and hotspot counts
 
         Eg,
@@ -354,9 +181,7 @@ class System:
             return {}
 
         # ring_name -> mineral -> count
-        hotspots: defaultdict[str, defaultdict[Minerals, int]] = defaultdict(
-            lambda: defaultdict(int)
-        )
+        hotspots: defaultdict[str, defaultdict[Minerals, int]] = defaultdict(lambda: defaultdict(int))
 
         for body in self.bodies:
             if not body.rings:
@@ -379,27 +204,41 @@ class System:
                     hotspots[ring.name][mineral] += count
 
         # Convert nested defaultdicts back to normal dicts
-        return {
-            ring: dict(mineral_hotspots) for ring, mineral_hotspots in hotspots.items()
-        }
+        return {ring: dict(mineral_hotspots) for ring, mineral_hotspots in hotspots.items()}
+
+    def get_commodities_prices(self, target_commodities: List[str]) -> Dict[str, Dict[str, CommodityPrice]]:
+        # station name -> commodity name -> price
+        station_to_commodity_prices: Dict[str, Dict[str, CommodityPrice]] = defaultdict(lambda: {})
+        for station in self.stations:
+            for commodity in target_commodities:
+                price = station.get_commodity_price(commodity)
+                if price is None:
+                    continue
+                if station.market is None:
+                    continue
+
+                price.updateTime = station.market.updateTime
+                station_to_commodity_prices[station.name][commodity] = price
+
+        return {station: dict(prices) for station, prices in station_to_commodity_prices.items()}
 
     @staticmethod
-    def db_table_name():
+    def db_table_name() -> str:
         return "system"
 
     @staticmethod
-    def db_column_list():
-        cols = [field.name for field in dataclasses.fields(System)]
+    def db_column_list() -> str:
+        cols = [field.name for field in fields(System)]
         return ", ".join(cols)
 
     @staticmethod
-    def db_values_list(system_dict: Dict):
-        cols = [field.name for field in dataclasses.fields(System)]
+    def db_values_list(system: "System") -> str:
+        cols = [field.name for field in fields(System)]
         rtn = ""
         for column_name in cols:
-            col_val = system_dict.get(column_name)
+            col_val = getattr(system, column_name)
             if col_val is None:
-                rtn += f"    null,\n"
+                rtn += "    null,\n"
             elif isinstance(col_val, int) or isinstance(col_val, float):
                 rtn += f"    {col_val},\n"
             else:
@@ -415,7 +254,17 @@ class System:
 
 @dataclass_json
 @dataclass
-class PowerplaySystem:
+class PowerplaySystem(DataClassJsonMixin):
+    """Represents a "lightweight view" of a system with powerplay-specific information
+
+    This avoids needing to pull the heavy station/body data for this system.
+
+    Likely will be deprecated once/if an overall better querying system is implemented with partial data hydration
+
+    Returns:
+        _type_: _description_
+    """
+
     powerState: str
     id64: int
     name: str
@@ -434,8 +283,8 @@ class PowerplaySystem:
     government: Optional[str] = None
     allegiance: Optional[str] = None
 
-    def controlling_faction_in_states(self, target_states: List[str]):
-        controlling_faction = max(self.factions, key=lambda faction: faction.influence)
+    def controlling_faction_in_states(self, target_states: List[str]) -> bool:
+        controlling_faction = max(self.factions or [], key=lambda faction: faction.influence)
         return controlling_faction.state in target_states
 
     def is_in_influence_range(self, other: "PowerplaySystem") -> Optional[bool]:
@@ -454,9 +303,7 @@ class PowerplaySystem:
             return None
 
         influence_range = 20.0 if self.powerState == "Fortified" else 30.0
-        return (
-            True if self.coords.distance_to(other.coords) <= influence_range else False
-        )
+        return True if self.coords.distance_to(other.coords) <= influence_range else False
 
 
 @dataclass
@@ -464,7 +311,7 @@ class AcquisitionSystemPairings:
     unoccupied_system: System
     acquiring_systems: List[System]
 
-    def has_valid_hotspot_ring(self, minerals: List[Minerals]):
+    def has_valid_hotspot_ring(self, minerals: List[Minerals]) -> bool:
         for system in self.acquiring_systems:
             if system.get_hotspot_rings(minerals):
                 return True

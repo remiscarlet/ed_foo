@@ -3,6 +3,7 @@ repos:
     rev: 25.1.0
     hooks:
       - id: black
+        args: ["--config=pyproject.toml", "-v"]
         language_version: python3.13
 
   - repo: https://github.com/PyCQA/isort
@@ -27,5 +28,4 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-      - id: end-of-file-fixer
       - id: check-yaml
