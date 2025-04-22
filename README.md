@@ -1,27 +1,13 @@
 # Elite Dangerous Related Data Things
 
-Hypothesis: There are systems that have elevated commodity prices but we don't know about them because of data staleness.
-
-Faction state (Boom) information is revealed when entering a system, which is much more likely than exact
-commodity prices which requires a CMDR to dock at a specific station.
-
-As such, there exists a time delta between freshness of faction states and known market prices.
-This script tries to analyze this delta for potential stations to check prices at for advantageous PP2.0 play
-
-<sub>Spoiler: Turns out the hypothesis is probably not-correct-enough to be useful. There's also faction state data staleness concerns.</sub>
-
 ### Usage
 - `./download_dump_data.py && ./import_dump_data.py`
+- `./find_best_reinforcement_mining_in_system.py --help`
+- `./find_top_commodities_in_system_per_station.py --help`
 - `./find_potential_acquisition_system_stations.py --help`
 - `./find_potential_reinforcement_system_stations.py --help`
 - `./find_all_commodity_prices_in_system.py --help`
 - `./find_all_hotspots_for_mineral_in_system.py --help`
-
-### Bottlenecks
-- Data size of a single system is massive
-  - Returning a whole system takes up massive bandwidth
-  - Long running queries (~30 seconds for returning ~120 systems) are largely because of data transfer time - not compute time
-  - Need more fine-grained tables and support for partially returned data (Eg, return bodies but only name, reserve level, and ring information in each object)
 
 ## Example Output
 - \[WIP\] `./find_best_reinforcement_mining_in_system.py`
@@ -180,3 +166,20 @@ Controlling Faction: PlayerMinorFaction(name='Selkana Labour',
   !! Monazite !! Last Known CommodityPrice(buyPrice=113666, demand=0, sellPrice=112540, supply=0)
   !! Platinum !! Last Known CommodityPrice(buyPrice=34007, demand=0, sellPrice=33670, supply=0)
 ```
+
+### Bottlenecks
+- Data size of a single system is massive
+  - Returning a whole system takes up massive bandwidth
+  - Long running queries (~30 seconds for returning ~120 systems) are largely because of data transfer time - not compute time
+  - Need more fine-grained tables and support for partially returned data (Eg, return bodies but only name, reserve level, and ring information in each object)
+
+## Initial Hypothesis
+Hypothesis: There are systems that have elevated commodity prices but we don't know about them because of data staleness.
+
+Faction state (Boom) information is revealed when entering a system, which is much more likely than exact
+commodity prices which requires a CMDR to dock at a specific station.
+
+As such, there exists a time delta between freshness of faction states and known market prices.
+This script tries to analyze this delta for potential stations to check prices at for advantageous PP2.0 play
+
+<sub>Spoiler: Turns out the hypothesis is probably not-correct-enough to be useful. There's also faction state data staleness concerns.</sub>
