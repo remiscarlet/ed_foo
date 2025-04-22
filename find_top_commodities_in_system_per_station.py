@@ -94,7 +94,7 @@ def run(args: argparse.Namespace) -> None:
         logger.info("!! Found NO stations with known markets!")
 
     for system_name, commodities in prices.items():
-        headers = ["System Name", "Commodity", "Sell Price", "Demand", "Buy Price", "Supply", "Updated Last"]
+        headers = ["Station Name", "Commodity", "Sell Price", "Demand", "Buy Price", "Supply", "Updated Last"]
         table = []
         for commodity in commodities.to_list():
 
@@ -120,8 +120,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    configure_logger(args)
-
     with Timer("Script", True):
+        args = parse_args()
+        configure_logger(args)
         run(args)

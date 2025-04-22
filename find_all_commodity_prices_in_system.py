@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
         "--commodity",
         dest="commodities",
         action="append",
-        type=str,
+        type=CommodityType,
         help="Commodity to print prices for in system",
         choices=list(CommodityType),
         default=None,
@@ -91,8 +91,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    configure_logger(args)
-
     with Timer("Script", True):
+        args = parse_args()
+        configure_logger(args)
         run(args)

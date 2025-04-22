@@ -22,7 +22,7 @@ class CommodityCategory(StrEnum):
     METALS = "Metals"
     MINERALS = "Minerals"
     SALVAGE = "Salvage"
-    SLAVES = "Slaves"
+    SLAVERY = "Slavery"
     TECHNOLOGY = "Technology"
     TEXTILES = "Textiles"
     WASTE = "Waste"

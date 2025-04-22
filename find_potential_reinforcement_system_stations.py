@@ -198,7 +198,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    configure_logger(args)
     with Timer("Script", True):
+        args = parse_args()
+        configure_logger(args)
         run(args)

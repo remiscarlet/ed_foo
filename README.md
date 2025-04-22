@@ -168,6 +168,10 @@ Controlling Faction: PlayerMinorFaction(name='Selkana Labour',
 ```
 
 ### Bottlenecks
+- Generally speaking, the entire data storage/schema infra.
+  - We're just a single naive SQLite table atm.
+    - DB Queries only at system level.
+    - Body/station queries must get whole system object first
 - Data size of a single system is massive
   - Returning a whole system takes up massive bandwidth
   - Long running queries (~30 seconds for returning ~120 systems) are largely because of data transfer time - not compute time

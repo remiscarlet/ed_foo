@@ -2,6 +2,7 @@
 
 import argparse
 import textwrap
+import traceback
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pprint import pformat
@@ -113,6 +114,27 @@ class MiningRoute(NamedTuple):
     time_since_update: str
 
 
+def route_scoring_fn(mining_route: PotentialMiningRoute) -> int:
+    dataAge = datetime.now(timezone.utc) - mining_route.update_time
+    if dataAge <= timedelta(days=2):
+        decay = 1.0
+    elif dataAge <= timedelta(days=4):
+        decay = 0.75
+    elif dataAge <= timedelta(days=7):
+        decay = 0.5
+    else:
+        decay = 0.25
+
+    price_weight = 0.98
+    demand_weight = 1 - price_weight
+    score = int((mining_route.demand**demand_weight) * (mining_route.sell_price**price_weight) * decay)
+    route = [mining_route.mineable_symbol.value, mining_route.sell_price, mining_route.demand]
+
+    logger.debug(f"ROUTE SCORE({score}) - {pformat(route)}")
+
+    return score
+
+
 def run(args: argparse.Namespace) -> None:
     system = PopulatedGalaxySystems.get_system(args.system)
     if system is None:
@@ -169,24 +191,8 @@ def run(args: argparse.Namespace) -> None:
     logger.debug("?? RINGNAMES BY COMMODITY")
     logger.debug(ringnames_by_commodity)
 
-    def tableKey(mining_route: PotentialMiningRoute) -> int:
-        dataAge = datetime.now(timezone.utc) - mining_route.update_time
-        if dataAge <= timedelta(days=2):
-            decay = 1.0
-        elif dataAge <= timedelta(days=4):
-            decay = 0.75
-        elif dataAge <= timedelta(days=7):
-            decay = 0.5
-        else:
-            decay = 0.25
-
-        alpha = 0.75
-        beta = 1 - alpha
-        score = int((mining_route.demand**alpha) * (mining_route.sell_price**beta) * decay)
-        return score
-
     # Get Top N Mining Routes
-    potential_routes = TopNStack[PotentialMiningRoute](args.routes, tableKey)
+    potential_routes = TopNStack[PotentialMiningRoute](args.routes, route_scoring_fn)
     for station_name, commodities in prices.items():
         for commodity in commodities.to_list():
             if commodity.symbol not in hotspot_commodities:
@@ -206,8 +212,7 @@ def run(args: argparse.Namespace) -> None:
                     )
                 )
             except ValueError:
-                # logger.debug(traceback.format_exc())
-                pass
+                logger.trace(traceback.format_exc())
 
     for potential_route in potential_routes.to_list():
         logger.debug("")
@@ -238,8 +243,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    configure_logger(args)
-
     with Timer("Script", True):
+        args = parse_args()
+        configure_logger(args)
         run(args)

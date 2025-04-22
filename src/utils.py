@@ -52,14 +52,14 @@ def debug_dataclasses_json_load(schema_type: type[HasSchema], data: Dict[str, An
 
 
 class TopNStack[T]:
-    def __init__(self, n: int, key: Callable[[T], int]) -> None:
+    def __init__(self, n: int, scoring_fn: Callable[[T], int]) -> None:
         """Creates a DS to keep track of the top N instances of T using key as the value function.
 
         Stack should be sorted high to low in the list (Eg, [10, 5, 1])
         """
         self.stack: List[T] = []
         self.n = n
-        self.key = key
+        self.scoring_fn = scoring_fn
 
     def __repr__(self) -> str:
         return f"TopNStack({len(self.stack)})"
@@ -75,7 +75,7 @@ class TopNStack[T]:
 
         found = False
         for idx, item in enumerate(self.stack):
-            if self.key(to_insert) > self.key(item):
+            if self.scoring_fn(to_insert) > self.scoring_fn(item):
                 insert_idx = idx
                 found = True
                 break
