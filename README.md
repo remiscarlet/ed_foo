@@ -11,9 +11,11 @@ This script tries to analyze this delta for potential stations to check prices a
 <sub>Spoiler: Turns out the hypothesis is probably not-correct-enough to be useful. There's also faction state data staleness concerns.</sub>
 
 ### Usage
-- `./download_dump_data && ./import_dump_data`
-- `./find_potential_acquisition_system_stations`
-- `./find_potential_reinforcement_system_stations`
+- `./download_dump_data.py && ./import_dump_data.py`
+- `./find_potential_acquisition_system_stations.py --help`
+- `./find_potential_reinforcement_system_stations.py --help`
+- `./find_all_commodity_prices_in_system.py --help`
+- `./find_all_hotspots_for_mineral_in_system.py --help`
 
 ### Bottlenecks
 - Data size of a single system is massive
@@ -22,7 +24,36 @@ This script tries to analyze this delta for potential stations to check prices a
   - Need more fine-grained tables and support for partially returned data (Eg, return bodies but only name, reserve level, and ring information in each object)
 
 ## Example Output
-- `./find_potential_acquisition_system_stations`
+- `./find_all_hotspots_for_mineable_in_system.py`
+```
+./find_all_hotspots_for_mineable_in_system.py --mineable "Void Opal"
+
+====== SYSTEM ======
+Name: Sol
+Target Mineables: ['Void Opal']
+
+++ Galle Ring ++
+  > Void Opal: 1 Hotspots
+[Script] Took 2.73 seconds
+```
+- `./find_all_commodity_prices_in_system.py`
+```
+./find_all_commodity_prices_in_system --system "Chanii"
+
+====== SYSTEM ======
+Name: Chanii
+Target Commodities: ['Platinum', 'Monazite']
+
+System Name    Commodity      Sell Price    Demand    Buy Price    Supply  Updated Last
+-------------  -----------  ------------  --------  -----------  --------  -----------------------------
+Lundwall Hub   Platinum            31569         0        31571         0  5 Weeks, 10 Hours Ago
+Lundwall Hub   Monazite           193918        19            0         0  5 Weeks, 10 Hours Ago
+Green Colony   Platinum           126274         0       126281         0  5 Weeks, 3 Days, 10 Hours Ago
+Green Colony   Monazite           314887        21            0         0  5 Weeks, 3 Days, 10 Hours Ago
+
+Note: Market data relies on EDDN/Spansh dumps. Not all stations may have market data uploaded and prices may be stale.
+```
+- `./find_potential_acquisition_system_stations.py`
 ```
 ===============================
 =        ACQUISITION?         =
@@ -65,7 +96,7 @@ PlayerMinorFaction(name='Starstone Enterprises',
   !! Platinum !! Last Known CommodityPrice(buyPrice=0, demand=136, sellPrice=54937, supply=0)
 ```
 
-- `./find_potential_reinforcement_system_stations`
+- `./find_potential_reinforcement_system_stations.py`
 ```
 ===============================
 =        REINFORCEMENT?       =

@@ -1,6 +1,7 @@
-#!/usr/bin/env python
-import zmq
+#!python
 import zlib
+
+import zmq
 
 ctx = zmq.Context()
 sub = ctx.socket(zmq.SUB)

@@ -13,6 +13,12 @@ class CommodityPrice(DataClassJsonMixin):
     supply: int
     updateTime: Optional[datetime] = None
 
+    def __repr__(self) -> str:
+        return (
+            f"CommodityPrice(buyPrice={self.buyPrice}, demand={self.demand}, "
+            f"sellPrice={self.sellPrice}, supply={self.supply}, updateTime={self.updateTime})"
+        )
+
 
 @dataclass_json
 @dataclass

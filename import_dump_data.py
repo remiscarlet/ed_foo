@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!python
 
 from src.constants import GALAXY_POPULATED_JSON
 from src.populated_galaxy_systems_importer import PopulatedGalaxySystemsImporter

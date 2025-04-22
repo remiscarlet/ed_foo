@@ -1,21 +1,16 @@
-import argparse
-from datetime import datetime, timedelta, timezone
-import pprint
+import traceback
+from datetime import datetime, timezone
+from typing import Any, Dict, Protocol
 
-from src.ed_types import Coordinates
-from src.populated_galaxy_systems import PopulatedGalaxySystems
-
-
-class StoreSystemNameWithCoords(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, values)
-        system = PopulatedGalaxySystems.get_system(values)
-        coords = Coordinates(0, 0, 0) if system is None else system.coords
-        setattr(namespace, "current_coords", coords)
-        pprint.pprint(namespace)
+from marshmallow import Schema
 
 
-def get_time_since(dt: datetime):
+class HasSchema(Protocol):
+    @classmethod
+    def schema(cls) -> Schema: ...
+
+
+def get_time_since(dt: datetime) -> str:
     """Returns a string of weeks, days, hours since supplied `dt`
     Eg, timedelta(days=20, hours=5) => "2 Weeks, 6 Days, 5 Hours Ago"
         timedelta(days=1, hours=1) => "1 Week, 1 Hour Ago"
@@ -41,3 +36,16 @@ def get_time_since(dt: datetime):
 
     time_since = ", ".join(parts)
     return f"{time_since} Ago"
+
+
+def debug_dataclasses_json_load(schema_type: type[HasSchema], data: Dict[str, Any]) -> None:
+    schema = schema_type.schema()
+    for name, field in schema.fields.items():
+        try:
+            print(f"Decoding field {name!r}: {type(data[name])}")
+            # this will invoke only the logic for that one field
+            field.deserialize(data[name], name, data)
+        except Exception:
+            print(f"Error decoding field {name!r}:")
+            traceback.print_exc()
+            break

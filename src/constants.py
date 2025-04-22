@@ -3,9 +3,12 @@ from pathlib import Path
 
 PWD = Path.cwd()
 REPO_ROOT = Path(__file__).parent.parent
-REL_PATH = PWD.relative_to(REPO_ROOT)
+REL_ROOT_PATH = PWD.relative_to(REPO_ROOT)
 
-DATA_DIR = REL_PATH / "data"
+LOG_DIR = REL_ROOT_PATH / "logs"
+DEFAULT_LOG_LEVEL = "INFO"
+
+DATA_DIR = REL_ROOT_PATH / "data"
 
 DB_DATA_PATH = DATA_DIR / "processed_data.db"
 # GALAXY_POPULATED = DATA_DIR / "galaxy_populated.truncated.json"

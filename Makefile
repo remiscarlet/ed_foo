@@ -4,15 +4,15 @@ install:
 	poetry install
 
 lint:
-	black --check .
-	isort --check-only .
-	flake8 .
+	poetry run black --check .
+	poetry run isort --check-only .
+	poetry run flake8 . -v
 
 lintfix:
-	black .
-	isort .
+	poetry run black .
+	poetry run isort .
 
 type:
-	mypy src
+	poetry run mypy .
 
 check: lint type

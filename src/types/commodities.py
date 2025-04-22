@@ -1,8 +1,14 @@
-from enum import Enum
 from itertools import chain
-from typing import Protocol, Set, TypedDict
+from typing import (
+    Iterable,
+    NotRequired,
+    Protocol,
+    Set,
+    TypedDict,
+    cast,
+)
 
-from aenum import StrEnum, enum
+from aenum import StrEnum, extend_enum
 
 # TODO: Consider adding "is_valid_hotspot" and other mining validity
 # checks here with bodies/asteroids being passed in as an arg.
@@ -25,30 +31,64 @@ class MineableMetadata(TypedDict):
     ring_types: Set[RingType]
     has_hotspots: bool
 
+    symbol: NotRequired[str]
+
 
 class HasMineableMetadata(Protocol):
+    # Enum field
+    name: str
+    value: str
+
+    # Metadata fields
+    symbol: str
+    is_mineable: bool
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
-    is_mineable: bool
 
 
-def mineableCommodityEnum(value: str, metadata: MineableMetadata) -> Enum:
-    return enum(value=value, is_mineable=True, **metadata)
+type CommodityEnumTuple = tuple[str, bool, str, set[MiningMethod], set[RingType], bool]
 
 
-def commodityEnum(value: str) -> Enum:
-    return enum(value=value, is_mineable=False)
+def mineableCommodityEnum(value: str, metadata: MineableMetadata) -> CommodityEnumTuple:
+    is_mineable = True
+    return (
+        value,
+        is_mineable,
+        metadata.get("symbol", value),
+        metadata["mining_methods"],
+        metadata["ring_types"],
+        metadata["has_hotspots"],
+    )
 
 
-class Chemicals(HasMineableMetadata, StrEnum):
+def commodityEnum(value: str) -> CommodityEnumTuple:
+    [is_mineable, mining_methods, ring_types, has_hotspots] = [False, set(), set(), False]  # type: ignore
+    return (value, is_mineable, value, mining_methods, ring_types, has_hotspots)
+
+
+aenum_json_init_config = "value is_mineable symbol mining_methods ring_types has_hotspots"
+
+
+class Chemicals(StrEnum):
     """
     Thanks, Tritium.
     """
 
+    _init_ = aenum_json_init_config
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
+    is_mineable: bool
+    TRITIUM = mineableCommodityEnum(
+        value="Tritium",
+        metadata={
+            "mining_methods": {MiningMethod.LASER_MINING},
+            "ring_types": {RingType.ICY},
+            "has_hotspots": True,
+        },
+    )
+
     ARGONOMIC_TREATMENT = commodityEnum(value="Argonomic Treatment")
     EXPLOSIVES = commodityEnum(value="Explosives")
     HYDROGEN_FUEL = commodityEnum(value="Hydrogen Fuel")
@@ -59,22 +99,17 @@ class Chemicals(HasMineableMetadata, StrEnum):
     ROCKFORTH_FERTILISER = commodityEnum(value="Rockforth Fertiliser")
     SURFACE_STABILISERS = commodityEnum(value="Surface Stabilisers")
     SYNTHETIC_REAGENTS = commodityEnum(value="Synthetic Reagents")
-    TRITIUM = mineableCommodityEnum(
-        value="Tritium",
-        metadata={
-            "mining_methods": {MiningMethod.LASER_MINING},
-            "ring_types": {RingType.ICY},
-            "has_hotspots": True,
-        },
-    )
+
     WATER = commodityEnum(value="Water")
 
 
 # Data from https://tinyurl.com/bdd435s5
-class Minerals(HasMineableMetadata, StrEnum):
+class Minerals(StrEnum):
+    _init_ = aenum_json_init_config
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
+    is_mineable: bool
 
     ALEXANDRITE = mineableCommodityEnum(
         value="Alexandrite",
@@ -170,7 +205,12 @@ class Minerals(HasMineableMetadata, StrEnum):
     )
     LOW_TEMPERATURE_DIAMONDS = mineableCommodityEnum(
         value="Low Temperature Diamonds",
-        metadata={"mining_methods": {MiningMethod.CORE_MINING}, "ring_types": {RingType.ICY}, "has_hotspots": True},
+        metadata={
+            "mining_methods": {MiningMethod.CORE_MINING},
+            "symbol": "LowTemperatureDiamond",
+            "ring_types": {RingType.ICY},
+            "has_hotspots": True,
+        },
     )
     METHANE_CLATHRATE = mineableCommodityEnum(
         value="Methane Clathrate",
@@ -245,17 +285,25 @@ class Minerals(HasMineableMetadata, StrEnum):
     )
     VOID_OPAL = mineableCommodityEnum(
         value="Void Opal",
-        metadata={"mining_methods": {MiningMethod.CORE_MINING}, "ring_types": {RingType.ICY}, "has_hotspots": True},
+        metadata={
+            "mining_methods": {MiningMethod.CORE_MINING},
+            "symbol": "Opal",
+            "ring_types": {RingType.ICY},
+            "has_hotspots": True,
+        },
     )
 
 
-Minerals.MONAZITE
+class Metals(StrEnum):
+    _init_ = aenum_json_init_config
+    mining_methods: Set[MiningMethod]
+    ring_types: Set[RingType]
+    has_hotspots: bool
+    is_mineable: bool
 
-
-class Metals(HasMineableMetadata, StrEnum):
     ALUMINIUM = commodityEnum(value="Aluminium")
     BERYLLIUM = commodityEnum(value="Beryllium")
-    BISMUTH = enum(value="Bismuth")
+    BISMUTH = commodityEnum(value="Bismuth")
     COBALT = mineableCommodityEnum(
         value="Cobalt",
         metadata={
@@ -336,4 +384,37 @@ class Metals(HasMineableMetadata, StrEnum):
     URANIUM = commodityEnum(value="Uranium")
 
 
-CommodityType = StrEnum("Commodities", [(e.name, e.value) for e in chain(Minerals, Metals)])
+mineables_lookup = {m.value: m for m in chain(Minerals, Metals, Chemicals)}
+
+
+class Mineables(StrEnum):
+    def getMineableMetadata(self) -> HasMineableMetadata:
+        return cast(HasMineableMetadata, mineables_lookup[self.value])
+
+
+mineable_symbols_lookup = {m.symbol: m for m in cast(Iterable[HasMineableMetadata], chain(Minerals, Metals, Chemicals))}
+
+
+class MineableSymbols(StrEnum):
+    def getMineableMetadata(self) -> HasMineableMetadata:
+        return mineable_symbols_lookup[self.value]
+
+
+mineable_categories = cast(Iterable[HasMineableMetadata], chain(Minerals, Metals, Chemicals))
+for item in mineable_categories:
+    if item.is_mineable:
+        extend_enum(Mineables, item.name, item.value)
+        extend_enum(MineableSymbols, item.name, item.symbol)
+
+
+commodity_lookup = {m.value: m for m in chain(Minerals, Metals, Chemicals)}
+
+
+class CommodityType(StrEnum):
+    def getMineableMetadata(self) -> HasMineableMetadata:
+        return cast(HasMineableMetadata, commodity_lookup[self.value])
+
+
+all_commodities = {e.name: e.value for e in chain(Minerals, Metals, Chemicals)}
+for name, value in all_commodities.items():
+    extend_enum(CommodityType, name, value)

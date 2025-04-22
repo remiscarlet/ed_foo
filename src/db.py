@@ -1,33 +1,37 @@
 import dataclasses
 import json
-import pprint
 import sqlite3
-from typing import Dict, List, Optional
+import traceback
+from pprint import pformat
+from typing import Any, Dict, List, Optional
 
-from .constants import DB_DATA_PATH
-from .ed_types import PowerplaySystem, System
+from src.constants import DB_DATA_PATH
+from src.logging import get_logger
+from src.types import PowerplaySystem, System
+
+logger = get_logger(__name__)
 
 
 class SystemDB:
-    table_name = "system"
-    conn: sqlite3.Connection
+    __table_name = "system"
+    __conn: sqlite3.Connection
 
-    def __init__(self):
-        self.conn = sqlite3.connect(DB_DATA_PATH)
-        self.conn.row_factory = sqlite3.Row
-        self.conn.isolation_level = None
+    def __init__(self) -> None:
+        self.__conn = sqlite3.connect(DB_DATA_PATH)
+        self.__conn.row_factory = sqlite3.Row
+        self.__conn.isolation_level = None
 
         # https://phiresky.github.io/blog/2020/sqlite-performance-tuning/
-        self.conn.execute("PRAGMA journal_mode = WAL;")
-        self.conn.execute("PRAGMA synchronous = normal;")
-        self.conn.execute("PRAGMA temp_store = memory;")
-        self.conn.execute("PRAGMA mmap_size = 30000000000;")
-        self.conn.execute("PRAGMA page_size = 32768;")
-        self.conn.execute("PRAGMA busy_timeout = 5000;")
+        self.__conn.execute("PRAGMA journal_mode = WAL;")
+        self.__conn.execute("PRAGMA synchronous = normal;")
+        self.__conn.execute("PRAGMA temp_store = memory;")
+        self.__conn.execute("PRAGMA mmap_size = 30000000000;")
+        self.__conn.execute("PRAGMA page_size = 32768;")
+        self.__conn.execute("PRAGMA busy_timeout = 5000;")
 
         self.init_tables()
 
-    def init_tables(self):
+    def init_tables(self) -> None:
         init_schema_query = """
             CREATE TABLE IF NOT EXISTS {table_name} (
                 id64 INTEGER PRIMARY KEY,
@@ -67,12 +71,14 @@ class SystemDB:
             CREATE INDEX IF NOT EXISTS power_state_idx
                 ON {table_name}(powerState);
         """
+        query = init_schema_query.format(table_name=self.__table_name)
 
-        self.conn.executescript(init_schema_query.format(table_name=self.table_name))
-        self.conn.commit()
+        logger.debug(query)
+        self.__conn.executescript(query)
+        self.__conn.commit()
 
-    def upsert_system(self, system: System):
-        query = """
+    def upsert_system(self, system: System) -> None:
+        query_fmt = """
         INSERT INTO
             {table_name} ({column_list})
         VALUES
@@ -108,23 +114,20 @@ class SystemDB:
             timestamps = excluded.timestamps
         """
 
-        with self.conn:
-            self.conn.execute(
-                query.format(
-                    table_name=System.db_table_name(),
-                    column_list=System.db_column_list(),
-                    quoted_and_comma_separated_values_list=System.db_values_list(
-                        system
-                    ),
-                )
+        with self.__conn:
+            query = query_fmt.format(
+                table_name=System.db_table_name(),
+                column_list=System.db_column_list(),
+                quoted_and_comma_separated_values_list=System.db_values_list(system),
             )
+            self.__conn.execute(query)
 
     system_cols = [field.name for field in dataclasses.fields(System)]
 
     def _convert_row_dict_to_dataclass_params(
-        self, expected_cols: List[str], sys_dict: Dict
-    ):
-        params = {}
+        self, expected_cols: List[str], sys_dict: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        params: Dict[str, Any] = {}
         for col in expected_cols:
             col_val = sys_dict[col]
             if col_val is None:
@@ -138,76 +141,70 @@ class SystemDB:
     system_cols = [field.name for field in dataclasses.fields(System)]
 
     def get_system(self, system_name: str) -> Optional[System]:
-        with self.conn:
+        with self.__conn:
             name = system_name.replace("'", "''")
-            cur = self.conn.execute(
-                f"SELECT * FROM {self.table_name} WHERE name='\"{name}\"'"
-            )
+            query = f"SELECT * FROM {self.__table_name} WHERE name='\"{name}\"'"
+            logger.debug(query)
+            cur = self.__conn.execute(query)
             fetch = cur.fetchone()
 
-            if fetch is None:
-                return None
-            return System.from_dict(
-                self._convert_row_dict_to_dataclass_params(self.system_cols, fetch)
-            )
+            try:
+                return System.from_dict(self._convert_row_dict_to_dataclass_params(self.system_cols, fetch))
+            except Exception:
+                logger.debug(pformat(fetch.keys()))
+                traceback.print_exc()
+            return None
 
-    def get_systems(self, system_names: List[str]) -> Optional[System]:
-        with self.conn:
+    def get_systems(self, system_names: List[str]) -> List[System]:
+        with self.__conn:
             names = list(map(lambda n: n.replace("'", "''"), system_names))
             names_str = ", ".join(list(map(lambda n: f"'{n}'", names)))
-            cur = self.conn.execute(
-                f"SELECT * FROM {self.table_name} WHERE name IN ({names_str})"
-            )
+
+            query = f"SELECT * FROM {self.__table_name} WHERE name IN ({names_str})"
+            logger.debug(query)
+            cur = self.__conn.execute(query)
             fetches = cur.fetchall()
 
             rows = []
             for fetch in fetches:
-                rows.append(
-                    self._convert_row_dict_to_dataclass_params(self.system_cols, fetch)
-                )
+                rows.append(self._convert_row_dict_to_dataclass_params(self.system_cols, fetch))
 
             return System.schema().load(rows, many=True)
 
-    powerplay_system_cols = [
-        field.name for field in dataclasses.fields(PowerplaySystem)
-    ]
+    powerplay_system_cols = [field.name for field in dataclasses.fields(PowerplaySystem)]
 
-    def get_powerplay_systems(
-        self, power: str, powerStates: Optional[List[str]] = None
-    ):
+    def get_powerplay_systems(self, power: str, powerStates: Optional[List[str]] = None) -> List[PowerplaySystem]:
         query = (
-            "SELECT controllingPower AS power, powerState, id64, name, coords, date, government, allegiance, factions, powers "
-            f"FROM {self.table_name} "
+            "SELECT controllingPower AS power, powerState, id64, name, "
+            "coords, date, government, allegiance, factions, powers "
+            f"FROM {self.__table_name} "
             f"WHERE controllingPower='\"{power}\"'"
         )
 
         if powerStates:
-            powerStatesStr = ", ".join(
-                list(map(lambda state: f"'\"{state}\"'", powerStates))
-            )
+            powerStatesStr = ", ".join(list(map(lambda state: f"'\"{state}\"'", powerStates)))
             query += f" AND powerState IN ({powerStatesStr})"
 
+        logger.debug(query)
         return self.__execute_powerplay_system_query(query)
 
-    def get_unoccupied_powerplay_systems(self, power: str):
+    def get_unoccupied_powerplay_systems(self, power: str) -> List[PowerplaySystem]:
         query = (
-            "SELECT controllingPower AS power, powerState, id64, name, coords, date, government, allegiance, factions, powers "
-            f"FROM {self.table_name} "
+            "SELECT controllingPower AS power, powerState, id64, "
+            "name, coords, date, government, allegiance, factions, powers "
+            f"FROM {self.__table_name} "
             f"WHERE powerState='\"Unoccupied\"' AND EXISTS (SELECT 1 FROM json_each(powers) WHERE value = '{power}')"
         )
+        logger.debug(query)
         return self.__execute_powerplay_system_query(query)
 
     def __execute_powerplay_system_query(self, query: str) -> List[PowerplaySystem]:
-        with self.conn:
-            cur = self.conn.execute(query)
+        with self.__conn:
+            cur = self.__conn.execute(query)
             fetches = cur.fetchall()
 
             rows = []
             for fetch in fetches:
-                rows.append(
-                    self._convert_row_dict_to_dataclass_params(
-                        self.powerplay_system_cols, fetch
-                    )
-                )
+                rows.append(self._convert_row_dict_to_dataclass_params(self.powerplay_system_cols, fetch))
 
             return PowerplaySystem.schema().load(rows, many=True)

@@ -27,8 +27,8 @@ dependencies = [
     "typing-extensions (==4.13.2)",
     "urllib3 (==2.4.0)",
     "zmq (==0.0.0)",
-    "flake8-pyproject (>=1.2.3,<2.0.0)",
-    "aenum (>=3.1.15,<4.0.0)"
+    "aenum (>=3.1.15,<4.0.0)",
+
 ]
 
 [build-system]
@@ -48,21 +48,23 @@ mypy = "^1.15.0"
 black = "^25.1.0"
 isort = "^6.0.1"
 flake8 = "^7.2.0"
+flake8-pyproject = "^1.2.3,<2.0.0"
 pre-commit = "^4.2.0"
 pytest = "^8.3.5"
-
-[tool.black]
-line-length = 120
-target-version = ["py313"]
 
 [tool.isort]
 profile = "black"
 src_paths = ["src"]
 
+[tool.black]
+line-length = 120
+target-version = ["py313"]
+
 [tool.flake8]
 max-line-length = 120
-extend-ignore = ["E203", "E701"]
+extend-ignore = [ "E203", "E701" ]
 exclude = ["__pycache__", "build", "dist", ".venv"]
+
 
 [tool.mypy]
 python_version = "3.13"

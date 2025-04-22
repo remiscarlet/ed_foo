@@ -1,11 +1,15 @@
 import json
-from typing import Dict, List, Optional
 from pathlib import Path
+from typing import Dict, List, Optional
+
+from src.logging import get_logger
 
 from .db import SystemDB
-from .ed_types import System
 from .powerplay_systems import PowerplaySystems
 from .timer import Timer
+from .types import System
+
+logger = get_logger(__name__)
 
 
 class PopulatedGalaxySystemsImporter:
@@ -17,7 +21,7 @@ class PopulatedGalaxySystemsImporter:
         self.pp_systems = PowerplaySystems()
         self.db = SystemDB()
 
-    def __load_data_dump(self, dump_file: Path):
+    def __load_data_dump(self, dump_file: Path) -> None:
         timer = Timer("__load_data_dump()")
 
         systems_by_name = {}
@@ -29,13 +33,12 @@ class PopulatedGalaxySystemsImporter:
 
         timer.end()
 
-        print("== Loaded Data Dump ==")
-        print(f">> {len(self.systems_by_name.keys())} Systems")
-        print(
-            f">> 'Col 285 Sector WM-N b22-3' loaded: {'YES' if 'Col 285 Sector WM-N b22-3' in self.systems_by_name else 'NO'}"
-        )
+        test_system = "Col 285 Sector WM-N b22-3"
+        logger.info("== Loaded Data Dump ==")
+        logger.info(f">> {len(self.systems_by_name.keys())} Systems")
+        logger.info(f">> '{test_system}' loaded: {'YES' if test_system in self.systems_by_name else 'NO'}")
 
-    def filter_and_import_systems(self, filters: Optional[Dict[str, List[str]]] = None):
+    def filter_and_import_systems(self, filters: Optional[Dict[str, List[str]]] = None) -> None:
         filters = filters if filters is not None else {}
         timer = Timer("Outer filter_and_import_systems")
 
@@ -50,9 +53,7 @@ class PopulatedGalaxySystemsImporter:
             upserted += 1
 
             if upserted % log_every == 0:
-                print(
-                    f"Upserted {log_every} systems in {inner_timer.end(return_time=True):.2f} Seconds"
-                )
+                logger.info(f"Upserted {log_every} systems in {inner_timer.end():.2f} Seconds")
                 inner_timer.restart()
 
         timer.end()

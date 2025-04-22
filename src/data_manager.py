@@ -1,13 +1,14 @@
 import gzip
 import os
-from pathlib import Path
 import shutil
-import requests
-from tqdm import tqdm
-from requests.adapters import HTTPAdapter, Retry
+from pathlib import Path
+
+import requests  # type: ignore
+from requests.adapters import HTTPAdapter, Retry  # type: ignore
+from tqdm import tqdm  # type: ignore
 
 
-def download_file(url: str, dest_path: Path, chunk_size: int = 16_384):
+def download_file(url: str, dest_path: Path, chunk_size: int = 16_384) -> None:
     """
     Download a file with streaming, progress bar, and resume support.
     """
@@ -31,13 +32,16 @@ def download_file(url: str, dest_path: Path, chunk_size: int = 16_384):
     total_size = int(resp.headers.get("Content-Length", 0)) + first_byte
     mode = "ab" if first_byte else "wb"
 
-    with open(temp_path, mode) as f, tqdm(
-        total=total_size,
-        initial=first_byte,
-        unit="B",
-        unit_scale=True,
-        desc=os.path.basename(dest_path),
-    ) as bar:
+    with (
+        open(temp_path, mode) as f,
+        tqdm(
+            total=total_size,
+            initial=first_byte,
+            unit="B",
+            unit_scale=True,
+            desc=os.path.basename(dest_path),
+        ) as bar,
+    ):
         for chunk in resp.iter_content(chunk_size=chunk_size):
             if not chunk:
                 continue
@@ -48,7 +52,7 @@ def download_file(url: str, dest_path: Path, chunk_size: int = 16_384):
     os.replace(temp_path, dest_path)
 
 
-def ungzip(in_path: Path, out_path: Path, delete=True):
+def ungzip(in_path: Path, out_path: Path, delete: bool = True) -> None:
     with gzip.open(in_path, "rb") as f_in:
         with out_path.open("wb") as f_out:
             shutil.copyfileobj(f_in, f_out)

@@ -6,8 +6,20 @@ from typing import Any, Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
-from src.types import Coordinates, Minerals, Timestamps, _default_serialize
-from src.types.station import CommodityPrice, Station
+from src.logging import get_logger
+from src.types import (
+    CommodityPrice,
+    Coordinates,
+    HasMineableMetadata,
+    MineableSymbols,
+    MiningMethod,
+    RingType,
+    Station,
+    Timestamps,
+    _default_serialize,
+)
+
+logger = get_logger(__name__)
 
 
 @dataclass_json
@@ -31,6 +43,13 @@ class ControllingFaction(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass
+class Signals:
+    signals: Dict[MineableSymbols, int]
+    updateTime: Optional[datetime] = None
+
+
+@dataclass_json
+@dataclass
 class Asteroids(DataClassJsonMixin):
     name: str
     type: str
@@ -39,17 +58,15 @@ class Asteroids(DataClassJsonMixin):
     outerRadius: float
 
     id64: Optional[int] = None
-    signals: Optional[Dict[str, Dict[Minerals, int]]] = None
+    signals: Optional[Signals] = None
 
-    def extract_signals(self) -> Dict[Minerals, int]:
-        if not getattr(self, "signals"):
-            return {}
+    def extract_signals(self) -> Dict[MineableSymbols, int]:
         if self.signals is None:
             return {}
-        return self.signals.get("signals", {})
+        return self.signals.signals
 
-    def is_invalid_ring_for_mineral(self, mineral: Minerals) -> bool:
-        return mineral is Minerals.PLATINUM and self.type != "Metallic"
+    def is_invalid_ring_type(self, mineral: HasMineableMetadata) -> bool:
+        return RingType(self.type) not in mineral.ring_types
 
 
 @dataclass_json
@@ -100,15 +117,13 @@ class Body(DataClassJsonMixin):
     type: Optional[str] = None
     volcanismType: Optional[str] = None
 
-    def is_invalid_body_for_mineral(self, mineral: Minerals) -> bool:
-        if mineral == Minerals.MONAZITE:
+    def is_invalid_reserve_level(self, mineable: HasMineableMetadata) -> bool:
+        if MiningMethod.CORE_MINING in mineable.mining_methods:
             return False
-        elif mineral in [
-            Minerals.PLATINUM,
-        ]:
+        elif MiningMethod.LASER_MINING in mineable.mining_methods:
             return self.reserveLevel != "Pristine"
         else:
-            raise Exception(f"Got unknown mineral: '{mineral}'!")
+            raise Exception(f"Got mineral with unknown mining method: '{mineable}'!")
 
 
 @dataclass_json
@@ -164,7 +179,9 @@ class System(DataClassJsonMixin):
 
         return stations
 
-    def get_hotspot_rings(self, target_minerals: List[Minerals]) -> Dict[str, Dict[Minerals, int]]:
+    def get_hotspot_rings(
+        self, target_mineables: List[HasMineableMetadata]
+    ) -> Dict[str, Dict[HasMineableMetadata, int]]:
         """Returns a dict of _pristine_ ring names, minerals, and hotspot counts
 
         Eg,
@@ -180,8 +197,8 @@ class System(DataClassJsonMixin):
         if not self.bodies:
             return {}
 
-        # ring_name -> mineral -> count
-        hotspots: defaultdict[str, defaultdict[Minerals, int]] = defaultdict(lambda: defaultdict(int))
+        # ring_name -> mineable -> count
+        hotspots: defaultdict[str, defaultdict[HasMineableMetadata, int]] = defaultdict(lambda: defaultdict(int))
 
         for body in self.bodies:
             if not body.rings:
@@ -192,16 +209,15 @@ class System(DataClassJsonMixin):
                 if not signals:
                     continue
 
-                for mineral in target_minerals:
-                    count = signals.get(mineral, 0)
-                    # pprint.pprint([mineral, count, ring.name, body.reserveLevel, ring.type])
+                for mineable in target_mineables:
+                    count = signals.get(mineable.symbol, 0)  # type: ignore
                     if count <= 0:
                         continue
-                    if body.is_invalid_body_for_mineral(mineral):
+                    if body.is_invalid_reserve_level(mineable):
                         continue
-                    if ring.is_invalid_ring_for_mineral(mineral):
+                    if ring.is_invalid_ring_type(mineable):
                         continue
-                    hotspots[ring.name][mineral] += count
+                    hotspots[ring.name][mineable] += count
 
         # Convert nested defaultdicts back to normal dicts
         return {ring: dict(mineral_hotspots) for ring, mineral_hotspots in hotspots.items()}
@@ -311,8 +327,8 @@ class AcquisitionSystemPairings:
     unoccupied_system: System
     acquiring_systems: List[System]
 
-    def has_valid_hotspot_ring(self, minerals: List[Minerals]) -> bool:
+    def has_valid_hotspot_ring(self, mineables: List[HasMineableMetadata]) -> bool:
         for system in self.acquiring_systems:
-            if system.get_hotspot_rings(minerals):
+            if system.get_hotspot_rings(mineables):
                 return True
         return False
