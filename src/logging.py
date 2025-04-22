@@ -1,9 +1,9 @@
 import logging
 import logging.config
 from argparse import Namespace
-from typing import Any, Protocol, cast
 
 from src.constants import DEFAULT_LOG_LEVEL, LOG_DIR
+from src.logging_bootstrap import TRACE_LEVEL_NUM, TraceLogger
 
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -39,30 +39,19 @@ LOGGING_CONFIG = {
     },
 }
 
-TRACE_LEVEL_NUM = 5
+# class TraceableLogger(Protocol):
+#     def trace(self, msg: str, *args: Any, **kws: Any) -> None: ...
+#     def debug(self, msg: str, *args: Any, **kws: Any) -> None: ...
+#     def info(self, msg: str, *args: Any, **kws: Any) -> None: ...
+#     def warning(self, msg: str, *args: Any, **kws: Any) -> None: ...
+#     def error(self, msg: str, *args: Any, **kws: Any) -> None: ...
 
 
-def trace(self: logging.Logger, message: str, *args: Any, **kws: Any) -> None:
-    if self.isEnabledFor(TRACE_LEVEL_NUM):
-        self._log(TRACE_LEVEL_NUM, message, args, **kws)
-
-
-class TraceableLogger(Protocol):
-    def trace(self, msg: str, *args: Any, **kws: Any) -> None: ...
-    def debug(self, msg: str, *args: Any, **kws: Any) -> None: ...
-    def info(self, msg: str, *args: Any, **kws: Any) -> None: ...
-    def warning(self, msg: str, *args: Any, **kws: Any) -> None: ...
-    def error(self, msg: str, *args: Any, **kws: Any) -> None: ...
-
-
-def get_logger(name: str) -> TraceableLogger:
-    return cast(TraceableLogger, logging.getLogger(name))
+def get_logger(name: str) -> TraceLogger:
+    return logging.getLogger(name)
 
 
 def configure_logger(args: Namespace) -> None:
-    logging.addLevelName(TRACE_LEVEL_NUM, "TRACE")
-    logging.Logger.trace = trace  # type: ignore[attr-defined]
-
     logging.config.dictConfig(LOGGING_CONFIG)
 
     match args.verbosity:
