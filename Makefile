@@ -1,4 +1,4 @@
-.PHONY: install lint type
+.PHONY: install lint lintfix type check lintfixcheck
 
 install:
 	poetry install
@@ -16,3 +16,9 @@ type:
 	poetry run mypy .
 
 check: lint type
+
+lintfixcheck:
+	poetry run black .
+	poetry run isort .
+	poetry run flake8 . -v
+	poetry run mypy .

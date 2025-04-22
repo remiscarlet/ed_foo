@@ -1,6 +1,7 @@
 import logging
 import logging.config
 from argparse import Namespace
+from typing import cast
 
 from src.constants import DEFAULT_LOG_LEVEL, LOG_DIR
 from src.logging_bootstrap import TRACE_LEVEL_NUM, TraceLogger
@@ -48,7 +49,7 @@ LOGGING_CONFIG = {
 
 
 def get_logger(name: str) -> TraceLogger:
-    return logging.getLogger(name)
+    return cast(TraceLogger, logging.getLogger(name))
 
 
 def configure_logger(args: Namespace) -> None:

@@ -1,19 +1,18 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from src.logging import get_logger
 
 from .db import SystemDB
 from .powerplay_systems import PowerplaySystems
 from .timer import Timer
-from .types import System
 
 logger = get_logger(__name__)
 
 
 class PopulatedGalaxySystemsImporter:
-    systems_by_name: Dict[str, System] = {}
+    systems_by_name: Dict[str, Dict[str, Any]] = {}
     pp_systems: PowerplaySystems
 
     def __init__(self, dump_file: Path):

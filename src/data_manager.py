@@ -49,7 +49,7 @@ def download_file(url: str, dest_path: Path, chunk_size: int = 16_384) -> None:
             bar.update(len(chunk))
 
     # Move temp to final name once complete
-    os.replace(temp_path, dest_path)
+    shutil.move(temp_path, dest_path)
 
 
 def ungzip(in_path: Path, out_path: Path, delete: bool = True) -> None:

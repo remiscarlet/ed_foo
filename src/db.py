@@ -77,7 +77,7 @@ class SystemDB:
         self.__conn.executescript(query)
         self.__conn.commit()
 
-    def upsert_system(self, system: System) -> None:
+    def upsert_system(self, system: Dict[str, Any]) -> None:
         query_fmt = """
         INSERT INTO
             {table_name} ({column_list})

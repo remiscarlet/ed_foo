@@ -1,7 +1,7 @@
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field, fields
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
@@ -18,6 +18,9 @@ from src.types import (
     Timestamps,
     _default_serialize,
 )
+from src.types.commodities import CommodityCategory
+from src.types.station import Commodity
+from src.utils import TopNStack
 
 logger = get_logger(__name__)
 
@@ -180,9 +183,13 @@ class System(DataClassJsonMixin):
         return stations
 
     def get_hotspot_rings(
-        self, target_mineables: List[HasMineableMetadata]
+        self, target_mineables: Optional[List[HasMineableMetadata]] = None
     ) -> Dict[str, Dict[HasMineableMetadata, int]]:
-        """Returns a dict of _pristine_ ring names, minerals, and hotspot counts
+        """Returns a dict of ring names, mineables, and hotspot counts
+
+        Tests validity of ringType/reserveLevel per mineable commodity type
+
+        If no `target_mineables` is provided, returns all hotspots.
 
         Eg,
         {
@@ -194,32 +201,31 @@ class System(DataClassJsonMixin):
             }
         }
         """
-        if not self.bodies:
-            return {}
 
         # ring_name -> mineable -> count
-        hotspots: defaultdict[str, defaultdict[HasMineableMetadata, int]] = defaultdict(lambda: defaultdict(int))
+        hotspots: Dict[str, Counter[HasMineableMetadata]] = defaultdict(Counter)
 
-        for body in self.bodies:
-            if not body.rings:
-                continue
-
-            for ring in body.rings:
+        for body in self.bodies or []:
+            for ring in body.rings or []:
                 signals = ring.extract_signals()
                 if not signals:
                     continue
 
-                for mineable in target_mineables:
-                    count = signals.get(mineable.symbol, 0)  # type: ignore
-                    if count <= 0:
-                        continue
-                    if body.is_invalid_reserve_level(mineable):
-                        continue
-                    if ring.is_invalid_ring_type(mineable):
-                        continue
-                    hotspots[ring.name][mineable] += count
+                mineables = (
+                    target_mineables if target_mineables is not None else [sym.getMineableMetadata() for sym in signals]
+                )
 
-        # Convert nested defaultdicts back to normal dicts
+                for m in mineables:
+                    count = signals.get(MineableSymbols(m.symbol), 0)
+                    if not count:
+                        continue
+                    if body.is_invalid_reserve_level(m):
+                        continue
+                    if ring.is_invalid_ring_type(m):
+                        continue
+
+                    hotspots[ring.name][m] += count
+
         return {ring: dict(mineral_hotspots) for ring, mineral_hotspots in hotspots.items()}
 
     def get_commodities_prices(self, target_commodities: List[str]) -> Dict[str, Dict[str, CommodityPrice]]:
@@ -238,6 +244,39 @@ class System(DataClassJsonMixin):
 
         return {station: dict(prices) for station, prices in station_to_commodity_prices.items()}
 
+    def get_top_commodity_prices_per_station(
+        self,
+        top_n: int,
+        return_buy_prices: bool,
+        min_supply_demand: int,
+        station_name: Optional[str] = None,
+        category_filter: Optional[List[CommodityCategory]] = None,
+        max_data_age_days: Optional[int] = None,
+    ) -> Dict[str, TopNStack[Commodity]]:
+        """If `station` is provided, filters results to just that station, if it exists in this system."""
+        top_by_station: Dict[str, TopNStack[Commodity]] = {}
+
+        stations = [*self.stations]
+        for body in self.bodies:
+            stations.extend(body.stations)
+
+        for station in stations:
+            logger.debug(station.name)
+            if station_name is not None and station.name != station_name:
+                continue
+            if max_data_age_days is not None and (datetime.now(timezone.utc) - station.updateTime) > timedelta(
+                days=max_data_age_days
+            ):
+                continue
+
+            top_n_stack = station.get_top_commodity_prices(top_n, return_buy_prices, min_supply_demand, category_filter)
+            logger.debug(top_n_stack)
+
+            if not top_n_stack.is_empty():
+                top_by_station[station.name] = top_n_stack
+
+        return top_by_station
+
     @staticmethod
     def db_table_name() -> str:
         return "system"
@@ -248,11 +287,11 @@ class System(DataClassJsonMixin):
         return ", ".join(cols)
 
     @staticmethod
-    def db_values_list(system: "System") -> str:
+    def db_values_list(sys_dict: Dict[str, Any]) -> str:
         cols = [field.name for field in fields(System)]
         rtn = ""
         for column_name in cols:
-            col_val = getattr(system, column_name)
+            col_val = sys_dict.get(column_name)
             if col_val is None:
                 rtn += "    null,\n"
             elif isinstance(col_val, int) or isinstance(col_val, float):

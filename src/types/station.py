@@ -1,8 +1,15 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+from pprint import pformat
 from typing import Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
+
+from src.logging import get_logger
+from src.types.commodities import CommodityCategory
+from src.utils import TopNStack
+
+logger = get_logger(__name__)
 
 
 @dataclass(kw_only=True)
@@ -23,7 +30,7 @@ class CommodityPrice(DataClassJsonMixin):
 @dataclass_json
 @dataclass
 class Commodity(CommodityPrice):
-    category: str
+    category: CommodityCategory
     commodityId: int
     name: str
     symbol: str
@@ -139,3 +146,26 @@ class Station(DataClassJsonMixin):
 
     def has_min_data_age_days(self, min_age_days: int) -> bool:
         return (datetime.now(timezone.utc) - self.updateTime) > timedelta(days=min_age_days)
+
+    def get_top_commodity_prices(
+        self,
+        top_n: int,
+        return_buy_prices: bool,
+        min_supply_demand: int,
+        category_filter: Optional[List[CommodityCategory]] = None,
+    ) -> TopNStack[Commodity]:
+        top_n_list = TopNStack[Commodity](top_n, lambda price: price.buyPrice if return_buy_prices else price.sellPrice)
+
+        if self.market is not None:
+            for commodity in self.market.commodities or []:
+                if category_filter is not None and commodity.category not in category_filter:
+                    continue
+
+                commodity.updateTime = commodity.updateTime or self.market.updateTime or self.updateTime
+
+                supply_or_demand = commodity.supply if return_buy_prices else commodity.demand
+                if supply_or_demand >= min_supply_demand:
+                    logger.trace(pformat([supply_or_demand, min_supply_demand, commodity.name]))
+                    top_n_list.insert(commodity)
+
+        return top_n_list

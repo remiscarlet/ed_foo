@@ -24,6 +24,57 @@ This script tries to analyze this delta for potential stations to check prices a
   - Need more fine-grained tables and support for partially returned data (Eg, return bodies but only name, reserve level, and ring information in each object)
 
 ## Example Output
+- \[WIP\] `./find_best_reinforcement_mining_in_system.py`
+```
+./find_best_reinforcement_mining_in_system.py --system Daesitiates -M 1 -n 50
+
+====== SYSTEM ======
+Name: Daesitiates
+
+Got 3 stations with 43 total commodities
+Got 6 rings with 10 unique mineables across 25 hotspots
+Commodity    Ring Name             Station            Price    Demand  Updated Last
+-----------  --------------------  ---------------  -------  --------  -------------------
+Monazite     Daesitiates 1 B Ring  Blaschke Survey   362443        21  1 Day, 19 Hours Ago
+Monazite     Daesitiates 3 B Ring  Blaschke Survey   362443        21  1 Day, 19 Hours Ago
+
+Note: Market data relies on EDDN/Spansh dumps. Not all stations may have market data uploaded and prices may be stale.
+[Script] Took 0.00 seconds
+```
+- `./find_top_commodities_in_system_per_station.py`
+```
+ ./find_top_commodities_in_system_per_station.py --system Daesitiates
+
+====== SYSTEM ======
+Name: Daesitiates
+
+System Name    Commodity                   Sell Price    Demand    Buy Price    Supply  Updated Last
+-------------  ------------------------  ------------  --------  -----------  --------  -------------------
+Ellis Gateway  Platinum                        190412       209            0         0  1 Day, 19 Hours Ago
+Ellis Gateway  Osmium                          184903      4265            0         0  1 Day, 19 Hours Ago
+Ellis Gateway  Low Temperature Diamonds        158271       394            0         0  1 Day, 19 Hours Ago
+Ellis Gateway  Palladium                        59318      4976            0         0  1 Day, 19 Hours Ago
+Ellis Gateway  Tritium                          57706      2134            0         0  1 Day, 19 Hours Ago
+
+System Name     Commodity                   Sell Price    Demand    Buy Price    Supply  Updated Last
+--------------  ------------------------  ------------  --------  -----------  --------  -------------------
+Stephenson Hub  Low Temperature Diamonds        223351       476            0         0  1 Day, 19 Hours Ago
+Stephenson Hub  Platinum                        219509       319            0         0  1 Day, 19 Hours Ago
+Stephenson Hub  Osmium                          184902      3670            0         0  1 Day, 19 Hours Ago
+Stephenson Hub  Painite                         110047       452            0         0  1 Day, 19 Hours Ago
+Stephenson Hub  Palladium                        59318      4282            0         0  1 Day, 19 Hours Ago
+
+System Name      Commodity              Sell Price    Demand    Buy Price    Supply  Updated Last
+---------------  -------------------  ------------  --------  -----------  --------  -------------------
+Blaschke Survey  Monazite                   362443        21            0         0  1 Day, 19 Hours Ago
+Blaschke Survey  Meta-Alloys                215355       462            0         0  1 Day, 19 Hours Ago
+Blaschke Survey  Osmium                     155985        53            0         0  1 Day, 19 Hours Ago
+Blaschke Survey  Thorium                     12522      6811            0         0  1 Day, 19 Hours Ago
+Blaschke Survey  Insulating Membrane         11474       347            0         0  1 Day, 19 Hours Ago
+
+Note: Market data relies on EDDN/Spansh dumps. Not all stations may have market data uploaded and prices may be stale.
+[Script] Took 0.00 seconds
+```
 - `./find_all_hotspots_for_mineable_in_system.py`
 ```
 ./find_all_hotspots_for_mineable_in_system.py --mineable "Void Opal"

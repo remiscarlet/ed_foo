@@ -10,8 +10,23 @@ from typing import (
 
 from aenum import StrEnum, extend_enum
 
-# TODO: Consider adding "is_valid_hotspot" and other mining validity
-# checks here with bodies/asteroids being passed in as an arg.
+
+class CommodityCategory(StrEnum):
+    CHEMICALS = "Chemicals"
+    CONSUMER_ITEMS = "Consumer Items"
+    LEGAL_DRUGS = "Legal Drugs"
+    FOODS = "Foods"
+    INDUSTRIAL_MATERIALS = "Industrial Materials"
+    MACHINERY = "Machinery"
+    MEDICINES = "Medicines"
+    METALS = "Metals"
+    MINERALS = "Minerals"
+    SALVAGE = "Salvage"
+    SLAVES = "Slaves"
+    TECHNOLOGY = "Technology"
+    TEXTILES = "Textiles"
+    WASTE = "Waste"
+    WEAPONS = "Weapons"
 
 
 class MiningMethod(StrEnum):
@@ -26,28 +41,15 @@ class RingType(StrEnum):
     ROCKY = "Rocky"
 
 
+type CommodityEnumTuple = tuple[str, bool, str, set[MiningMethod], set[RingType], bool]
+
+
 class MineableMetadata(TypedDict):
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
 
-    symbol: NotRequired[str]
-
-
-class HasMineableMetadata(Protocol):
-    # Enum field
-    name: str
-    value: str
-
-    # Metadata fields
-    symbol: str
-    is_mineable: bool
-    mining_methods: Set[MiningMethod]
-    ring_types: Set[RingType]
-    has_hotspots: bool
-
-
-type CommodityEnumTuple = tuple[str, bool, str, set[MiningMethod], set[RingType], bool]
+    symbol: NotRequired[str]  # This is okay to be a str as we convert it to a MineableSymbols
 
 
 def mineableCommodityEnum(value: str, metadata: MineableMetadata) -> CommodityEnumTuple:
@@ -63,11 +65,17 @@ def mineableCommodityEnum(value: str, metadata: MineableMetadata) -> CommodityEn
 
 
 def commodityEnum(value: str) -> CommodityEnumTuple:
-    [is_mineable, mining_methods, ring_types, has_hotspots] = [False, set(), set(), False]  # type: ignore
-    return (value, is_mineable, value, mining_methods, ring_types, has_hotspots)
+    [is_mineable, mineable_symbol, mining_methods, ring_types, has_hotspots] = [
+        False,
+        value,
+        set[MiningMethod](),
+        set[RingType](),
+        False,
+    ]
+    return (value, is_mineable, mineable_symbol, mining_methods, ring_types, has_hotspots)
 
 
-aenum_json_init_config = "value is_mineable symbol mining_methods ring_types has_hotspots"
+aenum_metadata_init_config = "value is_mineable symbol mining_methods ring_types has_hotspots"
 
 
 class Chemicals(StrEnum):
@@ -75,7 +83,7 @@ class Chemicals(StrEnum):
     Thanks, Tritium.
     """
 
-    _init_ = aenum_json_init_config
+    _init_ = aenum_metadata_init_config
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
@@ -105,7 +113,7 @@ class Chemicals(StrEnum):
 
 # Data from https://tinyurl.com/bdd435s5
 class Minerals(StrEnum):
-    _init_ = aenum_json_init_config
+    _init_ = aenum_metadata_init_config
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
@@ -295,7 +303,7 @@ class Minerals(StrEnum):
 
 
 class Metals(StrEnum):
-    _init_ = aenum_json_init_config
+    _init_ = aenum_metadata_init_config
     mining_methods: Set[MiningMethod]
     ring_types: Set[RingType]
     has_hotspots: bool
@@ -385,6 +393,19 @@ class Metals(StrEnum):
 
 
 mineables_lookup = {m.value: m for m in chain(Minerals, Metals, Chemicals)}
+
+
+class HasMineableMetadata(Protocol):
+    # Enum field
+    name: str
+    value: str
+
+    # Metadata fields
+    symbol: str  # Should be MineableSymbols but hard to do because we dynamically add its members, leading to circ deps
+    is_mineable: bool
+    mining_methods: Set[MiningMethod]
+    ring_types: Set[RingType]
+    has_hotspots: bool
 
 
 class Mineables(StrEnum):
