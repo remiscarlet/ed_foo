@@ -10,7 +10,7 @@
 
 This project is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data, built with scalability and adaptability in mind.
 
-We collect, process, and expose structured data from external sources like **Spansh**, **EDSM**, and **EDDN**, and allow internal and external users to interact with insights via:
+We collect, process, and expose structured data from external sources like **Spansh**, **EDSM**, and **EDDN**, and allow allowlisted users to interact with insights via:
 - CLI tools
 - REST APIs
 - Automated notifications (e.g., Discord bots, Webhooks)
