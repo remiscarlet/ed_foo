@@ -4,7 +4,6 @@ from pprint import pformat
 from typing import Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
-
 from src.logging import get_logger
 from src.types.commodities import CommodityCategory
 from src.utils import TopNStack

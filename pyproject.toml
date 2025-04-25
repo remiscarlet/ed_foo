@@ -28,6 +28,7 @@ dependencies = [
     "urllib3 (==2.4.0)",
     "zmq (==0.0.0)",
     "aenum (>=3.1.15,<4.0.0)",
+    "datamodel-code-generator (>=0.30.0,<0.31.0)",
 
 ]
 

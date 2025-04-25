@@ -3,14 +3,13 @@
 import argparse
 import textwrap
 
-from tabulate import tabulate  # type: ignore
-
 from src.argparse_actions import StoreSystemNameWithCoords
 from src.logging import configure_logger, get_logger
 from src.populated_galaxy_systems import PopulatedGalaxySystems
 from src.timer import Timer
 from src.types import CommodityType
 from src.utils import get_time_since
+from tabulate import tabulate  # type: ignore
 
 logger = get_logger(__name__)
 

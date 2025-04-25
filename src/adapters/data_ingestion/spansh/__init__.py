@@ -1,11 +1,10 @@
 import types
 from datetime import datetime
 from pprint import pformat
-from typing import Any, Dict, Union, get_args, get_origin
+from typing import Any, Union, get_args, get_origin
 
 import dataclasses_json
 import dataclasses_json.core as _core
-
 from src.logging import get_logger
 
 dataclasses_json.cfg.global_config.encoders[datetime] = datetime.isoformat
@@ -47,86 +46,3 @@ def _decode_generic(type_: Any, value: Any, infer_missing: bool) -> Any:
 
 
 _core._decode_generic = _decode_generic
-
-
-def _default_serialize(o: Any) -> Dict[str, Any]:
-    if hasattr(o, "to_dict"):
-        return o.to_dict()  # type: ignore
-    raise TypeError(f"Type {o!r} not serializable")
-
-
-__all__ = []
-
-from .commodities import (  # noqa: F401, E402
-    Chemicals,
-    CommodityType,
-    HasMineableMetadata,
-    Metals,
-    MineableMetadata,
-    Mineables,
-    MineableSymbols,
-    Minerals,
-    MiningMethod,
-    RingType,
-)
-from .common import (  # noqa: F401, E402
-    Coordinates,
-    Timestamps,
-)
-from .station import (  # noqa: F401, E402
-    Commodity,
-    CommodityPrice,
-    Market,
-    Outfitting,
-    Ship,
-    ShipModule,
-    Shipyard,
-    Station,
-)
-from .system import (  # noqa: F401, E402
-    AcquisitionSystemPairings,
-    Asteroids,
-    Body,
-    ControllingFaction,
-    PlayerMinorFaction,
-    PowerplaySystem,
-    Signals,
-    System,
-)
-
-__all__.extend(
-    [
-        # Commodities
-        "MiningMethod",
-        "RingType",
-        "MineableMetadata",
-        "HasMineableMetadata",
-        "Chemicals",
-        "Minerals",
-        "Metals",
-        "Mineables",
-        "MineableSymbols",
-        "CommodityType",
-        # Common
-        "Coordinates",
-        "Timestamps",
-        # Station
-        "CommodityPrice",
-        "Commodity",
-        "Market",
-        "ShipModule",
-        "Outfitting",
-        "Ship",
-        "Shipyard",
-        "Station",
-        # System
-        "PlayerMinorFaction",
-        "ControllingFaction",
-        "Signals",
-        "Asteroids",
-        "Body",
-        "System",
-        "PowerplaySystem",
-        "AcquisitionSystemPairings",
-    ]
-)
