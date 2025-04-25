@@ -128,17 +128,9 @@ We favor slightly more boilerplate up-front to achieve long-term adaptability as
 # Install deps
 make install
 
-# Run dev server
-make run-api
-
-# Export OpenAPI/JSON Schema
-make export-schema
-
-# Validate DB schemas
-make validate-db
-
-# Use CLI
-make cli greet --username testuser
+# Run Docker-based dev server
+make up
+make down
 ```
 
 ---

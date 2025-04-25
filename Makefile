@@ -27,6 +27,15 @@ lintfixcheck:
 	poetry run flake8 . -v
 	poetry run mypy .
 
+## Docker (Dev Only)
+
+up:
+	docker compose -f tools/docker/docker-compose.yml up --build
+
+down:
+	docker compose -f tools/docker/docker-compose.yml down
+
+
 ## Code Gen
 
 download_eddn_models:

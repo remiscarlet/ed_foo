@@ -79,3 +79,57 @@
 - Easy to test Core in isolation (no FastAPI, no SQLAlchemy needed).
 - Clean boundaries = easier scaling, easier maintenance, easier onboarding.
 
+
+# Mermaid Diagram
+
+```mermaid
+flowchart TD
+    ES1["Spansh"]
+    ES2["EDSM"]
+    ES3["EDDN"]
+    O1["HTTP Responses"]
+    O2["CLI Outputs"]
+    O3["Discord Webhooks (future)"]
+    O4["Data Exports (future)"]
+
+    subgraph Adapters
+      A1["Ingestion Adapters"]
+      A2["Persistence Adapter"]
+      A3["REST Adapter"]
+      A4["CLI Adapter"]
+    end
+
+    subgraph Ports
+      P1["Abstract Interfaces"]
+    end
+
+    subgraph Core
+      C1["Pydantic Models"]
+      C2["Workflows\n(Reports, Analysis)"]
+    end
+
+    ES1 --> A1
+    ES2 --> A1
+    ES3 --> A1
+
+    A1 --> P1
+    A2 --> P1
+    A3 --> P1
+    A4 --> P1
+
+    P1 --> C1
+    P1 --> C2
+
+    C2 --> P1
+    C1 --> P1
+
+    P1 --> A2
+    P1 --> A3
+    P1 --> A4
+
+    A3 --> O1
+    A4 --> O2
+    A4 --> O3
+    A4 --> O4
+
+```
