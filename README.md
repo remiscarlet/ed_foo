@@ -1,71 +1,150 @@
-## ED Foo Or Something
-<sub>...Enhanced Knowledge Analysis and Insights Notification Engine</sub>
+# ED Foo (Enhanced Knowledge Analysis and Insights Notification Engine)
 
-Extremely WIP refactor.
+<sub>Extremely WIP — initial refactor in progress.</sub>
 
-# Design
+---
 
-## What
-- Poetry for project/package management
-    - Makefiles for build workflows
-- Uses Hexagonal/Ports and Adapters Code Architecture
-- Pydantic Types
-    - Core pydantic models will be used as the source of truth for codegen as well
-    - Typer for pydantic-integrated CLI args
-- FastAPI for HTTP
-- Codegen for schemas
-    - JSON Schemas for EDDN
-    - OpenAPI defs
+# Design Overview
 
-## Why Hexagonal/Ports and Adapters Architecture
-We have some core logical functionality we want to expose - data analysis and reports about them. The exact source of data and where or how the data is presented is not a primary concern.
+## What This Project Is
 
-Our data can come from multiple source like Spansh, EDSM, or EDDN. All have different formats, meaning we need our own internal format for consistency. People might use the analysis results through CLI commands, use a REST API/WebUI, rely on Discord webhook events through Crons, or other methods. This all means the "inputs" and "outputs" are numerous and we want to avoid any tight coupling of technology or interface choices.
+This project is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data, built with scalability and adaptability in mind.
 
-The Hexagonal architecture lends itself well to these design concerns and thus was chosen.
+We collect, process, and expose structured data from external sources like **Spansh**, **EDSM**, and **EDDN**, and allow internal and external users to interact with insights via:
+- CLI tools
+- REST APIs
+- Automated notifications (e.g., Discord bots, Webhooks)
 
-## Models and Schemas
-We have three major categories of models and schemas:
-  - "Logical" Schemas
-  - "Physical" Schemas
-  - "External" Schemas
+---
 
-### Logical Schemas
- "Logical" schemas are the ones we interact with the most in the code. It represents the purest conceptual shapes we work with, with a focus on usability and ergonomics as the primary concerns.
+## Key Technologies
 
-- `src/core/models/`
-- Represents how we work with data
-- Not tied to any specific framework or technology - it's tech agnostic and domain-specific to our core business logic.
+| Purpose                         | Technology                   | Why |
+|:---------------------------------|:------------------------------|:----|
+| Project Management              | Poetry                        | Modern Python packaging and dependency management |
+| Build Automation                | Makefiles                     | Human-readable, cross-platform dev commands |
+| Core Data Modeling              | Pydantic                      | Type-safe schemas, OpenAPI generation, easy codegen |
+| CLI Development                 | Typer                         | Pydantic-integrated CLI with minimal boilerplate |
+| API Server                      | FastAPI                       | Modern async Python HTTP API, OpenAPI integration |
+| Database                        | Postgres + SQLAlchemy         | Relational storage, robust ORM mapping |
+| Migrations                      | Alembic                       | Database schema evolution |
+| Code Generation (planned)       | OpenAPI, JSON Schema export   | External data contracts and client generation |
 
-### Physical Schemas
-"Physical" schemas are how we physically store the data. This is technology-dependent, such as storing data in Postgres.
+---
 
-- `src/adapters/persistence/postgres/`
-- `src/alembic/`
-- Represents implementation details of how we store the data
-- Requires mapping Logical schemas to Physical schemas
-  - Boilerplate-y, but cost of logical abstractions/Ports and Adapters architecture
-- Manually written migrations
-  - Ideally run as part of CICD
+# Code Architecture
 
-### External Schemas
-Schemas defined by third parties that we may want to use in Python code.
+## Why Hexagonal (Ports and Adapters) Architecture?
 
-- `gen/`
-- Currently only `gen/eddn_models/`
-  - Generated from their JSON Schemas
+The system must be flexible about:
+- **Where data comes from** (e.g., EDSM dumps, live EDDN feeds, manually entered data)
+- **Where results go** (e.g., CLI display, API endpoints, webhook events)
 
-# Developing
+Thus, we separate **core domain logic** from **input/output concerns**.
+This avoids coupling the system tightly to any specific data source or delivery mechanism.
 
-## Makefile
-- Setup
-  - `make install`
-- Lint + fix, type check
-  - `make lintfixcheck`
-- Generate EDDN pydantic models
-  - `make models`
+| Layer | Responsibility |
+|:------|:---------------|
+| Core (Domain) | Pure business logic, technology-agnostic |
+| Ports (Interfaces) | Abstract contract definitions (e.g., User storage) |
+| Adapters | Technology-specific implementations (e.g., SQLAlchemy, FastAPI) |
 
+This structure allows:
+- Adding new ingestion sources easily
+- Exposing workflows through new channels (CLI, API, Discord) with minimal duplication
+- Isolating tests cleanly at each layer
+
+---
+
+# Models and Schemas
+
+We organize our data definitions into three major categories:
+
+## Logical Schemas
+- Location: `src/core/models/`
+- Purpose: Represent pure domain concepts, independent of technology
+- Characteristics:
+  - Pydantic models
+  - Clean, type-safe, business-focused
+
+## Physical Schemas
+- Location: `src/adapters/persistence/postgres/` and `src/alembic/`
+- Purpose: Represent how data is stored in persistent systems (e.g., Postgres tables)
+- Characteristics:
+  - SQLAlchemy models
+  - Manual migrations with Alembic
+  - Mappings between Logical and Physical schemas as needed
+
+> **Note**: This introduces some unavoidable boilerplate but pays off in flexibility and clarity.
+
+## External Schemas
+- Location: `gen/`
+- Purpose: Represent third-party schema definitions (e.g., EDDN event formats)
+- Characteristics:
+  - Pydantic models auto-generated from external JSON Schemas
+  - Used for ingesting external messages safely
+
+---
+
+# Development
+
+## Key Makefile Commands
+
+| Command | Purpose |
+|:--------|:--------|
+| `make install` | Set up Python environment |
+| `make lintfixcheck` | Lint, auto-fix, and type-check |
+| `make export-schema` | Generate and save JSON Schemas from Pydantic models |
+| `make run-api` | Run local FastAPI server via Uvicorn |
+| `make cli` | Run CLI entrypoint |
+| `make migrate` | Create new Alembic migration |
+| `make upgrade` | Apply Alembic migrations |
+
+---
 
 # Future TODOs
-- CICD once there's a bit more clarity on existing infra and resources
-- Consider a command bus pattern once we have a non-trivial number of "commands"/"workflows"
+
+- Set up full **CI/CD pipeline** (likely GitHub Actions)
+- Introduce optional **Command Bus** pattern for CLI and API workflow invocation
+- Explore async ORM integration (SQLAlchemy 2.0 async support)
+- Expand ingestion sources beyond EDSM/EDDN
+- Add in-memory and background workers (for task queues, webhook triggers)
+- Add basic operational monitoring (metrics, logging)
+
+---
+
+# Design Philosophy
+
+This system is engineered for **durability**, **extensibility**, and **clean separation of concerns**.
+We favor slightly more boilerplate up-front to achieve long-term adaptability as project complexity grows.
+
+> *Tech debt is managed by modularity, not shortcuts.*
+
+---
+
+# Quickstart Example
+
+```bash
+# Install deps
+make install
+
+# Run dev server
+make run-api
+
+# Export OpenAPI/JSON Schema
+make export-schema
+
+# Validate DB schemas
+make validate-db
+
+# Use CLI
+make cli greet --username testuser
+```
+
+---
+
+# Closing Notes
+
+This project is designed with the assumption that it will grow significantly in scope and complexity over time.
+Architecture choices prioritize **clarity, extensibility, and ergonomics for future developers** — even at some cost to initial verbosity.
+
