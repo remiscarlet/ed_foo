@@ -114,10 +114,6 @@ class MiningRoute(NamedTuple):
 
 
 def route_scoring_fn(mining_route: PotentialMiningRoute) -> int:
-    """Route scoring fn for choosing top N of potential routes
-
-    TODO: Calc distance between ring/body and station as part of score
-    """
     dataAge = datetime.now(timezone.utc) - mining_route.update_time
     if dataAge <= timedelta(days=2):
         decay = 1.0
@@ -224,13 +220,10 @@ def run(args: argparse.Namespace) -> None:
 
     table: List[MiningRoute] = []
     for potential_route in potential_routes.to_list():
-        # TODO: Make .to_list() return a List[NamedTuple] so can use these without spreading the list first.
-        # TODO: Maybe a `MiningRoute.from_named_tuple_name()`?
+
         [mineable_symbol, ring_name, station_name, sell_price, demand, _update_time, time_since_update] = (
             potential_route
         )
-
-        # TODO: Split list by mining type. Make it argparsable
 
         logger.debug("")
         logger.debug("??  MINEABLE SYMBOL AND HOTSPOT COMMODITIES")
