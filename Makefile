@@ -35,8 +35,15 @@ up:
 down:
 	docker compose -f tools/docker/docker-compose.yml down
 
+updb:
+	docker compose -f tools/docker/docker-compose.yml up --build -d db
+
+downdb:
+	docker compose -f tools/docker/docker-compose.yml stop db
+
 
 ## Code Gen
+
 
 download_eddn_models:
 	mkdir data

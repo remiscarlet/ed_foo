@@ -3,11 +3,10 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
-from src.types.commodities import CommodityCategory
 
 
 @dataclass(kw_only=True)
-class CommodityPriceDTO(DataClassJsonMixin):
+class CommodityPriceSpansh(DataClassJsonMixin):
     buyPrice: int
     demand: int
     sellPrice: int
@@ -17,8 +16,8 @@ class CommodityPriceDTO(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass
-class CommodityDTO(CommodityPriceDTO):
-    category: CommodityCategory
+class CommoditySpansh(CommodityPriceSpansh):
+    category: str  # src.core.models.commodity.CommodityCategory
     commodityId: int
     name: str
     symbol: str
@@ -26,15 +25,15 @@ class CommodityDTO(CommodityPriceDTO):
 
 @dataclass_json
 @dataclass
-class MarketDTO(DataClassJsonMixin):
-    commodities: Optional[List[CommodityDTO]] = None
+class MarketSpansh(DataClassJsonMixin):
+    commodities: Optional[List[CommoditySpansh]] = None
     prohibitedCommodities: Optional[List[str]] = None
     updateTime: Optional[datetime] = None
 
 
 @dataclass_json
 @dataclass
-class ShipModuleDTO(DataClassJsonMixin):
+class ShipModuleSpansh(DataClassJsonMixin):
     category: str
     cls: int = field(metadata=config(field_name="class"))
     moduleId: int
@@ -47,14 +46,14 @@ class ShipModuleDTO(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass
-class OutfittingDTO(DataClassJsonMixin):
-    modules: List[ShipModuleDTO]
+class OutfittingSpansh(DataClassJsonMixin):
+    modules: List[ShipModuleSpansh]
     updateTime: datetime
 
 
 @dataclass_json
 @dataclass
-class ShipDTO(DataClassJsonMixin):
+class ShipSpansh(DataClassJsonMixin):
     name: str
     shipId: int
     symbol: str
@@ -62,14 +61,14 @@ class ShipDTO(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass
-class ShipyardDTO(DataClassJsonMixin):
-    ships: List[ShipDTO]
+class ShipyardSpansh(DataClassJsonMixin):
+    ships: List[ShipSpansh]
     updateTime: datetime
 
 
 @dataclass_json
 @dataclass
-class StationDTO(DataClassJsonMixin):
+class StationSpansh(DataClassJsonMixin):
     id: int
     name: str
     updateTime: datetime
@@ -81,11 +80,11 @@ class StationDTO(DataClassJsonMixin):
     economies: Optional[Dict[str, float]] = None
     government: Optional[str] = None
     landingPads: Optional[Dict[str, int]] = None
-    market: Optional[MarketDTO] = None
-    outfitting: Optional[OutfittingDTO] = None
+    market: Optional[MarketSpansh] = None
+    outfitting: Optional[OutfittingSpansh] = None
     primaryEconomy: Optional[str] = None
     services: Optional[List[str]] = None
-    shipyard: Optional[ShipyardDTO] = None
+    shipyard: Optional[ShipyardSpansh] = None
     type: Optional[str] = None
 
     carrierName: Optional[str] = None

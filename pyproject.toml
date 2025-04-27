@@ -27,15 +27,18 @@ dependencies = [
     "typing-extensions (==4.13.2)",
     "urllib3 (==2.4.0)",
     "zmq (==0.0.0)",
-    "aenum (>=3.1.15,<4.0.0)",
     "datamodel-code-generator (>=0.30.0,<0.31.0)",
-
+    "uvicorn (>=0.34.2,<0.35.0)",
+    "fastapi (>=0.115.12,<0.116.0)",
+    "typer (>=0.15.2,<0.16.0)",
+    "alembic (>=1.15.2,<2.0.0)",
+    "sqlalchemy (>=2.0.40,<3.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
 ]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-
 
 [tool.poetry]
 name = "ed_foo"
@@ -53,9 +56,13 @@ flake8-pyproject = "^1.2.3,<2.0.0"
 pre-commit = "^4.2.0"
 pytest = "^8.3.5"
 
+[tool.poetry.scripts]
+cli = "src.app.main:main"
+
 [tool.isort]
 profile = "black"
 src_paths = ["src"]
+known_src = ["src"]
 
 [tool.black]
 line-length = 120
@@ -64,7 +71,7 @@ target-version = ["py313"]
 [tool.flake8]
 max-line-length = 120
 extend-ignore = [ "E203", "E701" ]
-exclude = ["__pycache__", "build", "dist", ".venv"]
+exclude = ["__pycache__", "build", "dist", ".venv", "data", "gen"]
 
 
 [tool.mypy]

@@ -3,8 +3,8 @@ import logging.config
 from argparse import Namespace
 from typing import cast
 
-from src.constants import DEFAULT_LOG_LEVEL, LOG_DIR
-from src.logging_bootstrap import TRACE_LEVEL_NUM, TraceLogger
+from src.common.constants import DEFAULT_LOG_LEVEL, LOG_DIR
+from src.common.logging_bootstrap import TRACE_LEVEL_NUM, TraceLogger
 
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -92,6 +92,7 @@ flowchart TD
     O3["Discord Webhooks (future)"]
     O4["Data Exports (future)"]
 
+
     subgraph Adapters
       A1["Ingestion Adapters"]
       A2["Persistence Adapter"]
@@ -105,7 +106,7 @@ flowchart TD
 
     subgraph Core
       C1["Pydantic Models"]
-      C2["Workflows\n(Reports, Analysis)"]
+      C2["Workflows (Reports, Analysis)"]
     end
 
     ES1 --> A1

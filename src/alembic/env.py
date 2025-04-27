@@ -2,23 +2,16 @@ import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
-from src.adapters.persistence.sqlalchemy.user import Base
 
 from alembic import context
+from src.adapters.persistence.postgresql import Base
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
-
-# Interpret the config file for Python logging.
 fileConfig(config.config_file_name)
 
-# Add your models' metadata here
 target_metadata = Base.metadata
 
-# Database URL from environment variables
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://ed_kaine:ed_kaine_pw@localhost:5432/ed_kaine")
-
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://e_kaine:e_kaine_pw@localhost:5432/e_kaine")
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 

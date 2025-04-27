@@ -7,7 +7,7 @@ from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 @dataclass_json
 @dataclass
-class CoordinatesDTO(DataClassJsonMixin):
+class CoordinatesSpansh(DataClassJsonMixin):
     x: float
     y: float
     z: float
@@ -15,7 +15,7 @@ class CoordinatesDTO(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass
-class TimestampsDTO(DataClassJsonMixin):
+class TimestampsSpansh(DataClassJsonMixin):
     controllingPower: Optional[datetime] = None
     powerState: Optional[datetime] = None
     powers: Optional[datetime] = None
