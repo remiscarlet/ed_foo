@@ -18,8 +18,8 @@ class Coordinates(BaseModel):
 
 
 class Timestamps(BaseModel):
-    controllingPower: Optional[datetime] = None
-    powerState: Optional[datetime] = None
+    controlling_power: Optional[datetime] = None
+    power_state: Optional[datetime] = None
     powers: Optional[datetime] = None
-    distanceToArrival: Optional[datetime] = None
-    meanAnomaly: Optional[datetime] = None
+    distance_to_arrival: Optional[datetime] = None
+    mean_anomaly: Optional[datetime] = None

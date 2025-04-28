@@ -1,0 +1,184 @@
+---
+Alexandrite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Icy]
+  has_hotspots: true
+
+Bauxite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Rocky]
+  has_hotspots: false
+
+Benitoite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Rocky]
+  has_hotspots: true
+
+Bertrandite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Bromellite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Icy]
+  has_hotspots: true
+
+Coltan:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Rocky]
+  has_hotspots: false
+
+Cryolite:
+  category: Minerals
+  is_mineable: false
+
+Gallite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Goslarite:
+  category: Minerals
+  is_mineable: false
+
+Grandidierite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: ['Rocky, Icy']
+  has_hotspots: true
+
+Haematite:
+  category: Minerals
+  is_mineable: false
+
+Indite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Jadeite:
+  category: Minerals
+  is_mineable: false
+
+Lepidolite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Lithium Hydroxide:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Low Temperature Diamonds:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  symbol: LowTemperatureDiamond
+  ring_types: [Icy]
+  has_hotspots: true
+
+Methane Clathrate:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Methanol Monohydrate Crystals:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Moissanite:
+  category: Minerals
+  is_mineable: false
+
+Monazite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Metallic]
+  has_hotspots: true
+
+Musgravite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Rocky]
+  has_hotspots: true
+
+Painite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: true
+
+Pyrophyllite:
+  category: Minerals
+  is_mineable: false
+
+Rhodplumsite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Metallic]
+  has_hotspots: true
+
+Rutile:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Serendibite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Metallic]
+  has_hotspots: true
+
+Taaffeite:
+  category: Minerals
+  is_mineable: false
+
+Uraninite:
+  category: Minerals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Void Opal:
+  category: Minerals
+  symbol: Opal
+  is_mineable: true
+  mining_method: Core
+  ring_types: [Icy]
+  has_hotspots: true

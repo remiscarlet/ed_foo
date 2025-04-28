@@ -1,3 +1,4 @@
+---
 services:
   db:
     image: timescale/timescaledb-ha:pg17
@@ -6,22 +7,26 @@ services:
       POSTGRES_USER: e_kaine
       POSTGRES_PASSWORD: e_kaine_pw
       POSTGRES_DB: e_kaine
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
+    ports: [5432:5432]
+    volumes: [pgdata:/var/lib/postgresql/data]
   api:
     build:
       context: ../../
       dockerfile: tools/docker/e_kaine/Dockerfile
-    depends_on:
-      - db
+    depends_on: [db]
     environment:
       DATABASE_URL: postgres://e_kaine:e_kaine_pw@db:5432/e_kaine
-    ports:
-      - "8000:8000"
-    command: ["poetry", "run", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports: [8000:8000]
+    command:
+      - poetry
+      - run
+      - uvicorn
+      - src.app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8000'
+      - --reload
 
 volumes:
   pgdata:

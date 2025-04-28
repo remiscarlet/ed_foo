@@ -13,11 +13,22 @@ class Faction(BaseModel):
     allegiance: str
     state: str
 
+    edsm_id: Optional[int] = None
+    happiness: Optional[str] = None
+    is_player: Optional[bool] = None
+    active_states: Optional[List[str]] = None
+    pending_states: Optional[List[str]] = None
+    recovering_states: Optional[List[str]] = None
+
+    spansh_update_time: Optional[datetime] = None
+    edsm_update_time: Optional[datetime] = None
+    eddn_update_time: Optional[datetime] = None
+
 
 class System(BaseModel):
     allegiance: str
     bodies: List[Any]  # Body
-    controllingFaction: Any  # ControllingFaction
+    controlling_faction: Any  # ControllingFaction
     coords: Coordinates
     date: datetime
     factions: List[Any]  #  PlayerMinorFaction
@@ -25,20 +36,24 @@ class System(BaseModel):
     id64: int
     name: str
     population: int
-    primaryEconomy: str
-    secondaryEconomy: str
+    primary_economy: str
+    secondary_economy: str
     security: str
     stations: List[Any]  # Station
 
-    bodyCount: Optional[int] = None
+    body_count: Optional[int] = None
 
-    controllingPower: Optional[str] = None
-    powerConflictProgress: Optional[List[Any]] = None
-    powerState: Optional[str] = None
-    powerStateControlProgress: Optional[float] = None
-    powerStateReinforcement: Optional[float] = None
-    powerStateUndermining: Optional[float] = None
+    controlling_power: Optional[str] = None
+    power_conflict_progress: Optional[List[Any]] = None
+    power_state: Optional[str] = None
+    power_stat_control_progress: Optional[float] = None
+    power_state_reinforcement: Optional[float] = None
+    power_state_undermining: Optional[float] = None
     powers: Optional[List[str]] = None
 
-    thargoidWar: Optional[int] = None
+    thargoid_war: Optional[int] = None
     timestamps: Optional[Timestamps] = None
+
+    spansh_update_time: Optional[datetime] = None
+    edsm_update_time: Optional[datetime] = None
+    eddn_update_time: Optional[datetime] = None

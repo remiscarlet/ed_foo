@@ -8,11 +8,13 @@ install:
 ## Code Quality
 
 lint:
+	poetry run yamllint **/*.yaml
 	poetry run black --check .
 	poetry run isort --check-only .
 	poetry run flake8 . -v
 
 lintfix:
+	poetry run yamlfix **/*.yaml
 	poetry run black .
 	poetry run isort .
 
@@ -22,6 +24,7 @@ type:
 check: lint type
 
 lintfixcheck:
+	poetry run yamlfix **/*.yaml
 	poetry run black .
 	poetry run isort .
 	poetry run flake8 . -v
@@ -30,16 +33,16 @@ lintfixcheck:
 ## Docker (Dev Only)
 
 up:
-	docker compose -f tools/docker/docker-compose.yml up --build
+	docker compose -f tools/docker/docker-compose.yaml up --build
 
 down:
-	docker compose -f tools/docker/docker-compose.yml down
+	docker compose -f tools/docker/docker-compose.yaml down
 
 updb:
-	docker compose -f tools/docker/docker-compose.yml up --build -d db
+	docker compose -f tools/docker/docker-compose.yaml up --build -d db
 
 downdb:
-	docker compose -f tools/docker/docker-compose.yml stop db
+	docker compose -f tools/docker/docker-compose.yaml stop db
 
 
 ## Code Gen

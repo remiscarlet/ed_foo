@@ -1,0 +1,51 @@
+---
+Tritium:
+  category: Chemicals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Icy]
+  has_hotspots: true
+
+Argonomic Treatment:
+  category: Chemicals
+  is_mineable: false
+
+Explosives:
+  category: Chemicals
+  is_mineable: false
+
+Hydrogen Fuel:
+  category: Chemicals
+  is_mineable: false
+
+Liquid Fuel:
+  category: Chemicals
+  is_mineable: false
+
+Mineral Oil:
+  category: Chemicals
+  is_mineable: false
+
+Nerve Agents:
+  category: Chemicals
+  is_mineable: false
+
+Pesticides:
+  category: Chemicals
+  is_mineable: false
+
+Rockforth Fertiliser:
+  category: Chemicals
+  is_mineable: false
+
+Surface Stabilisers:
+  category: Chemicals
+  is_mineable: false
+
+Synthetic Reagents:
+  category: Chemicals
+  is_mineable: false
+
+Water:
+  category: Chemicals
+  is_mineable: false

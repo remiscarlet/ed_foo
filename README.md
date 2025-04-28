@@ -94,7 +94,7 @@ We organize our data definitions into three major categories:
 |:--------|:--------|
 | `make install` | Set up Python environment |
 | `make lintfixcheck` | Lint, auto-fix, and type-check |
-| `make export-schema` | Generate and save JSON Schemas from Pydantic models |
+<!-- | `make export-schema` | Generate and save JSON Schemas from Pydantic models | -->
 | `make run-api` | Run local FastAPI server via Uvicorn |
 | `make cli` | Run CLI entrypoint |
 | `make migrate` | Create new Alembic migration |
@@ -110,6 +110,7 @@ We organize our data definitions into three major categories:
 - Expand ingestion sources beyond EDSM/EDDN
 - Add in-memory and background workers (for task queues, webhook triggers)
 - Add basic operational monitoring (metrics, logging)
+- If we do a lot of spacial/system coordinate based calculations, may consider **PostGIS**
 
 ---
 

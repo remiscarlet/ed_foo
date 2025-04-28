@@ -34,6 +34,8 @@ dependencies = [
     "alembic (>=1.15.2,<2.0.0)",
     "sqlalchemy (>=2.0.40,<3.0.0)",
     "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "yamlfix (>=1.17.0,<2.0.0)",
+    "yamllint (>=1.37.0,<2.0.0)",
 ]
 
 [build-system]
@@ -73,6 +75,9 @@ max-line-length = 120
 extend-ignore = [ "E203", "E701" ]
 exclude = ["__pycache__", "build", "dist", ".venv", "data", "gen"]
 
+[tool.yamlfix]
+line_length = 80
+section_whitelines = 1
 
 [tool.mypy]
 python_version = "3.13"

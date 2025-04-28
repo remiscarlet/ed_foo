@@ -5,42 +5,42 @@ from sqlalchemy.orm import relationship
 from src.adapters.persistence.postgresql import BaseModel, HasCoordinates
 
 
-class SignalDB(BaseModel):
+class SignalsDB(BaseModel):
     __tablename__ = "signals"
 
     id = Column(Integer, primary_key=True)
-    body_id = Column(Integer, ForeignKey("body.id"), nullable=False)
+    body_id = Column(Integer, ForeignKey("bodies.id"), nullable=False)
     signal_type = Column(String, nullable=False)
     count = Column(Integer)
 
 
-class RingDB(BaseModel):
-    __tablename__ = "ring"
+class RingsDB(BaseModel):
+    __tablename__ = "rings"
 
     id = Column(Integer, primary_key=True)
-    body_id = Column(Integer, ForeignKey("body.id"), nullable=False)
+    body_id = Column(Integer, ForeignKey("bodies.id"), nullable=False)
     name = Column(String, nullable=False)
 
-    hotspots = relationship("HotspotDB", back_populates="ring")
+    hotspots = relationship("HotspotsDB", back_populates="ring")
 
 
-class HotSpotDB(BaseModel):
-    __tablename__ = "hotspot"
+class HotSpotsDB(BaseModel):
+    __tablename__ = "hotspots"
 
     id = Column(Integer, primary_key=True)
-    ring_id = Column(Integer, ForeignKey("ring.id"), nullable=False)
-    commodity_id = Column(Integer, ForeignKey("commodity.id"), nullable=False)
+    ring_id = Column(Integer, ForeignKey("rings.id"), nullable=False)
+    commodity_id = Column(Integer, ForeignKey("commodities.id"), nullable=False)
 
     count = Column(Integer)
 
-    ring = relationship("RingDB", back_populates="hotspots")
-    commodity = relationship("CommodityDB", back_populates="hotspots")
+    ring = relationship("RingsDB", back_populates="hotspots")
+    commodity = relationship("CommoditiesDB", back_populates="hotspots")
 
 
-class FactionDB(BaseModel):
-    __tablename__ = "faction"
+class FactionsDB(BaseModel):
+    __tablename__ = "factions"
     id = Column(Integer, primary_key=True, index=True)
-    system = relationship("SystemDB", back_populates="factions")
+    system = relationship("SystemsDB", back_populates="factions")
 
     name = Column(String, index=True)
     influence = Column(Float)
@@ -49,21 +49,21 @@ class FactionDB(BaseModel):
     state = Column(String)
 
 
-class FactionPresenceDB(BaseModel):
+class FactionPresencesDB(BaseModel):
     __tablename__ = "faction_presences"
 
     id = Column(Integer, primary_key=True)
-    system_id = Column(Integer, ForeignKey("system.id64"), nullable=False)
-    faction_id = Column(Integer, ForeignKey("faction.id"), nullable=False)
+    system_id = Column(Integer, ForeignKey("systems.id64"), nullable=False)
+    faction_id = Column(Integer, ForeignKey("factions.id"), nullable=False)
 
     influence = Column(Float)
 
-    system = relationship("SystemDB", back_populates="factions")
-    faction = relationship("FactionDB", back_populates="presences")
+    system = relationship("SystemsDB", back_populates="factions")
+    faction = relationship("FactionsDB", back_populates="presences")
 
 
-class SystemDB(HasCoordinates):
-    __tablename__ = "system"
+class SystemsDB(HasCoordinates):
+    __tablename__ = "systems"
 
     id64 = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
@@ -76,10 +76,10 @@ class SystemDB(HasCoordinates):
     allegiance = Column(String)
     government = Column(String)
 
-    bodies = relationship("BodyDB", back_populates="system", cascade="all, delete-orphan")
-    stations = relationship("StationDB", back_populates="system", cascade="all, delete-orphan")
-    factions = relationship("FactionDB", back_populates="system", cascade="all, delete-orphan")
-    controlling_faction_id = Column(Integer, ForeignKey("faction.id"), nullable=True)
+    bodies = relationship("BodiesDB", back_populates="system", cascade="all, delete-orphan")
+    stations = relationship("StationsDB", back_populates="system", cascade="all, delete-orphan")
+    factions = relationship("FactionsDB", back_populates="system", cascade="all, delete-orphan")
+    controlling_faction_id = Column(Integer, ForeignKey("factions.id"), nullable=True)
 
     controllingPower = Column(String)
     powerConflictProgress = Column(JSONB)

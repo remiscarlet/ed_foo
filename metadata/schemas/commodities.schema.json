@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "commodities.schema.json",
+    "type": "object",
+    "patternProperties": {
+        "^.*$": {
+            "type": "object",
+            "required": ["name", "category", "is_mineable"],
+            "properties": {
+                "name": { "type": "string" },
+                "symbol": { "type": ["string", "null"] },
+                "category": { "$ref": "enums.schema.json#/$defs/CommodityCategory" },
+                "is_mineable": { "type": "boolean" },
+                "mining_type": {
+                    "anyOf": [
+                        { "$ref": "enums.schema.json#/$defs/MiningType" },
+                        { "type": "null" }
+                    ]
+                },
+                "ring_types": {
+                    "type": ["array", "null"],
+                    "items": { "$ref": "enums.schema.json#/$defs/RingType" },
+                    "uniqueItems": true
+                },
+                "base_price": { "type": ["number", "null"] }
+            },
+            "additionalProperties": false
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "$defs": {
+        "RingType": {
+            "type": "string",
+            "enum": ["Metallic", "Metal Rich", "Icy", "Rocky"]
+        },
+        "MiningType": {
+            "type": "string",
+            "enum": ["Laser", "Core"]
+        },
+        "CommodityCategory": {
+            "type": "string",
+            "enum": ["Chemicals", "Consumer Items", "Legal Drugs", "Foods", "Industrial Materials", "Machinery", "Medicines", "Metals", "Minerals", "Salvage", "Slavery", "Technology", "Textiles", "Waste", "Weapons"]
+        }
+    }
+  }

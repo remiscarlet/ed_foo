@@ -1,0 +1,116 @@
+---
+Aluminum:
+  category: Metals
+  is_mineable: false
+
+Beryllium:
+  category: Metals
+  is_mineable: false
+
+Bismuth:
+  category: Metals
+  is_mineable: false
+
+Cobalt:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Rocky]
+  has_hotspots: false
+
+Copper:
+  category: Metals
+  is_mineable: false
+
+Gallium:
+  category: Metals
+  is_mineable: false
+
+Gold:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Hafnium 178:
+  category: Metals
+  is_mineable: false
+
+Indium:
+  category: Metals
+  is_mineable: false
+
+Lanthanum:
+  category: Metals
+  is_mineable: false
+
+Lithium:
+  category: Metals
+  is_mineable: false
+
+Osmium:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Palladium:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Platinum:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: true
+
+Praseodymium:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Samarium:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Silver:
+  category: Metals
+  is_mineable: true
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Steel:
+  category: Metals
+  is_mineable: false
+
+Tantalum:
+  category: Metals
+  is_mineable: false
+
+Thallium:
+  category: Metals
+  is_mineable: false
+
+Thorium:
+  category: Metals
+  is_mineable: false
+
+Titanium:
+  category: Metals
+  is_mineable: false
+
+Uranium:
+  category: Metals
+  is_mineable: false

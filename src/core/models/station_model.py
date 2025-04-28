@@ -5,30 +5,30 @@ from pydantic import BaseModel, Field
 
 
 class CommodityPrice(BaseModel):
-    buyPrice: int
+    buy_price: int
     demand: int
-    sellPrice: int
+    sell_price: int
     supply: int
-    updateTime: Optional[datetime] = None
+    update_time: Optional[datetime] = None
 
 
 class Commodity(BaseModel):
     category: str  # src.core.models.commodity.CommodityCategory
-    commodityId: int
+    commodity_id: int
     name: str
     symbol: str
 
 
 class Market(BaseModel):
     commodities: Optional[List[Commodity]] = None
-    prohibitedCommodities: Optional[List[str]] = None
-    updateTime: Optional[datetime] = None
+    prohibited_commodities: Optional[List[str]] = None
+    update_time: Optional[datetime] = None
 
 
 class ShipModule(BaseModel):
     category: str
     cls: int = Field(alias="class")
-    moduleId: int
+    module_id: int
     name: str
     rating: str
     symbol: str
@@ -38,18 +38,18 @@ class ShipModule(BaseModel):
 
 class Outfitting(BaseModel):
     modules: List[ShipModule]
-    updateTime: datetime
+    update_time: datetime
 
 
 class Ship(BaseModel):
     name: str
-    shipId: int
+    ship_id: int
     symbol: str
 
 
 class Shipyard(BaseModel):
     ships: List[Ship]
-    updateTime: datetime
+    update_time: datetime
 
 
 class Station(BaseModel):
@@ -58,19 +58,19 @@ class Station(BaseModel):
     updateTime: datetime
 
     allegiance: Optional[str] = None
-    controllingFaction: Optional[str] = None
-    controllingFactionState: Optional[str] = None
-    distanceToArrival: Optional[float] = None
+    controlling_faction: Optional[str] = None
+    controlling_faction_state: Optional[str] = None
+    distance_to_Arrival: Optional[float] = None
     economies: Optional[Dict[str, float]] = None
     government: Optional[str] = None
-    landingPads: Optional[Dict[str, int]] = None
+    landing_pads: Optional[Dict[str, int]] = None
     market: Optional[Market] = None
     outfitting: Optional[Outfitting] = None
-    primaryEconomy: Optional[str] = None
+    primary_economy: Optional[str] = None
     services: Optional[List[str]] = None
     shipyard: Optional[Shipyard] = None
     type: Optional[str] = None
 
-    carrierName: Optional[str] = None
+    carrier_name: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
