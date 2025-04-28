@@ -60,7 +60,7 @@ Grandidierite:
   category: Minerals
   is_mineable: true
   mining_method: Core
-  ring_types: ['Rocky, Icy']
+  ring_types: [Rocky, Icy]
   has_hotspots: true
 
 Haematite:

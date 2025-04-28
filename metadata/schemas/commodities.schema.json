@@ -5,15 +5,14 @@
     "patternProperties": {
         "^.*$": {
             "type": "object",
-            "required": ["name", "category", "is_mineable"],
+            "required": ["category", "is_mineable"],
             "properties": {
-                "name": { "type": "string" },
                 "symbol": { "type": ["string", "null"] },
                 "category": { "$ref": "enums.schema.json#/$defs/CommodityCategory" },
                 "is_mineable": { "type": "boolean" },
-                "mining_type": {
+                "mining_method": {
                     "anyOf": [
-                        { "$ref": "enums.schema.json#/$defs/MiningType" },
+                        { "$ref": "enums.schema.json#/$defs/MiningMethod" },
                         { "type": "null" }
                     ]
                 },
@@ -22,7 +21,7 @@
                     "items": { "$ref": "enums.schema.json#/$defs/RingType" },
                     "uniqueItems": true
                 },
-                "base_price": { "type": ["number", "null"] }
+                "has_hotspots": { "type": ["boolean", "null"] }
             },
             "additionalProperties": false
         }

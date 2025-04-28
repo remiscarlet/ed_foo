@@ -9,12 +9,14 @@ install:
 
 lint:
 	poetry run yamllint **/*.yaml
+	poetry run lint_metadata
 	poetry run black --check .
 	poetry run isort --check-only .
 	poetry run flake8 . -v
 
 lintfix:
 	poetry run yamlfix **/*.yaml
+	poetry run lint_metadata
 	poetry run black .
 	poetry run isort .
 
@@ -25,6 +27,7 @@ check: lint type
 
 lintfixcheck:
 	poetry run yamlfix **/*.yaml
+	poetry run lint_metadata
 	poetry run black .
 	poetry run isort .
 	poetry run flake8 . -v

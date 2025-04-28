@@ -4,7 +4,7 @@
             "type": "string",
             "enum": ["Metallic", "Metal Rich", "Icy", "Rocky"]
         },
-        "MiningType": {
+        "MiningMethod": {
             "type": "string",
             "enum": ["Laser", "Core"]
         },
