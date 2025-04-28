@@ -1,0 +1,16 @@
+---
+Biowaste:
+  category: Waste
+  is_mineable: false
+
+Chemical Waste:
+  category: Waste
+  is_mineable: false
+
+Scrap:
+  category: Waste
+  is_mineable: false
+
+Toxic Waste:
+  category: Waste
+  is_mineable: false

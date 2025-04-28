@@ -1,0 +1,20 @@
+---
+Clothing:
+  category: Consumer Items
+  is_mineable: false
+
+Consumer Technology:
+  category: Consumer Items
+  is_mineable: false
+
+Domestic Appliances:
+  category: Consumer Items
+  is_mineable: false
+
+Evacuation Shelter:
+  category: Consumer Items
+  is_mineable: false
+
+Survival Equipment:
+  category: Consumer Items
+  is_mineable: false

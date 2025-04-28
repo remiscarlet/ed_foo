@@ -1,0 +1,24 @@
+---
+Advanced Medicines:
+  category: Medicines
+  is_mineable: false
+
+Agri-Medicines:
+  category: Medicines
+  is_mineable: false
+
+Basic Medicines:
+  category: Medicines
+  is_mineable: false
+
+Combat Stabilisers:
+  category: Medicines
+  is_mineable: false
+
+Performance Enhancers:
+  category: Medicines
+  is_mineable: false
+
+Progenitor Cells:
+  category: Medicines
+  is_mineable: false

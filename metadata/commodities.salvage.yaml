@@ -1,0 +1,388 @@
+---
+AI Relics:
+  category: Salvage
+  is_mineable: false
+
+Ancient Artefact:
+  category: Salvage
+  is_mineable: false
+
+Ancient Key:
+  category: Salvage
+  is_mineable: false
+
+Anomaly Particles:
+  category: Salvage
+  is_mineable: false
+
+Antimatter Containment Unit:
+  category: Salvage
+  is_mineable: false
+
+Antique Jewellery:
+  category: Salvage
+  is_mineable: false
+
+Antiquities:
+  category: Salvage
+  is_mineable: false
+
+Assault Plans:
+  category: Salvage
+  is_mineable: false
+
+Black Box:
+  category: Salvage
+  is_mineable: false
+
+Bone Fragments:
+  category: Salvage
+  is_mineable: false
+
+Caustic Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Commercial Samples:
+  category: Salvage
+  is_mineable: false
+
+Coral Sap:
+  category: Salvage
+  is_mineable: false
+
+Cyst Specimen:
+  category: Salvage
+  is_mineable: false
+
+Damaged Escape Pod:
+  category: Salvage
+  is_mineable: false
+
+Data Core:
+  category: Salvage
+  is_mineable: false
+
+Diplomatic Bag:
+  category: Salvage
+  is_mineable: false
+
+Earth Relics:
+  category: Salvage
+  is_mineable: false
+
+Encrypted Correspondence:
+  category: Salvage
+  is_mineable: false
+
+Encrypted Data Storage:
+  category: Salvage
+  is_mineable: false
+
+Experimental Chemicals:
+  category: Salvage
+  is_mineable: false
+
+Fossil Remnants:
+  category: Salvage
+  is_mineable: false
+
+Gene Bank:
+  category: Salvage
+  is_mineable: false
+
+Geological Samples:
+  category: Salvage
+  is_mineable: false
+
+Guardian Casket:
+  category: Salvage
+  is_mineable: false
+
+Guardian Orb:
+  category: Salvage
+  is_mineable: false
+
+Guardian Relic:
+  category: Salvage
+  is_mineable: false
+
+Guardian Tablet:
+  category: Salvage
+  is_mineable: false
+
+Guardian Totem:
+  category: Salvage
+  is_mineable: false
+
+Guardian Urn:
+  category: Salvage
+  is_mineable: false
+
+Hostages:
+  category: Salvage
+  is_mineable: false
+
+Impure Spire Mineral:
+  category: Salvage
+  is_mineable: false
+
+Large Survey Data Cache:
+  category: Salvage
+  is_mineable: false
+
+Military Intelligence:
+  category: Salvage
+  is_mineable: false
+
+Military Plans:
+  category: Salvage
+  is_mineable: false
+
+Mollusc Brain Tissue:
+  category: Salvage
+  is_mineable: false
+
+Mollusc Fluid:
+  category: Salvage
+  is_mineable: false
+
+Mollusc Membrane:
+  category: Salvage
+  is_mineable: false
+
+Mollusc Mycelium:
+  category: Salvage
+  is_mineable: false
+
+Mollusc Soft Tissue:
+  category: Salvage
+  is_mineable: false
+
+Mollusc Spores:
+  category: Salvage
+  is_mineable: false
+
+Mysterious Idol:
+  category: Salvage
+  is_mineable: false
+
+Occupied Escape Pod:
+  category: Salvage
+  is_mineable: false
+
+Organ Sample:
+  category: Salvage
+  is_mineable: false
+
+Personal Effects:
+  category: Salvage
+  is_mineable: false
+
+Pod Core Tissue:
+  category: Salvage
+  is_mineable: false
+
+Pod Dead Tissue:
+  category: Salvage
+  is_mineable: false
+
+Pod Mesoglea:
+  category: Salvage
+  is_mineable: false
+
+Pod Outer Tissue:
+  category: Salvage
+  is_mineable: false
+
+Pod Shell Tissue:
+  category: Salvage
+  is_mineable: false
+
+Pod Surface Tissue:
+  category: Salvage
+  is_mineable: false
+
+Pod Tissue:
+  category: Salvage
+  is_mineable: false
+
+Political Prisoners:
+  category: Salvage
+  is_mineable: false
+
+Precious Gems:
+  category: Salvage
+  is_mineable: false
+
+Prohibited Research Materials:
+  category: Salvage
+  is_mineable: false
+
+Protective Membrane Scrap:
+  category: Salvage
+  is_mineable: false
+
+Prototype Tech:
+  category: Salvage
+  is_mineable: false
+
+Rare Artwork:
+  category: Salvage
+  is_mineable: false
+
+Rebel Transmissions:
+  category: Salvage
+  is_mineable: false
+
+SAP:
+  category: Salvage
+  is_mineable: false
+
+Scientific Research:
+  category: Salvage
+  is_mineable: false
+
+Scientific Samples:
+  category: Salvage
+  is_mineable: false
+
+Semi-Refined Spire Mineral:
+  category: Salvage
+  is_mineable: false
+
+Small Survey Data Cache:
+  category: Salvage
+  is_mineable: false
+
+Space Pioneer Relics:
+  category: Salvage
+  is_mineable: false
+
+Tactical Data:
+  category: Salvage
+  is_mineable: false
+
+Technical Blueprints:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Basilisk Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Bio-storage Capsule:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Biological Matter:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Cyclops Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Glaive Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Heart:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Hydra Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Link:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Medusa Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Orthrus Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Probe:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Resin:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Scout Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Scythe Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Sensor:
+  category: Salvage
+  is_mineable: false
+
+Thargoid Technology Samples:
+  category: Salvage
+  is_mineable: false
+
+Time Capsule:
+  category: Salvage
+  is_mineable: false
+
+Titan Deep Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Titan Drive Component:
+  category: Salvage
+  is_mineable: false
+
+Titan Maw Deep Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Titan Maw Partial Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Titan Maw Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Titan Partial Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Titan Tissue Sample:
+  category: Salvage
+  is_mineable: false
+
+Trade Data:
+  category: Salvage
+  is_mineable: false
+
+Trinkets of Hidden Fortune:
+  category: Salvage
+  is_mineable: false
+
+Unclassified Relic:
+  category: Salvage
+  is_mineable: false
+
+Unoccupied Escape Pod:
+  category: Salvage
+  is_mineable: false
+
+Unstable Data Core:
+  category: Salvage
+  is_mineable: false
+
+Wreckage Components:
+  category: Salvage
+  is_mineable: false

@@ -1,0 +1,36 @@
+---
+Ceramic Composites:
+  category: Industrial Materials
+  is_mineable: false
+
+CMM Composite:
+  category: Industrial Materials
+  is_mineable: false
+
+Insulating Membrane:
+  category: Industrial Materials
+  is_mineable: false
+
+Meta-Alloys:
+  category: Industrial Materials
+  is_mineable: false
+
+Micro-weave Cooling Hoses:
+  category: Industrial Materials
+  is_mineable: false
+
+Neofabric Insulation:
+  category: Industrial Materials
+  is_mineable: false
+
+Polymers:
+  category: Industrial Materials
+  is_mineable: false
+
+Semiconductors:
+  category: Industrial Materials
+  is_mineable: false
+
+Superconductors:
+  category: Industrial Materials
+  is_mineable: false

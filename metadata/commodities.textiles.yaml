@@ -1,0 +1,20 @@
+---
+Conductive Fabrics:
+  category: Textiles
+  is_mineable: false
+
+Leather:
+  category: Textiles
+  is_mineable: false
+
+Military Grade Fabrics:
+  category: Textiles
+  is_mineable: false
+
+Natural Fabrics:
+  category: Textiles
+  is_mineable: false
+
+Synthetic Fabrics:
+  category: Textiles
+  is_mineable: false

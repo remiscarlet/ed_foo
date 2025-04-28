@@ -1,0 +1,20 @@
+---
+Battle Weapons:
+  category: Weapons
+  is_mineable: false
+
+Landmines:
+  category: Weapons
+  is_mineable: false
+
+Non-Lethal Weapons:
+  category: Weapons
+  is_mineable: false
+
+Personal Weapons:
+  category: Weapons
+  is_mineable: false
+
+Reactive Armour:
+  category: Weapons
+  is_mineable: false

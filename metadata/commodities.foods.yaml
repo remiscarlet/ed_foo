@@ -1,0 +1,36 @@
+---
+Algae:
+  category: Foods
+  is_mineable: false
+
+Animal Meat:
+  category: Foods
+  is_mineable: false
+
+Coffee:
+  category: Foods
+  is_mineable: false
+
+Fish:
+  category: Foods
+  is_mineable: false
+
+Food Cartridges:
+  category: Foods
+  is_mineable: false
+
+Fruit and Vegetables:
+  category: Foods
+  is_mineable: false
+
+Grain:
+  category: Foods
+  is_mineable: false
+
+Synthetic Meat:
+  category: Foods
+  is_mineable: false
+
+Tea:
+  category: Foods
+  is_mineable: false

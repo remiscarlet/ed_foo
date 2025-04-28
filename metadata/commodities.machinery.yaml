@@ -1,0 +1,96 @@
+---
+Articulation Motors:
+  category: Machinery
+  is_mineable: false
+
+Atmospheric Processors:
+  category: Machinery
+  is_mineable: false
+
+Building Fabricators:
+  category: Machinery
+  is_mineable: false
+
+Crop Harvesters:
+  category: Machinery
+  is_mineable: false
+
+Emergency Power Cells:
+  category: Machinery
+  is_mineable: false
+
+Energy Grid Assembly:
+  category: Machinery
+  is_mineable: false
+
+Exhaust Manifold:
+  category: Machinery
+  is_mineable: false
+
+Geological Equipment:
+  category: Machinery
+  is_mineable: false
+
+Heatsink Interlink:
+  category: Machinery
+  is_mineable: false
+
+HN Shock Mount:
+  category: Machinery
+  is_mineable: false
+
+Ion Distributor:
+  category: Machinery
+  is_mineable: false
+
+Magnetic Emitter Coil:
+  category: Machinery
+  is_mineable: false
+
+Marine Equipment:
+  category: Machinery
+  is_mineable: false
+
+Microbial Furnaces:
+  category: Machinery
+  is_mineable: false
+
+Mineral Extractors:
+  category: Machinery
+  is_mineable: false
+
+Modular Terminals:
+  category: Machinery
+  is_mineable: false
+
+Power Converter:
+  category: Machinery
+  is_mineable: false
+
+Power Generators:
+  category: Machinery
+  is_mineable: false
+
+Power Transfer Bus:
+  category: Machinery
+  is_mineable: false
+
+Radiation Baffle:
+  category: Machinery
+  is_mineable: false
+
+Reinforced Mounting Plate:
+  category: Machinery
+  is_mineable: false
+
+Skimmer Components:
+  category: Machinery
+  is_mineable: false
+
+Thermal Cooling Units:
+  category: Machinery
+  is_mineable: false
+
+Water Purifiers:
+  category: Machinery
+  is_mineable: false
