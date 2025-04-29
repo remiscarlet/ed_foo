@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
-from core.models.common_model import Coordinates, Timestamps
+from src.core.models.common_model import Coordinates, Timestamps
 
 
 class Faction(BaseModel):
@@ -20,9 +20,9 @@ class Faction(BaseModel):
     pending_states: Optional[List[str]] = None
     recovering_states: Optional[List[str]] = None
 
-    spansh_update_time: Optional[datetime] = None
-    edsm_update_time: Optional[datetime] = None
-    eddn_update_time: Optional[datetime] = None
+    spansh_updated_at: Optional[datetime] = None
+    edsm_updated_at: Optional[datetime] = None
+    eddn_updated_at: Optional[datetime] = None
 
 
 class System(BaseModel):
@@ -31,7 +31,7 @@ class System(BaseModel):
     controlling_faction: Any  # ControllingFaction
     coords: Coordinates
     date: datetime
-    factions: List[Any]  #  PlayerMinorFaction
+    factions: List[Any]  # PlayerMinorFaction
     government: str
     id64: int
     name: str
@@ -46,7 +46,7 @@ class System(BaseModel):
     controlling_power: Optional[str] = None
     power_conflict_progress: Optional[List[Any]] = None
     power_state: Optional[str] = None
-    power_stat_control_progress: Optional[float] = None
+    power_state_control_progress: Optional[float] = None
     power_state_reinforcement: Optional[float] = None
     power_state_undermining: Optional[float] = None
     powers: Optional[List[str]] = None
@@ -54,6 +54,6 @@ class System(BaseModel):
     thargoid_war: Optional[int] = None
     timestamps: Optional[Timestamps] = None
 
-    spansh_update_time: Optional[datetime] = None
-    edsm_update_time: Optional[datetime] = None
-    eddn_update_time: Optional[datetime] = None
+    spansh_updated_at: Optional[datetime] = None
+    edsm_updated_at: Optional[datetime] = None
+    eddn_updated_at: Optional[datetime] = None

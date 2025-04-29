@@ -7,18 +7,18 @@ from dataclasses_json import DataClassJsonMixin, config, dataclass_json
 
 @dataclass(kw_only=True)
 class CommodityPriceSpansh(DataClassJsonMixin):
-    buyPrice: int
+    buy_price: int
     demand: int
-    sellPrice: int
+    sell_price: int
     supply: int
-    updateTime: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 @dataclass_json
 @dataclass
 class CommoditySpansh(CommodityPriceSpansh):
     category: str  # src.core.models.commodity.CommodityCategory
-    commodityId: int
+    commodity_id: int
     name: str
     symbol: str
 
@@ -27,8 +27,8 @@ class CommoditySpansh(CommodityPriceSpansh):
 @dataclass
 class MarketSpansh(DataClassJsonMixin):
     commodities: Optional[List[CommoditySpansh]] = None
-    prohibitedCommodities: Optional[List[str]] = None
-    updateTime: Optional[datetime] = None
+    prohibited_commodities: Optional[List[str]] = None
+    updated_at: Optional[datetime] = None
 
 
 @dataclass_json
@@ -36,7 +36,7 @@ class MarketSpansh(DataClassJsonMixin):
 class ShipModuleSpansh(DataClassJsonMixin):
     category: str
     cls: int = field(metadata=config(field_name="class"))
-    moduleId: int
+    module_id: int
     name: str
     rating: str
     symbol: str
@@ -48,14 +48,14 @@ class ShipModuleSpansh(DataClassJsonMixin):
 @dataclass
 class OutfittingSpansh(DataClassJsonMixin):
     modules: List[ShipModuleSpansh]
-    updateTime: datetime
+    updated_at: datetime
 
 
 @dataclass_json
 @dataclass
 class ShipSpansh(DataClassJsonMixin):
     name: str
-    shipId: int
+    ship_id: int
     symbol: str
 
 
@@ -63,7 +63,7 @@ class ShipSpansh(DataClassJsonMixin):
 @dataclass
 class ShipyardSpansh(DataClassJsonMixin):
     ships: List[ShipSpansh]
-    updateTime: datetime
+    updated_at: datetime
 
 
 @dataclass_json
@@ -71,22 +71,22 @@ class ShipyardSpansh(DataClassJsonMixin):
 class StationSpansh(DataClassJsonMixin):
     id: int
     name: str
-    updateTime: datetime
+    updated_at: datetime
 
     allegiance: Optional[str] = None
-    controllingFaction: Optional[str] = None
-    controllingFactionState: Optional[str] = None
-    distanceToArrival: Optional[float] = None
+    controlling_faction: Optional[str] = None
+    controlling_faction_state: Optional[str] = None
+    distance_to_arrival: Optional[float] = None
     economies: Optional[Dict[str, float]] = None
     government: Optional[str] = None
-    landingPads: Optional[Dict[str, int]] = None
+    landing_pads: Optional[Dict[str, int]] = None
     market: Optional[MarketSpansh] = None
     outfitting: Optional[OutfittingSpansh] = None
-    primaryEconomy: Optional[str] = None
+    primary_economy: Optional[str] = None
     services: Optional[List[str]] = None
     shipyard: Optional[ShipyardSpansh] = None
     type: Optional[str] = None
 
-    carrierName: Optional[str] = None
+    carrier_name: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None

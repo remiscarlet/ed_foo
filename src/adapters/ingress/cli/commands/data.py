@@ -8,5 +8,5 @@ cli = typer.Typer()
 
 
 @cli.command()
-def download_spansh_dump():
+def download_spansh_dump() -> None:
     download_spansh_dump_adapter()

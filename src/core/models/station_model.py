@@ -9,7 +9,7 @@ class CommodityPrice(BaseModel):
     demand: int
     sell_price: int
     supply: int
-    update_time: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class Commodity(BaseModel):
@@ -22,7 +22,7 @@ class Commodity(BaseModel):
 class Market(BaseModel):
     commodities: Optional[List[Commodity]] = None
     prohibited_commodities: Optional[List[str]] = None
-    update_time: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class ShipModule(BaseModel):
@@ -38,7 +38,7 @@ class ShipModule(BaseModel):
 
 class Outfitting(BaseModel):
     modules: List[ShipModule]
-    update_time: datetime
+    updated_at: datetime
 
 
 class Ship(BaseModel):
@@ -49,7 +49,7 @@ class Ship(BaseModel):
 
 class Shipyard(BaseModel):
     ships: List[Ship]
-    update_time: datetime
+    updated_at: datetime
 
 
 class Station(BaseModel):

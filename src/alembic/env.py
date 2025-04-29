@@ -4,18 +4,18 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from src.adapters.persistence.postgresql import Base
+from src.adapters.persistence.postgresql import BaseModel
 
 config = context.config
-fileConfig(config.config_file_name)
+fileConfig(config.config_file_name or "")
 
-target_metadata = Base.metadata
+target_metadata = BaseModel.metadata
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://e_kaine:e_kaine_pw@localhost:5432/e_kaine")
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -28,9 +28,9 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online() -> None:
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section) or {},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

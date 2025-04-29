@@ -21,7 +21,7 @@ lintfix:
 	poetry run isort .
 
 type:
-	poetry run mypy .
+	poetry run mypy src/
 
 check: lint type
 
@@ -31,7 +31,7 @@ lintfixcheck:
 	poetry run black .
 	poetry run isort .
 	poetry run flake8 . -v
-	poetry run mypy .
+	poetry run mypy src/
 
 ## Docker (Dev Only)
 

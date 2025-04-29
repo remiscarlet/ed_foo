@@ -9,12 +9,12 @@ from src.core.models.station_model import Station
 
 class HotSpots(BaseModel):
     hotspots: Dict[str, int]  # Commodity Name -> number
-    update_time: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class Signals(BaseModel):
     signals: Dict[str, int]
-    update_time: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class Asteroids(BaseModel):
@@ -33,7 +33,7 @@ class Body(BaseModel):
     body_id: int
     name: str
     stations: List[Station]
-    update_time: datetime
+    updated_at: datetime
 
     absolute_magnitude: Optional[float] = None
     age: Optional[int] = None

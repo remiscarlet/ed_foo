@@ -8,13 +8,14 @@ from datetime import datetime, timedelta, timezone
 from pprint import pformat
 from typing import Dict, List, NamedTuple
 
+from tabulate import tabulate  # type: ignore
+
 from src.argparse_actions import StoreSystemNameWithCoords
 from src.logging import configure_logger, get_logger
 from src.populated_galaxy_systems import PopulatedGalaxySystems
 from src.timer import Timer
 from src.types.commodities import CommodityCategory, MineableSymbols
 from src.utils import TopNStack, get_time_since
-from tabulate import tabulate  # type: ignore
 
 logger = get_logger(__name__)
 
@@ -100,7 +101,7 @@ class PotentialMiningRoute(NamedTuple):
     station_name: str
     sell_price: int
     demand: int
-    update_time: datetime
+    updated_at: datetime
     time_since_update: str
 
 
@@ -114,7 +115,7 @@ class MiningRoute(NamedTuple):
 
 
 def route_scoring_fn(mining_route: PotentialMiningRoute) -> int:
-    dataAge = datetime.now(timezone.utc) - mining_route.update_time
+    dataAge = datetime.now(timezone.utc) - mining_route.updated_at
     if dataAge <= timedelta(days=2):
         decay = 1.0
     elif dataAge <= timedelta(days=4):
@@ -221,9 +222,7 @@ def run(args: argparse.Namespace) -> None:
     table: List[MiningRoute] = []
     for potential_route in potential_routes.to_list():
 
-        [mineable_symbol, ring_name, station_name, sell_price, demand, _update_time, time_since_update] = (
-            potential_route
-        )
+        [mineable_symbol, ring_name, station_name, sell_price, demand, _updated_at, time_since_update] = potential_route
 
         logger.debug("")
         logger.debug("??  MINEABLE SYMBOL AND HOTSPOT COMMODITIES")

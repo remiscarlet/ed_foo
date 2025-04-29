@@ -76,7 +76,7 @@ target-version = ["py313"]
 [tool.flake8]
 max-line-length = 120
 extend-ignore = [ "E203", "E701" ]
-exclude = ["__pycache__", "build", "dist", ".venv", "data", "gen"]
+exclude = ["__pycache__", "archive", "build", "dist", ".venv", "data", "gen"]
 
 [tool.yamlfix]
 line_length = 80
@@ -87,3 +87,4 @@ python_version = "3.13"
 strict = true
 namespace_packages = true
 mypy_path = "typings"
+exclude = "(archive|data|gen)/"

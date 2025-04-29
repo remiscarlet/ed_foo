@@ -4,15 +4,15 @@ from typing import Any, Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
-from adapters.data_ingestion.spansh.models.common_spansh import TimestampsSpansh
-from adapters.data_ingestion.spansh.models.station_spansh import StationSpansh
+from src.adapters.data_ingestion.spansh.models.common_spansh import TimestampsSpansh
+from src.adapters.data_ingestion.spansh.models.station_spansh import StationSpansh
 
 
 @dataclass_json
 @dataclass
 class SignalsSpansh:
     signals: Dict[str, int]
-    updateTime: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 @dataclass_json
@@ -21,8 +21,8 @@ class AsteroidsSpansh(DataClassJsonMixin):
     name: str
     type: str
     mass: float
-    innerRadius: float
-    outerRadius: float
+    inner_radius: float
+    outer_radius: float
 
     id64: Optional[int] = None
     signals: Optional[SignalsSpansh] = None
@@ -35,43 +35,43 @@ class BodySpansh(DataClassJsonMixin):
     bodyId: int
     name: str
     stations: List[StationSpansh]
-    updateTime: datetime
+    updated_at: datetime
 
-    absoluteMagnitude: Optional[float] = None
+    absolute_magnitude: Optional[float] = None
     age: Optional[int] = None
-    argOfPeriapsis: Optional[float] = None
-    ascendingNode: Optional[float] = None
-    atmosphereComposition: Optional[Dict[str, Any]] = None
-    atmosphereType: Optional[str] = None
-    axialTilt: Optional[float] = None
+    arg_of_periapsis: Optional[float] = None
+    ascending_node: Optional[float] = None
+    atmosphere_composition: Optional[Dict[str, Any]] = None
+    atmosphere_type: Optional[str] = None
+    axial_tilt: Optional[float] = None
     belts: Optional[List[AsteroidsSpansh]] = None
-    distanceToArrival: Optional[float] = None
-    earthMasses: Optional[float] = None
+    distance_to_arrival: Optional[float] = None
+    earth_masses: Optional[float] = None
     gravity: Optional[float] = None
-    isLandable: Optional[bool] = None
+    is_landable: Optional[bool] = None
     luminosity: Optional[str] = None
-    mainStar: Optional[bool] = None
+    main_star: Optional[bool] = None
     materials: Optional[Dict[str, Any]] = None
-    meanAnomaly: Optional[float] = None
-    orbitalEccentricity: Optional[float] = None
-    orbitalInclination: Optional[float] = None
-    orbitalPeriod: Optional[float] = None
+    mean_anomaly: Optional[float] = None
+    orbital_eccentricity: Optional[float] = None
+    orbital_inclination: Optional[float] = None
+    orbital_period: Optional[float] = None
     parents: Optional[List[Dict[str, int]]] = None
     radius: Optional[float] = None
-    reserveLevel: Optional[str] = None
+    reserve_level: Optional[str] = None
     rings: Optional[List[AsteroidsSpansh]] = None
-    rotationalPeriod: Optional[float] = None
-    rotationalPeriodTidallyLocked: Optional[bool] = None
-    semiMajorAxis: Optional[float] = None
+    rotational_period: Optional[float] = None
+    rotational_period_tidally_locked: Optional[bool] = None
+    semi_major_axis: Optional[float] = None
     signals: Optional[Dict[str, Any]] = None
-    solarMasses: Optional[float] = None
-    solarRadius: Optional[float] = None
-    solidComposition: Optional[Any] = None
-    spectralClass: Optional[str] = None
-    subType: Optional[str] = None
-    surfacePressure: Optional[float] = None
-    surfaceTemperature: Optional[float] = None
-    terraformingState: Optional[str] = None
+    solar_masses: Optional[float] = None
+    solar_radius: Optional[float] = None
+    solid_composition: Optional[Any] = None
+    spectral_class: Optional[str] = None
+    sub_type: Optional[str] = None
+    surface_pressure: Optional[float] = None
+    surface_temperature: Optional[float] = None
+    terraforming_state: Optional[str] = None
     timestamps: Optional[TimestampsSpansh] = None
     type: Optional[str] = None
-    volcanismType: Optional[str] = None
+    volcanism_type: Optional[str] = None

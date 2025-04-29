@@ -1,15 +1,5 @@
-from sqlalchemy.orm import Mapped, declarative_base
-
-Base = declarative_base()
+from sqlalchemy.orm import DeclarativeBase, Mapped
 
 
-class BaseModel(Base):
+class BaseModel(DeclarativeBase):
     __abstract__ = True
-
-
-class HasCoordinates(BaseModel):
-    __abstract__ = True
-
-    x: Mapped[float]
-    y: Mapped[float]
-    z: Mapped[float]
