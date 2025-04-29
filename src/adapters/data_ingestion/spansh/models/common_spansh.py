@@ -1,15 +1,12 @@
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from dataclasses_json import DataClassJsonMixin, dataclass_json
-
+from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
 from src.core.models.common_model import Coordinates, Timestamps
+from src.core.ports.converter_port import ToCoreModel
 
 
-@dataclass_json
-@dataclass
-class CoordinatesSpansh(DataClassJsonMixin):
+class CoordinatesSpansh(BaseSpanshModel, ToCoreModel[Coordinates]):
     x: float
     y: float
     z: float
@@ -18,14 +15,18 @@ class CoordinatesSpansh(DataClassJsonMixin):
         return Coordinates(x=self.x, y=self.y, z=self.z)
 
 
-@dataclass_json
-@dataclass
-class TimestampsSpansh(DataClassJsonMixin):
+class TimestampsSpansh(BaseSpanshModel, ToCoreModel[Timestamps]):
     controlling_power: Optional[datetime] = None
     power_state: Optional[datetime] = None
     powers: Optional[datetime] = None
     distance_to_arrival: Optional[datetime] = None
     mean_anomaly: Optional[datetime] = None
+
+    _validate_controlling_power = BaseSpanshModel.flexible_datetime_validator("controlling_power")
+    _validate_power_state = BaseSpanshModel.flexible_datetime_validator("power_state")
+    _validate_powers = BaseSpanshModel.flexible_datetime_validator("powers")
+    _validate_distance_to_arrival = BaseSpanshModel.flexible_datetime_validator("distance_to_arrival")
+    _validate_mean_anomaly = BaseSpanshModel.flexible_datetime_validator("mean_anomaly")
 
     def to_core_model(self) -> Timestamps:
         return Timestamps(

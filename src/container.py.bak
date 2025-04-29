@@ -1,0 +1,33 @@
+from dependency_injector import containers, providers
+
+from src.adapters.persistence.postgresql.body_db import BodiesDB
+from src.adapters.persistence.postgresql.station_db import StationsDB
+from src.adapters.persistence.postgresql.system_db import SystemsDB
+
+
+# --- Dependency Injection Container ---
+class Container(containers.DeclarativeContainer):
+    # Adapters
+    systems_repo = providers.Factory(SystemsDB)
+    stations_repo = providers.Factory(StationsDB)
+    bodys_repo = providers.Factory(BodiesDB)
+
+    # Services
+    # validation_service = providers.Singleton(ValidationService)
+    # ingestion_service = providers.Singleton(IngestionService)
+
+    # CLI Commands
+    cli_import_systems = providers.Factory(
+        CLIImportSystemsCommand,
+        system_port=system_repo,
+        ingestion_service=ingestion_service,
+    )
+
+    cli_import_stations = providers.Factory(
+        CLIImportStationsCommand,
+        station_port=station_repo,
+        ingestion_service=ingestion_service,
+    )
+
+    # FastAPI App
+    fastapi_app = providers.Singleton(FastAPI)

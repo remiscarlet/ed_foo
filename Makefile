@@ -1,9 +1,14 @@
-.PHONY: install lint lintfix type check lintfixcheck download_eddn_models gen_eddn_models models
+.PHONY: install download-spansh lint lint-fix type check lint-fix-check download-eddn-models gen-eddn-models models
 
 ## Setup
 
 install:
 	poetry install
+
+## Data DL/Import
+
+download-spansh:
+	poetry run cli data download-spansh-dump
 
 ## Code Quality
 
@@ -14,7 +19,7 @@ lint:
 	poetry run isort --check-only .
 	poetry run flake8 . -v
 
-lintfix:
+lint-fix:
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black .
@@ -25,7 +30,7 @@ type:
 
 check: lint type
 
-lintfixcheck:
+lint-fix-check:
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black .
@@ -41,22 +46,22 @@ up:
 down:
 	docker compose -f tools/docker/docker-compose.yaml down
 
-updb:
+up-db:
 	docker compose -f tools/docker/docker-compose.yaml up --build -d db
 
-downdb:
+down-db:
 	docker compose -f tools/docker/docker-compose.yaml stop db
 
 
 ## Code Gen
 
 
-download_eddn_models:
+download-eddn-models:
 	mkdir data
 	git clone https://github.com/EDCD/EDDN.git data/eddn/ 2>/dev/null || true
 	git -C data/eddn pull
 
-gen_eddn_models: download_eddn_models
+gen-eddn-models: download-eddn-models
 	mkdir -p data/_tmp
 	cp data/eddn/schemas/*.json data/_tmp
 	mkdir gen
@@ -69,4 +74,4 @@ gen_eddn_models: download_eddn_models
 		--output gen/eddn_models/
 	touch gen/__init__.py
 	touch gen/eddn_models/__init__.py
-models: gen_eddn_models
+models: gen-eddn-models

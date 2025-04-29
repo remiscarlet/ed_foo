@@ -32,9 +32,9 @@ class Body(BaseModel):
     id64: int
     body_id: int
     name: str
-    stations: List[Station]
-    updated_at: datetime
 
+    stations: Optional[List[Station]] = None
+    updated_at: Optional[datetime]
     absolute_magnitude: Optional[float] = None
     age: Optional[int] = None
     arg_of_periapsis: Optional[float] = None
@@ -61,7 +61,7 @@ class Body(BaseModel):
     rotational_period: Optional[float] = None
     rotational_period_tidally_locked: Optional[bool] = None
     semi_major_axis: Optional[float] = None
-    signals: Optional[Dict[str, Any]] = None
+    signals: Optional[Signals] = None
     solar_masses: Optional[float] = None
     solar_radius: Optional[float] = None
     solid_composition: Optional[Any] = None

@@ -1,8 +1,21 @@
-from src.adapters.data_ingestion.spansh.data_ingestor import SpanshDataIngestor
-from src.adapters.data_ingestion.spansh.loader import load_spansh_populated_systems_dump
+from itertools import batched
+
+from src.adapters.data_ingestion.spansh.adapter import SpanshDataRetrievalAdapter
+from src.adapters.persistence.postgresql.adapter import SystemsAdapter
+
+# from src.core.ports.system_port import SystemPort
+# from src.core.ports.data_dump_retrieval_port import DataDumpRetrievalPort
+
+
+CHUNK_SIZE = 10
 
 
 def import_data_usecase() -> None:
-    ingestor = SpanshDataIngestor()
-    for system_name, system in ingestor.get_systems().items():
-        pass
+    data_adapter = SpanshDataRetrievalAdapter()
+    # data_adapter = DataDumpRetrievalPort()
+    # data_adapter.download_data()
+
+    system_adapter = SystemsAdapter()
+    # system_adapter = SystemPort()
+    for systems_chunk in list(batched(data_adapter.load_data().values(), CHUNK_SIZE)):
+        system_adapter.upsert_systems(list(systems_chunk))

@@ -38,6 +38,7 @@ dependencies = [
     "yamllint (>=1.37.0,<2.0.0)",
     "jsonschema (>=4.23.0,<5.0.0)",
     "pyyaml (>=6.0.2,<7.0.0)",
+    "dependency-injector (>=4.46.0,<5.0.0)",
 ]
 
 [build-system]
@@ -61,7 +62,7 @@ pre-commit = "^4.2.0"
 pytest = "^8.3.5"
 
 [tool.poetry.scripts]
-cli = "src.app.main:main"
+cli = "src.main:main"
 lint_metadata = "tools.scripts.validate_yaml_schema:main"
 
 [tool.isort]

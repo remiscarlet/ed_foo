@@ -5,6 +5,7 @@ from typing import Any, Dict, Union, get_args, get_origin
 
 import dataclasses_json
 import dataclasses_json.core as _core
+
 from src.logging import get_logger
 
 dataclasses_json.cfg.global_config.encoders[datetime] = datetime.isoformat

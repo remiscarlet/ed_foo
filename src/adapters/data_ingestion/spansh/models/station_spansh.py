@@ -1,41 +1,58 @@
-from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from dataclasses_json import DataClassJsonMixin, config, dataclass_json
+from pydantic import Field
+
+from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
+from src.core.models.station_model import (
+    Commodity,
+    Market,
+    Outfitting,
+    Ship,
+    ShipModule,
+    Shipyard,
+    Station,
+)
+from src.core.ports.converter_port import ToCoreModel
 
 
-@dataclass(kw_only=True)
-class CommodityPriceSpansh(DataClassJsonMixin):
+class CommodityPriceSpansh(BaseSpanshModel):
     buy_price: int
     demand: int
     sell_price: int
     supply: int
     updated_at: Optional[datetime] = None
+    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
 
-@dataclass_json
-@dataclass
-class CommoditySpansh(CommodityPriceSpansh):
+class CommoditySpansh(CommodityPriceSpansh, ToCoreModel[Commodity]):
     category: str  # src.core.models.commodity.CommodityCategory
     commodity_id: int
     name: str
     symbol: str
 
+    def to_core_model(self) -> Commodity:
+        return Commodity(
+            category=self.category,
+            commodity_id=self.commodity_id,
+            name=self.name,
+            symbol=self.symbol,
+        )
 
-@dataclass_json
-@dataclass
-class MarketSpansh(DataClassJsonMixin):
+
+class MarketSpansh(BaseSpanshModel, ToCoreModel[Market]):
     commodities: Optional[List[CommoditySpansh]] = None
     prohibited_commodities: Optional[List[str]] = None
     updated_at: Optional[datetime] = None
+    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
+
+    def to_core_model(self) -> Market:
+        return Market()
 
 
-@dataclass_json
-@dataclass
-class ShipModuleSpansh(DataClassJsonMixin):
+class ShipModuleSpansh(BaseSpanshModel, ToCoreModel[ShipModule]):
     category: str
-    cls: int = field(metadata=config(field_name="class"))
+    cls: int = Field(alias="class")
     module_id: int
     name: str
     rating: str
@@ -43,35 +60,60 @@ class ShipModuleSpansh(DataClassJsonMixin):
 
     ship: Optional[str] = None
 
+    def to_core_model(self) -> ShipModule:
+        return ShipModule(
+            category=self.category,
+            cls=self.cls,
+            module_id=self.module_id,
+            name=self.name,
+            rating=self.rating,
+            symbol=self.symbol,
+            ship=self.ship,
+        )
 
-@dataclass_json
-@dataclass
-class OutfittingSpansh(DataClassJsonMixin):
+
+class OutfittingSpansh(BaseSpanshModel, ToCoreModel[Outfitting]):
     modules: List[ShipModuleSpansh]
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
+    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
+
+    def to_core_model(self) -> Outfitting:
+        return Outfitting(
+            modules=[module.to_core_model() for module in self.modules or []],
+            updated_at=self.updated_at,
+        )
 
 
-@dataclass_json
-@dataclass
-class ShipSpansh(DataClassJsonMixin):
+class ShipSpansh(BaseSpanshModel, ToCoreModel[Ship]):
     name: str
     ship_id: int
     symbol: str
 
+    def to_core_model(self) -> Ship:
+        return Ship(
+            name=self.name,
+            ship_id=self.ship_id,
+            symbol=self.symbol,
+        )
 
-@dataclass_json
-@dataclass
-class ShipyardSpansh(DataClassJsonMixin):
+
+class ShipyardSpansh(BaseSpanshModel, ToCoreModel[Shipyard]):
     ships: List[ShipSpansh]
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
+    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
+
+    def to_core_model(self) -> Shipyard:
+        return Shipyard(
+            ships=[ship.to_core_model() for ship in self.ships or []],
+            updated_at=self.updated_at,
+        )
 
 
-@dataclass_json
-@dataclass
-class StationSpansh(DataClassJsonMixin):
+class StationSpansh(BaseSpanshModel, ToCoreModel[Station]):
     id: int
     name: str
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
+    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
     allegiance: Optional[str] = None
     controlling_faction: Optional[str] = None
@@ -90,3 +132,26 @@ class StationSpansh(DataClassJsonMixin):
     carrier_name: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+
+    def to_core_model(self) -> Station:
+        return Station(
+            id=self.id,
+            name=self.name,
+            updated_at=self.updated_at,
+            allegiance=self.allegiance,
+            controlling_faction=self.controlling_faction,
+            controlling_faction_state=self.controlling_faction_state,
+            distance_to_arrival=self.distance_to_arrival,
+            economies=self.economies,
+            government=self.government,
+            landing_pads=self.landing_pads,
+            market=self.market.to_core_model() if self.market is not None else None,
+            outfitting=self.outfitting.to_core_model() if self.outfitting is not None else None,
+            primary_economy=self.primary_economy,
+            services=self.services,
+            shipyard=self.shipyard.to_core_model() if self.shipyard is not None else None,
+            type=self.type,
+            carrier_name=self.carrier_name,
+            latitude=self.latitude,
+            longitude=self.longitude,
+        )

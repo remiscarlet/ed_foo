@@ -1,59 +1,67 @@
-from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
-from dataclasses_json import DataClassJsonMixin, config, dataclass_json
-
+from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
 from src.adapters.data_ingestion.spansh.models.body_spansh import BodySpansh
 from src.adapters.data_ingestion.spansh.models.common_spansh import (
     CoordinatesSpansh,
     TimestampsSpansh,
 )
 from src.adapters.data_ingestion.spansh.models.station_spansh import StationSpansh
-from src.core.models.system_model import System
+from src.core.models.system_model import Faction, System
+from src.core.ports.converter_port import ToCoreModel
 
 
-@dataclass_json
-@dataclass
-class FactionSpansh(DataClassJsonMixin):
+class FactionSpansh(BaseSpanshModel, ToCoreModel[Faction]):
     name: str
-    influence: float
+    influence: Optional[float]
 
     government: Optional[str] = None
     allegiance: Optional[str] = None
     state: Optional[str] = None
 
+    def to_core_model(self) -> Faction:
+        return Faction(
+            name=self.name,
+            allegiance=self.allegiance,
+            government=self.government,
+            influence=self.influence,
+            state=self.state,
+        )
 
-@dataclass_json
-@dataclass
-class ControllingFactionSpansh(DataClassJsonMixin):
+
+class ControllingFactionSpansh(BaseSpanshModel, ToCoreModel[Faction]):
+    name: str
     allegiance: Optional[str] = None
     government: Optional[str] = None
-    name: Optional[str] = None
 
-
-@dataclass_json
-@dataclass
-class SystemSpansh(DataClassJsonMixin):
-    allegiance: str
-    bodies: List[BodySpansh]
-    controlling_faction: ControllingFactionSpansh
-    coords: CoordinatesSpansh
-    date: datetime = field(
-        metadata=config(
-            decoder=datetime.fromisoformat,
-            encoder=datetime.isoformat,
+    def to_core_model(self) -> Faction:
+        return Faction(
+            name=self.name,
+            allegiance=self.allegiance,
+            government=self.government,
         )
-    )
-    factions: List[FactionSpansh]
-    government: str
+
+
+class SystemSpansh(BaseSpanshModel, ToCoreModel[System]):
     id64: int
     name: str
-    population: int
-    primary_economy: str
-    secondary_economy: str
-    security: str
-    stations: List[StationSpansh]
+
+    allegiance: str
+    controlling_faction: ControllingFactionSpansh
+    coords: CoordinatesSpansh
+    date: datetime
+    _validate_date = BaseSpanshModel.flexible_datetime_validator("date")
+
+    government: Optional[str] = None
+    population: Optional[int] = None
+    primary_economy: Optional[str] = None
+    secondary_economy: Optional[str] = None
+    security: Optional[str] = None
+
+    bodies: Optional[List[BodySpansh]] = None
+    factions: Optional[List[FactionSpansh]] = None
+    stations: Optional[List[StationSpansh]] = None
 
     body_count: Optional[int] = None
 
@@ -65,17 +73,17 @@ class SystemSpansh(DataClassJsonMixin):
     power_state_undermining: Optional[float] = None
     powers: Optional[List[str]] = None
 
-    thargoid_war: Optional[int] = None
+    thargoid_war: Optional[Dict[str, Any]] = None
     timestamps: Optional[TimestampsSpansh] = None
 
     def to_core_model(self) -> System:
         return System(
             allegiance=self.allegiance,
-            bodies=self.bodies,
-            controlling_faction=self.controlling_faction,
+            bodies=[body.to_core_model() for body in self.bodies or []],
+            controlling_faction=self.controlling_faction.to_core_model(),
             coords=self.coords.to_core_model(),
             date=self.date,
-            factions=self.factions,
+            factions=[faction.to_core_model() for faction in self.factions or []],
             government=self.government,
             id64=self.id64,
             name=self.name,
@@ -83,7 +91,7 @@ class SystemSpansh(DataClassJsonMixin):
             primary_economy=self.primary_economy,
             secondary_economy=self.secondary_economy,
             security=self.security,
-            stations=self.stations,
+            stations=[station.to_core_model() for station in self.stations or []],
             body_count=self.body_count,
             controlling_power=self.controlling_power,
             power_conflict_progress=self.power_conflict_progress,

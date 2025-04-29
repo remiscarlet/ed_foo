@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class CommodityPrice(BaseModel):
@@ -27,7 +27,7 @@ class Market(BaseModel):
 
 class ShipModule(BaseModel):
     category: str
-    cls: int = Field(alias="class")
+    cls: int
     module_id: int
     name: str
     rating: str
@@ -38,7 +38,7 @@ class ShipModule(BaseModel):
 
 class Outfitting(BaseModel):
     modules: List[ShipModule]
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
 
 
 class Ship(BaseModel):
@@ -49,18 +49,19 @@ class Ship(BaseModel):
 
 class Shipyard(BaseModel):
     ships: List[Ship]
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
 
 
 class Station(BaseModel):
     id: int
     name: str
-    updateTime: datetime
+
+    updated_at: Optional[datetime] = None
 
     allegiance: Optional[str] = None
     controlling_faction: Optional[str] = None
     controlling_faction_state: Optional[str] = None
-    distance_to_Arrival: Optional[float] = None
+    distance_to_arrival: Optional[float] = None
     economies: Optional[Dict[str, float]] = None
     government: Optional[str] = None
     landing_pads: Optional[Dict[str, int]] = None

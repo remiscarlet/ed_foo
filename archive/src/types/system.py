@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config, dataclass_json
+
 from src.logging import get_logger
 from src.types import (
     CommodityPrice,
