@@ -40,6 +40,13 @@ lint-fix-check:
 
 ## Docker (Dev Only)
 
+pg-shell: # "Lightweight" PG shell for convenience
+	poetry run pgcli "postgres://e_kaine:e_kaine_pw@localhost:5432/e_kaine"
+
+nuke-db:
+	docker stop ekaine_db
+	docker rm ekaine_db
+
 up:
 	docker compose -f tools/docker/docker-compose.yaml up --build
 
@@ -52,6 +59,13 @@ up-db:
 down-db:
 	docker compose -f tools/docker/docker-compose.yaml stop db
 
+## Alembic
+
+alembic-upgrade:
+	poetry run alembic upgrade head
+
+alembic-revision:
+	poetry run alembic revision --autogenerate
 
 ## Code Gen
 

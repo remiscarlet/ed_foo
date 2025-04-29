@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -10,24 +11,27 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     Text,
+    select,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
 from src.adapters.persistence.postgresql import BaseModel
+from src.core.models.body_model import Body
 from src.core.models.common_model import Coordinates
-from src.core.models.system_model import System
+from src.core.models.system_model import Faction, System
 
 
 class BodiesDB(BaseModel):
     __tablename__ = "bodies"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    id64: Mapped[int] = mapped_column(BigInteger, unique=True)
-    spansh_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    edsm_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    body_id: Mapped[int] = mapped_column(unique=True)
     name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+
+    id64: Mapped[Optional[int]] = mapped_column(BigInteger)
+    spansh_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    edsm_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    body_id: Mapped[Optional[int]] = mapped_column(BigInteger)
 
     system_id: Mapped[int] = mapped_column(ForeignKey("systems.id"))
     system: Mapped["SystemsDB"] = relationship(back_populates="bodies")
@@ -73,6 +77,20 @@ class BodiesDB(BaseModel):
 
     rings: Mapped[List["RingsDB"]] = relationship(back_populates="body")
     signals: Mapped[List["SignalsDB"]] = relationship(back_populates="body")
+
+    @classmethod
+    def from_core_model(cls, body: Body) -> "BodiesDB":
+        return cls(
+            id64=body.id64,
+            name=body.name,
+        )
+
+    def to_core_model(self) -> Body:
+        return Body(
+            id64=self.id64,
+            body_id=self.body_id,
+            name=self.name,
+        )
 
     def __repr__(self) -> str:
         return f"<BodiesDB(id={self.id}, name={self.name!r})>"
@@ -175,9 +193,9 @@ class StationsDB(BaseModel):
 
         parent: Optional[Union[SystemsDB, BodiesDB]] = None
         if self.owner_type == "system":
-            parent = session.query(SystemsDB).filter_by(id=self.owner_id).first()
+            parent = session.scalars(select(SystemsDB).where(SystemsDB.id.is_(self.owner_id))).first()
         elif self.owner_type == "body":
-            parent = session.query(BodiesDB).filter_by(id=self.owner_id).first()
+            parent = session.scalars(select(BodiesDB).where(BodiesDB.id.is_(self.owner_id))).first()
         else:
             raise ValueError(f"Unknown owner_type: {self.owner_type}")
 
@@ -291,12 +309,22 @@ class FactionsDB(BaseModel):
 
     faction_presences: Mapped[List["FactionPresencesDB"]] = relationship(back_populates="faction")
 
+    @classmethod
+    def from_core_model(cls, faction: Faction) -> "FactionsDB":
+        return cls(
+            name=faction.name,
+            allegiance=faction.allegiance,
+            government=faction.government,
+        )
+
     def __repr__(self) -> str:
         return f"<FactionsDB(id={self.id}, name={self.name})>"
 
 
+@dataclass
 class FactionPresencesDB(BaseModel):
     __tablename__ = "faction_presences"
+    __allow_unmapped__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
     system_id: Mapped[int] = mapped_column(ForeignKey("systems.id"))
@@ -316,23 +344,25 @@ class FactionPresencesDB(BaseModel):
         return f"<FactionPresencesDB(id={self.id}, system_id={self.system_id}, faction_id={self.faction_id})>"
 
 
+@dataclass
 class SystemsDB(BaseModel):
     __tablename__ = "systems"
+    __allow_unmapped__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    id64: Mapped[int] = mapped_column(BigInteger, unique=True)
-    spansh_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    edsm_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(Text, unique=True)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(Text)
-    controlling_faction_id: Mapped[Optional[int]] = mapped_column(ForeignKey("factions.id"))
+    id64: Mapped[Optional[int]] = mapped_column(BigInteger)
+    spansh_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    edsm_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+
     x: Mapped[float] = mapped_column(Float)
     y: Mapped[float] = mapped_column(Float)
     z: Mapped[float] = mapped_column(Float)
-    date: Mapped[datetime] = mapped_column(DateTime)
+    date: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    population: Mapped[Optional[int]] = mapped_column(Integer)
+    allegiance: Mapped[Optional[str]] = mapped_column(Text)
+    population: Mapped[Optional[int]] = mapped_column(BigInteger)
     primary_economy: Mapped[Optional[str]] = mapped_column(Text)
     secondary_economy: Mapped[Optional[str]] = mapped_column(Text)
     security: Mapped[Optional[str]] = mapped_column(Text)
@@ -351,37 +381,40 @@ class SystemsDB(BaseModel):
     power_state_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     powers_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
+    controlling_faction_id: Mapped[Optional[int]] = mapped_column(ForeignKey("factions.id"))
+    controlling_faction: Mapped[Optional["FactionsDB"]] = relationship()
+
     bodies: Mapped[List["BodiesDB"]] = relationship(back_populates="system")
     stations: Mapped[List["StationsDB"]] = relationship(back_populates="system")
     faction_presences: Mapped[List["FactionPresencesDB"]] = relationship(back_populates="system")
 
-    @staticmethod
-    def from_core_model(system: System) -> "SystemsDB":
-        return SystemsDB(
-            allegiance=system.allegiance,
-            bodies=system.bodies,
-            controlling_faction=None,
-            x=system.coords.x,
-            y=system.coords.y,
-            z=system.coords.z,
-            date=system.date,
-            government=system.government,
-            id64=system.id64,
-            name=system.name,
-            population=system.population,
-            primary_economy=system.primary_economy,
-            secondary_economy=system.secondary_economy,
-            security=system.security,
-            body_count=system.body_count,
-            controlling_power=system.controlling_power,
-            power_conflict_progress=system.power_conflict_progress,
-            power_state=system.power_state,
-            power_state_control_progress=system.power_state_control_progress,
-            power_state_reinforcement=system.power_state_reinforcement,
-            power_state_undermining=system.power_state_undermining,
-            powers=system.powers,
-            thargoid_war=system.thargoid_war,
-        )
+    @classmethod
+    def from_core_model_to_dict(cls, system: System) -> Dict[str, Any]:
+        return {
+            "allegiance": system.allegiance,
+            "bodies": [],  # [BodiesDB.from_core_model(body) for body in system.bodies],
+            "controlling_faction": None,  # controlling_faction,
+            "x": system.coords.x,
+            "y": system.coords.y,
+            "z": system.coords.z,
+            "date": system.date,
+            "government": system.government,
+            "id64": system.id64,
+            "name": system.name,
+            "population": system.population,
+            "primary_economy": system.primary_economy,
+            "secondary_economy": system.secondary_economy,
+            "security": system.security,
+            "body_count": system.body_count,
+            "controlling_power": system.controlling_power,
+            "power_conflict_progress": system.power_conflict_progress,
+            "power_state": system.power_state,
+            "power_state_control_progress": system.power_state_control_progress,
+            "power_state_reinforcement": system.power_state_reinforcement,
+            "power_state_undermining": system.power_state_undermining,
+            "powers": system.powers,
+            "thargoid_war": system.thargoid_war,
+        }
 
     def to_core_model(self) -> System:
         session = Session.object_session(self)
@@ -390,7 +423,9 @@ class SystemsDB(BaseModel):
 
         controlling_faction = None
         if self.controlling_faction_id is not None:
-            controlling_faction = session.query(FactionsDB).filter(FactionsDB.id == self.controlling_faction_id).first()
+            controlling_faction = session.scalars(
+                select(FactionsDB).where(FactionsDB.id.is_(self.controlling_faction_id))
+            ).first()
             if controlling_faction is None:
                 raise Exception("Associated controlling faction id could not be found in the FactionsDB!")
 
@@ -402,11 +437,11 @@ class SystemsDB(BaseModel):
 
         return System(
             allegiance=self.allegiance,
-            bodies=self.bodies,
-            controlling_faction=controlling_faction,
+            bodies=[body.to_core_model() for body in self.bodies],
+            controlling_faction=controlling_faction.to_core_model() if controlling_faction is not None else None,
             coords=Coordinates(x=self.x, y=self.y, z=self.z),
             date=self.date,
-            factions=factions,
+            factions=[faction.to_core_model() for faction in factions],
             government=self.government,
             id64=self.id64,
             name=self.name,
@@ -414,7 +449,7 @@ class SystemsDB(BaseModel):
             primary_economy=self.primary_economy,
             secondary_economy=self.secondary_economy,
             security=self.security,
-            stations=self.stations,
+            stations=[station.to_core_model() for station in self.stations],
             body_count=self.body_count,
             controlling_power=self.controlling_power,
             power_conflict_progress=self.power_conflict_progress,
@@ -424,8 +459,6 @@ class SystemsDB(BaseModel):
             power_state_undermining=self.power_state_undermining,
             powers=self.powers,
             thargoid_war=self.thargoid_war,
-            # TODO: Timestamps
-            # TODO: 1-to-M relationships (bodies, stations, etc)
         )
 
     def __repr__(self) -> str:

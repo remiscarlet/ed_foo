@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
-from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
 from src.core.models.common_model import Coordinates, Timestamps
 from src.core.ports.converter_port import ToCoreModel
+from src.ingestion.spansh.models import BaseSpanshModel
 
 
 class CoordinatesSpansh(BaseSpanshModel, ToCoreModel[Coordinates]):

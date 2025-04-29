@@ -34,7 +34,6 @@ class Body(BaseModel):
     name: str
 
     stations: Optional[List[Station]] = None
-    updated_at: Optional[datetime]
     absolute_magnitude: Optional[float] = None
     age: Optional[int] = None
     arg_of_periapsis: Optional[float] = None
@@ -73,3 +72,6 @@ class Body(BaseModel):
     timestamps: Optional[Timestamps] = None
     type: Optional[str] = None
     volcanism_type: Optional[str] = None
+
+    mean_anomaly_updated_at: Optional[datetime] = None
+    distance_to_arrival_updated_at: Optional[datetime] = None

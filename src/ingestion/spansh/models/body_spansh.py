@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
-from src.adapters.data_ingestion.spansh.models.common_spansh import TimestampsSpansh
-from src.adapters.data_ingestion.spansh.models.station_spansh import StationSpansh
 from src.core.models.body_model import Asteroids, Body, Signals
 from src.core.ports.converter_port import ToCoreModel
+from src.ingestion.spansh.models import BaseSpanshModel
+from src.ingestion.spansh.models.common_spansh import TimestampsSpansh
+from src.ingestion.spansh.models.station_spansh import StationSpansh
 
 
 class SignalsSpansh(BaseSpanshModel, ToCoreModel[Signals]):
@@ -97,7 +97,6 @@ class BodySpansh(BaseSpanshModel, ToCoreModel[Body]):
             body_id=self.body_id,
             name=self.name,
             stations=[station.to_core_model() for station in self.stations or []],
-            updated_at=self.update_time,  # Rename
             absolute_magnitude=self.absolute_magnitude,
             age=self.age,
             arg_of_periapsis=self.arg_of_periapsis,

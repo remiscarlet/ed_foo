@@ -3,7 +3,6 @@ from typing import Dict, List, Optional
 
 from pydantic import Field
 
-from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
 from src.core.models.station_model import (
     Commodity,
     Market,
@@ -14,6 +13,7 @@ from src.core.models.station_model import (
     Station,
 )
 from src.core.ports.converter_port import ToCoreModel
+from src.ingestion.spansh.models import BaseSpanshModel
 
 
 class CommodityPriceSpansh(BaseSpanshModel):
@@ -33,10 +33,15 @@ class CommoditySpansh(CommodityPriceSpansh, ToCoreModel[Commodity]):
 
     def to_core_model(self) -> Commodity:
         return Commodity(
+            buy_price=self.buy_price,
+            demand=self.demand,
+            sell_price=self.sell_price,
+            supply=self.supply,
             category=self.category,
             commodity_id=self.commodity_id,
             name=self.name,
             symbol=self.symbol,
+            updated_at=self.updated_at,
         )
 
 

@@ -12,7 +12,7 @@ class CommodityPrice(BaseModel):
     updated_at: Optional[datetime] = None
 
 
-class Commodity(BaseModel):
+class Commodity(CommodityPrice):
     category: str  # src.core.models.commodity.CommodityCategory
     commodity_id: int
     name: str

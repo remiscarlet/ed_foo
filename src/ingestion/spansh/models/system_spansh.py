@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from src.adapters.data_ingestion.spansh.models import BaseSpanshModel
-from src.adapters.data_ingestion.spansh.models.body_spansh import BodySpansh
-from src.adapters.data_ingestion.spansh.models.common_spansh import (
+from src.core.models.system_model import Faction, System
+from src.core.ports.converter_port import ToCoreModel
+from src.ingestion.spansh.models import BaseSpanshModel
+from src.ingestion.spansh.models.body_spansh import BodySpansh
+from src.ingestion.spansh.models.common_spansh import (
     CoordinatesSpansh,
     TimestampsSpansh,
 )
-from src.adapters.data_ingestion.spansh.models.station_spansh import StationSpansh
-from src.core.models.system_model import Faction, System
-from src.core.ports.converter_port import ToCoreModel
+from src.ingestion.spansh.models.station_spansh import StationSpansh
 
 
 class FactionSpansh(BaseSpanshModel, ToCoreModel[Faction]):

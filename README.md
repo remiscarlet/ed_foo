@@ -32,30 +32,6 @@ We collect, process, and expose structured data from external sources like **Spa
 
 ---
 
-# Code Architecture
-
-## Why Hexagonal (Ports and Adapters) Architecture?
-
-The system must be flexible about:
-- **Where data comes from** (e.g., EDSM dumps, live EDDN feeds, manually entered data)
-- **Where results go** (e.g., CLI display, API endpoints, webhook events)
-
-Thus, we separate **core domain logic** from **input/output concerns**.
-This avoids coupling the system tightly to any specific data source or delivery mechanism.
-
-| Layer | Responsibility |
-|:------|:---------------|
-| Core (Domain) | Pure business logic, technology-agnostic |
-| Ports (Interfaces) | Abstract contract definitions (e.g., User storage) |
-| Adapters | Technology-specific implementations (e.g., SQLAlchemy, FastAPI) |
-
-This structure allows:
-- Adding new ingestion sources easily
-- Exposing workflows through new channels (CLI, API, Discord) with minimal duplication
-- Isolating tests cleanly at each layer
-
----
-
 # Models and Schemas
 
 We organize our data definitions into three major categories:

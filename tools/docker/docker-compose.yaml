@@ -1,6 +1,7 @@
 ---
 services:
   db:
+    container_name: ekaine_db
     image: timescale/timescaledb-ha:pg17
     restart: always
     environment:
@@ -10,6 +11,7 @@ services:
     ports: [5432:5432]
     volumes: [pgdata:/var/lib/postgresql/data]
   api:
+    container_name: ekaine_api
     build:
       context: ../../
       dockerfile: tools/docker/e_kaine/Dockerfile

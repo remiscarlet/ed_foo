@@ -11,5 +11,5 @@ class ToCoreModel[T](ABC):
 class FromCoreModel[T](ABC):
     @classmethod
     @abstractmethod
-    def to_core_model(cls: type[Self], t: T) -> Self:
+    def from_core_model(cls: type[Self], t: T) -> Self:
         pass

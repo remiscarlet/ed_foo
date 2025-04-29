@@ -3,7 +3,9 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
+from src.core.models.body_model import Body
 from src.core.models.common_model import Coordinates, Timestamps
+from src.core.models.station_model import Station
 
 
 class Faction(BaseModel):
@@ -26,23 +28,22 @@ class Faction(BaseModel):
 
 
 class System(BaseModel):
-    allegiance: Optional[str]
-    bodies: List[Any]  # Body
-    controlling_faction: Any  # ControllingFaction
-    coords: Coordinates
-    date: Optional[datetime]
-    factions: List[Any]  # PlayerMinorFaction
-    government: Optional[str]
     id64: int
     name: str
+    coords: Coordinates
+    date: Optional[datetime]
+
+    bodies: List[Body]
+    allegiance: Optional[str]
+    factions: List[Faction]
+    government: Optional[str]
     population: Optional[int]
     primary_economy: Optional[str]
     secondary_economy: Optional[str]
     security: Optional[str]
-    stations: List[Any]  # Station
-
+    stations: List[Station]
+    controlling_faction: Optional[Faction] = None
     body_count: Optional[int] = None
-
     controlling_power: Optional[str] = None
     power_conflict_progress: Optional[List[Any]] = None
     power_state: Optional[str] = None

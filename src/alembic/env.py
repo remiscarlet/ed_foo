@@ -3,6 +3,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
+import src.adapters.persistence.postgresql.db
 from alembic import context
 from src.adapters.persistence.postgresql import BaseModel
 
