@@ -2,23 +2,22 @@ from pprint import pformat
 
 import typer
 
-from src.adapters.data_ingestion.spansh.adapter import SpanshDataRetrievalAdapter
 from src.adapters.persistence.postgresql.adapter import SystemsAdapter
-from src.core.usecases.import_data_usecase import import_data_usecase
+from src.ingestion.spansh.main import SpanshDataPipeline
 
 # Data CLI
 data_cli = typer.Typer()
-data_adapter = SpanshDataRetrievalAdapter()
+data_pipeline = SpanshDataPipeline()
 
 
 @data_cli.command()
 def download_spansh_dump() -> None:
-    data_adapter.download_data()
+    data_pipeline.download_data()
 
 
 @data_cli.command()
 def import_spansh_dump() -> None:
-    import_data_usecase()
+    data_pipeline.run()
 
 
 # Debug CLI

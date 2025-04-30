@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from src.core.models.system_model import Faction, System
-from src.core.ports.converter_port import ToCoreModel
 from src.ingestion.spansh.models import BaseSpanshModel
 from src.ingestion.spansh.models.body_spansh import BodySpansh
 from src.ingestion.spansh.models.common_spansh import (
@@ -13,7 +11,7 @@ from src.ingestion.spansh.models.station_spansh import StationSpansh
 
 
 class FactionSpansh(BaseSpanshModel):
-    def __hash__(self) -> str:
+    def __hash__(self) -> int:
         return hash((type(self), self.name))
 
     name: str
@@ -47,7 +45,7 @@ class ControllingFactionSpansh(BaseSpanshModel):
 
 
 class SystemSpansh(BaseSpanshModel):
-    def __hash__(self) -> str:
+    def __hash__(self) -> int:
         return hash((type(self), self.id64, self.name))
 
     id64: int

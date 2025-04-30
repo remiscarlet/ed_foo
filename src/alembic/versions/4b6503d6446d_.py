@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 6cc057923c6a
+Revision ID: 4b6503d6446d
 Revises:
-Create Date: 2025-04-29 18:41:26.859496
+Create Date: 2025-04-29 21:42:28.029777
 
 """
 
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "6cc057923c6a"
+revision: str = "4b6503d6446d"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -66,12 +66,100 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
+        "stations",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("id64", sa.BigInteger(), nullable=True),
+        sa.Column("id_spansh", sa.BigInteger(), nullable=True),
+        sa.Column("id_edsm", sa.BigInteger(), nullable=True),
+        sa.Column("name", sa.Text(), nullable=False),
+        sa.Column("owner_id", sa.Integer(), nullable=False),
+        sa.Column("owner_type", sa.Text(), nullable=False),
+        sa.Column("allegiance", sa.Text(), nullable=True),
+        sa.Column("controlling_faction", sa.Text(), nullable=True),
+        sa.Column("controlling_faction_state", sa.Text(), nullable=True),
+        sa.Column("distance_to_arrival", sa.Float(), nullable=True),
+        sa.Column("economies", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column("government", sa.Text(), nullable=True),
+        sa.Column("large_landing_pads", sa.Integer(), nullable=True),
+        sa.Column("medium_landing_pads", sa.Integer(), nullable=True),
+        sa.Column("small_landing_pads", sa.Integer(), nullable=True),
+        sa.Column("primary_economy", sa.Text(), nullable=True),
+        sa.Column("services", sa.ARRAY(sa.Text()), nullable=True),
+        sa.Column("type", sa.Text(), nullable=True),
+        sa.Column("carrier_name", sa.Text(), nullable=True),
+        sa.Column("latitude", sa.Float(), nullable=True),
+        sa.Column("longitude", sa.Float(), nullable=True),
+        sa.Column("spansh_updated_at", sa.DateTime(), nullable=True),
+        sa.Column("edsm_updated_at", sa.DateTime(), nullable=True),
+        sa.Column("eddn_updated_at", sa.DateTime(), nullable=True),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name", "owner_id", name="_station_name_and_owner_uc"),
+    )
+    op.create_table(
+        "market_commodities",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("station_id", sa.BigInteger(), nullable=False),
+        sa.Column("commodity_sym", sa.Text(), nullable=False),
+        sa.Column("buy_price", sa.Integer(), nullable=True),
+        sa.Column("sell_price", sa.Integer(), nullable=True),
+        sa.Column("stock", sa.BigInteger(), nullable=True),
+        sa.Column("demand", sa.BigInteger(), nullable=True),
+        sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["commodity_sym"],
+            ["commodities.symbol"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["station_id"],
+            ["stations.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
+        "outfitting_ship_modules",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("station_id", sa.BigInteger(), nullable=False),
+        sa.Column("module_id", sa.BigInteger(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["module_id"],
+            ["ship_modules.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["station_id"],
+            ["stations.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
+        "shipyard_ships",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("station_id", sa.BigInteger(), nullable=False),
+        sa.Column("ship_id", sa.BigInteger(), nullable=False),
+        sa.Column("buy_price", sa.Integer(), nullable=True),
+        sa.Column("sell_price", sa.Integer(), nullable=True),
+        sa.Column("stock", sa.BigInteger(), nullable=True),
+        sa.Column("demand", sa.BigInteger(), nullable=True),
+        sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["ship_id"],
+            ["ships.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["station_id"],
+            ["stations.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
         "systems",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("id64", sa.BigInteger(), nullable=True),
-        sa.Column("spansh_id", sa.BigInteger(), nullable=True),
-        sa.Column("edsm_id", sa.BigInteger(), nullable=True),
+        sa.Column("id_spansh", sa.BigInteger(), nullable=True),
+        sa.Column("id_edsm", sa.BigInteger(), nullable=True),
         sa.Column("x", sa.Float(), nullable=False),
         sa.Column("y", sa.Float(), nullable=False),
         sa.Column("z", sa.Float(), nullable=False),
@@ -107,8 +195,8 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("id64", sa.BigInteger(), nullable=True),
-        sa.Column("spansh_id", sa.BigInteger(), nullable=True),
-        sa.Column("edsm_id", sa.BigInteger(), nullable=True),
+        sa.Column("id_spansh", sa.BigInteger(), nullable=True),
+        sa.Column("id_edsm", sa.BigInteger(), nullable=True),
         sa.Column("body_id", sa.BigInteger(), nullable=True),
         sa.Column("system_id", sa.Integer(), nullable=False),
         sa.Column("atmosphere_composition", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
@@ -117,7 +205,7 @@ def upgrade() -> None:
         sa.Column("absolute_magnitude", sa.Float(), nullable=True),
         sa.Column("age", sa.Integer(), nullable=True),
         sa.Column("arg_of_periapsis", sa.Float(), nullable=True),
-        sa.Column("ascending_Node", sa.Float(), nullable=True),
+        sa.Column("ascending_node", sa.Float(), nullable=True),
         sa.Column("atmosphere_type", sa.Text(), nullable=True),
         sa.Column("axial_tilt", sa.Float(), nullable=True),
         sa.Column("distance_to_arrival", sa.Float(), nullable=True),
@@ -178,83 +266,11 @@ def upgrade() -> None:
         sa.UniqueConstraint("system_id", "faction_id", name="_system_faction_presence_uc"),
     )
     op.create_table(
-        "stations",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("id64", sa.BigInteger(), nullable=True),
-        sa.Column("spansh_id", sa.BigInteger(), nullable=True),
-        sa.Column("edsm_id", sa.BigInteger(), nullable=True),
-        sa.Column("name", sa.Text(), nullable=False),
-        sa.Column("system_id", sa.Integer(), nullable=False),
-        sa.Column("owner_id", sa.Integer(), nullable=False),
-        sa.Column("owner_type", sa.Text(), nullable=False),
-        sa.Column("allegiance", sa.Text(), nullable=True),
-        sa.Column("controlling_faction", sa.Text(), nullable=True),
-        sa.Column("controlling_faction_state", sa.Text(), nullable=True),
-        sa.Column("distance_to_arrival", sa.Float(), nullable=True),
-        sa.Column("economies", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.Column("government", sa.Text(), nullable=True),
-        sa.Column("large_landing_pad", sa.Integer(), nullable=True),
-        sa.Column("medium_landing_pad", sa.Integer(), nullable=True),
-        sa.Column("small_landing_pad", sa.Integer(), nullable=True),
-        sa.Column("primary_economy", sa.Text(), nullable=True),
-        sa.Column("services", sa.ARRAY(sa.Text()), nullable=True),
-        sa.Column("type", sa.Text(), nullable=True),
-        sa.Column("carrier_name", sa.Text(), nullable=True),
-        sa.Column("latitude", sa.Float(), nullable=True),
-        sa.Column("longitude", sa.Float(), nullable=True),
-        sa.Column("spansh_updated_at", sa.DateTime(), nullable=True),
-        sa.Column("edsm_updated_at", sa.DateTime(), nullable=True),
-        sa.Column("eddn_updated_at", sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["system_id"],
-            ["systems.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name"),
-    )
-    op.create_table(
-        "market_commodities",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("station_id", sa.BigInteger(), nullable=False),
-        sa.Column("commodity_sym", sa.Text(), nullable=False),
-        sa.Column("buy_price", sa.Integer(), nullable=True),
-        sa.Column("sell_price", sa.Integer(), nullable=True),
-        sa.Column("stock", sa.BigInteger(), nullable=True),
-        sa.Column("demand", sa.BigInteger(), nullable=True),
-        sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["commodity_sym"],
-            ["commodities.symbol"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["station_id"],
-            ["stations.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
-        "outfitting_ship_modules",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("station_id", sa.BigInteger(), nullable=False),
-        sa.Column("module_id", sa.BigInteger(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["module_id"],
-            ["ship_modules.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["station_id"],
-            ["stations.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
         "rings",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("body_id", sa.Integer(), nullable=False),
-        sa.Column("id64", sa.BigInteger(), nullable=False),
+        sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("name", sa.Text(), nullable=False),
+        sa.Column("body_id", sa.Integer(), nullable=False),
         sa.Column("type", sa.Text(), nullable=True),
         sa.Column("mass", sa.Float(), nullable=True),
         sa.Column("inner_radius", sa.Float(), nullable=True),
@@ -264,28 +280,7 @@ def upgrade() -> None:
             ["bodies.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("id64"),
-    )
-    op.create_table(
-        "shipyard_ships",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("station_id", sa.BigInteger(), nullable=False),
-        sa.Column("ship_id", sa.BigInteger(), nullable=False),
-        sa.Column("buy_price", sa.Integer(), nullable=True),
-        sa.Column("sell_price", sa.Integer(), nullable=True),
-        sa.Column("stock", sa.BigInteger(), nullable=True),
-        sa.Column("demand", sa.BigInteger(), nullable=True),
-        sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["ship_id"],
-            ["ships.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["station_id"],
-            ["stations.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("body_id", "name", name="_ring_on_body_uc"),
     )
     op.create_table(
         "signals",
@@ -299,6 +294,7 @@ def upgrade() -> None:
             ["bodies.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("body_id", "signal_type", name="_signal_on_body_uc"),
     )
     op.create_table(
         "hotspots",
@@ -324,14 +320,14 @@ def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table("hotspots")
     op.drop_table("signals")
-    op.drop_table("shipyard_ships")
     op.drop_table("rings")
-    op.drop_table("outfitting_ship_modules")
-    op.drop_table("market_commodities")
-    op.drop_table("stations")
     op.drop_table("faction_presences")
     op.drop_table("bodies")
     op.drop_table("systems")
+    op.drop_table("shipyard_ships")
+    op.drop_table("outfitting_ship_modules")
+    op.drop_table("market_commodities")
+    op.drop_table("stations")
     op.drop_table("ships")
     op.drop_table("ship_modules")
     op.drop_table("factions")

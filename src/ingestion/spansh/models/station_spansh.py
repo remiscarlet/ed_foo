@@ -1,18 +1,14 @@
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import Field
 
 from src.core.models.station_model import (
-    Commodity,
-    Market,
     Outfitting,
     Ship,
     ShipModule,
     Shipyard,
-    Station,
 )
-from src.core.ports.converter_port import ToCoreModel
 from src.ingestion.spansh.models import BaseSpanshModel
 
 
@@ -61,7 +57,7 @@ class ShipModuleSpansh(BaseSpanshModel):
         )
 
 
-class OutfittingSpansh(BaseSpanshModel, ToCoreModel[Outfitting]):
+class OutfittingSpansh(BaseSpanshModel):
     modules: List[ShipModuleSpansh]
     updated_at: Optional[datetime] = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
@@ -73,7 +69,7 @@ class OutfittingSpansh(BaseSpanshModel, ToCoreModel[Outfitting]):
         )
 
 
-class ShipSpansh(BaseSpanshModel, ToCoreModel[Ship]):
+class ShipSpansh(BaseSpanshModel):
     name: str
     ship_id: int
     symbol: str
@@ -86,7 +82,7 @@ class ShipSpansh(BaseSpanshModel, ToCoreModel[Ship]):
         )
 
 
-class ShipyardSpansh(BaseSpanshModel, ToCoreModel[Shipyard]):
+class ShipyardSpansh(BaseSpanshModel):
     ships: List[ShipSpansh]
     updated_at: Optional[datetime] = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
@@ -98,9 +94,9 @@ class ShipyardSpansh(BaseSpanshModel, ToCoreModel[Shipyard]):
         )
 
 
-class StationSpansh(BaseSpanshModel, ToCoreModel[Station]):
-    def __hash__(self) -> str:
-        return hash((type(self),), (self.id, self.name))
+class StationSpansh(BaseSpanshModel):
+    def __hash__(self) -> int:
+        return hash((type(self), self.id, self.name))
 
     id: int
     name: str
@@ -125,25 +121,34 @@ class StationSpansh(BaseSpanshModel, ToCoreModel[Station]):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
 
-    def to_core_model(self) -> Station:
-        return Station(
-            id=self.id,
-            name=self.name,
-            updated_at=self.updated_at,
-            allegiance=self.allegiance,
-            controlling_faction=self.controlling_faction,
-            controlling_faction_state=self.controlling_faction_state,
-            distance_to_arrival=self.distance_to_arrival,
-            economies=self.economies,
-            government=self.government,
-            landing_pads=self.landing_pads,
-            market=self.market.to_core_model() if self.market is not None else None,
-            outfitting=self.outfitting.to_core_model() if self.outfitting is not None else None,
-            primary_economy=self.primary_economy,
-            services=self.services,
-            shipyard=self.shipyard.to_core_model() if self.shipyard is not None else None,
-            type=self.type,
-            carrier_name=self.carrier_name,
-            latitude=self.latitude,
-            longitude=self.longitude,
-        )
+    def to_sqlalchemy_dict(self, owner_id: int, owner_type: str) -> Dict[str, Any]:
+        if self.landing_pads is not None:
+            large_pads = self.landing_pads.get("large", 0)
+            medium_pads = self.landing_pads.get("medium", 0)
+            small_pads = self.landing_pads.get("small", 0)
+        else:
+            large_pads = 0
+            medium_pads = 0
+            small_pads = 0
+        return {
+            "id_spansh": self.id,
+            "owner_id": owner_id,
+            "owner_type": owner_type,
+            "name": self.name,
+            "allegiance": self.allegiance,
+            "controlling_faction": self.controlling_faction,
+            "controlling_faction_state": self.controlling_faction_state,
+            "distance_to_arrival": self.distance_to_arrival,
+            "economies": self.economies,
+            "government": self.government,
+            "large_landing_pads": large_pads,
+            "medium_landing_pads": medium_pads,
+            "small_landing_pads": small_pads,
+            "primary_economy": self.primary_economy,
+            "services": self.services,
+            "type": self.type,
+            "carrier_name": self.carrier_name,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "spansh_updated_at": self.updated_at,
+        }

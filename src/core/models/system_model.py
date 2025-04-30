@@ -28,11 +28,12 @@ class Faction(BaseModel):
 
 
 class System(BaseModel):
-    id64: int
+
     name: str
     coords: Coordinates
     date: Optional[datetime]
 
+    id64: Optional[int]
     bodies: List[Body]
     allegiance: Optional[str]
     factions: List[Faction]

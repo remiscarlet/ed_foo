@@ -2,11 +2,10 @@ from datetime import datetime
 from typing import Optional
 
 from src.core.models.common_model import Coordinates, Timestamps
-from src.core.ports.converter_port import ToCoreModel
 from src.ingestion.spansh.models import BaseSpanshModel
 
 
-class CoordinatesSpansh(BaseSpanshModel, ToCoreModel[Coordinates]):
+class CoordinatesSpansh(BaseSpanshModel):
     x: float
     y: float
     z: float
@@ -15,7 +14,7 @@ class CoordinatesSpansh(BaseSpanshModel, ToCoreModel[Coordinates]):
         return Coordinates(x=self.x, y=self.y, z=self.z)
 
 
-class TimestampsSpansh(BaseSpanshModel, ToCoreModel[Timestamps]):
+class TimestampsSpansh(BaseSpanshModel):
     controlling_power: Optional[datetime] = None
     power_state: Optional[datetime] = None
     powers: Optional[datetime] = None

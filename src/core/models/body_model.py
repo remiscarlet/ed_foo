@@ -29,10 +29,10 @@ class Asteroids(BaseModel):
 
 
 class Body(BaseModel):
-    id64: int
-    body_id: int
     name: str
 
+    body_id: Optional[int] = None
+    id64: Optional[int] = None
     stations: Optional[List[Station]] = None
     absolute_magnitude: Optional[float] = None
     age: Optional[int] = None

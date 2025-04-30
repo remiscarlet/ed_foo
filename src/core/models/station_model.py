@@ -53,9 +53,11 @@ class Shipyard(BaseModel):
 
 
 class Station(BaseModel):
-    id: int
     name: str
 
+    id64: Optional[int] = None
+    id_spansh: Optional[int] = None
+    id_edsm: Optional[int] = None
     updated_at: Optional[datetime] = None
 
     allegiance: Optional[str] = None
@@ -75,3 +77,7 @@ class Station(BaseModel):
     carrier_name: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+
+    spansh_updated_at: Optional[datetime] = None
+    edsm_updated_at: Optional[datetime] = None
+    eddn_updated_at: Optional[datetime] = None
