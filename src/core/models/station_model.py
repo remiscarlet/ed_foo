@@ -14,7 +14,7 @@ class CommodityPrice(BaseModel):
 
 class Commodity(CommodityPrice):
     category: str  # src.core.models.commodity.CommodityCategory
-    commodity_id: int
+    commodity_sym: str
     name: str
     symbol: str
 

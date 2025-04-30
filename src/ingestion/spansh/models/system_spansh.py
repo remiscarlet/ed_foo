@@ -12,7 +12,10 @@ from src.ingestion.spansh.models.common_spansh import (
 from src.ingestion.spansh.models.station_spansh import StationSpansh
 
 
-class FactionSpansh(BaseSpanshModel, ToCoreModel[Faction]):
+class FactionSpansh(BaseSpanshModel):
+    def __hash__(self) -> str:
+        return hash((type(self), self.name))
+
     name: str
     influence: Optional[float]
 
@@ -20,30 +23,33 @@ class FactionSpansh(BaseSpanshModel, ToCoreModel[Faction]):
     allegiance: Optional[str] = None
     state: Optional[str] = None
 
-    def to_core_model(self) -> Faction:
-        return Faction(
-            name=self.name,
-            allegiance=self.allegiance,
-            government=self.government,
-            influence=self.influence,
-            state=self.state,
-        )
+    def to_sqlalchemy_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "allegiance": self.allegiance,
+            "government": self.government,
+            "influence": self.influence,
+            "state": self.state,
+        }
 
 
-class ControllingFactionSpansh(BaseSpanshModel, ToCoreModel[Faction]):
+class ControllingFactionSpansh(BaseSpanshModel):
     name: str
     allegiance: Optional[str] = None
     government: Optional[str] = None
 
-    def to_core_model(self) -> Faction:
-        return Faction(
-            name=self.name,
-            allegiance=self.allegiance,
-            government=self.government,
-        )
+    def to_sqlalchemy_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "allegiance": self.allegiance,
+            "government": self.government,
+        }
 
 
-class SystemSpansh(BaseSpanshModel, ToCoreModel[System]):
+class SystemSpansh(BaseSpanshModel):
+    def __hash__(self) -> str:
+        return hash((type(self), self.id64, self.name))
+
     id64: int
     name: str
 
@@ -76,30 +82,29 @@ class SystemSpansh(BaseSpanshModel, ToCoreModel[System]):
     thargoid_war: Optional[Dict[str, Any]] = None
     timestamps: Optional[TimestampsSpansh] = None
 
-    def to_core_model(self) -> System:
-        return System(
-            allegiance=self.allegiance,
-            bodies=[body.to_core_model() for body in self.bodies or []],
-            controlling_faction=self.controlling_faction.to_core_model(),
-            coords=self.coords.to_core_model(),
-            date=self.date,
-            factions=[faction.to_core_model() for faction in self.factions or []],
-            government=self.government,
-            id64=self.id64,
-            name=self.name,
-            population=self.population,
-            primary_economy=self.primary_economy,
-            secondary_economy=self.secondary_economy,
-            security=self.security,
-            stations=[station.to_core_model() for station in self.stations or []],
-            body_count=self.body_count,
-            controlling_power=self.controlling_power,
-            power_conflict_progress=self.power_conflict_progress,
-            power_state=self.power_state,
-            power_state_control_progress=self.power_state_control_progress,
-            power_state_reinforcement=self.power_state_reinforcement,
-            power_state_undermining=self.power_state_undermining,
-            powers=self.powers,
-            thargoid_war=self.thargoid_war,
-            timestamps=(self.timestamps.to_core_model() if self.timestamps is not None else None),
-        )
+    def to_sqlalchemy_dict(self, controlling_faction_id: int) -> Dict[str, Any]:
+        return {
+            "allegiance": self.allegiance,
+            "controlling_faction_id": controlling_faction_id,
+            "x": self.coords.x,
+            "y": self.coords.y,
+            "z": self.coords.z,
+            "date": self.date,
+            "government": self.government,
+            "id64": self.id64,
+            "name": self.name,
+            "population": self.population,
+            "primary_economy": self.primary_economy,
+            "secondary_economy": self.secondary_economy,
+            "security": self.security,
+            "body_count": self.body_count,
+            "controlling_power": self.controlling_power,
+            "power_conflict_progress": self.power_conflict_progress,
+            "power_state": self.power_state,
+            "power_state_control_progress": self.power_state_control_progress,
+            "power_state_reinforcement": self.power_state_reinforcement,
+            "power_state_undermining": self.power_state_undermining,
+            "powers": self.powers,
+            "thargoid_war": self.thargoid_war,
+            # "timestamps": (self.timestamps.to_core_model() if self.timestamps is not None else None),
+        }

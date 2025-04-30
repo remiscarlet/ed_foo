@@ -89,3 +89,6 @@ gen-eddn-models: download-eddn-models
 	touch gen/__init__.py
 	touch gen/eddn_models/__init__.py
 models: gen-eddn-models
+
+
+# make nuke-db; make up-db; sleep 1; rm -rf src/alembic/versions/*; make alembic-revision; make alembic-upgrade;

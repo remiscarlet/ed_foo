@@ -34,7 +34,7 @@ We collect, process, and expose structured data from external sources like **Spa
 
 # Models and Schemas
 
-We organize our data definitions into three major categories:
+We organize our data definitions into three major categories (Exact locations subject to change):
 
 ## Logical Schemas
 - Location: `src/core/models/`
@@ -49,71 +49,12 @@ We organize our data definitions into three major categories:
 - Characteristics:
   - SQLAlchemy models
   - Manual migrations with Alembic
-  - Mappings between Logical and Physical schemas as needed
 
 > **Note**: This introduces some unavoidable boilerplate but pays off in flexibility and clarity.
 
 ## External Schemas
-- Location: `gen/`
+- Location: `gen/`, `src/ingestion/spansh/models/`
 - Purpose: Represent third-party schema definitions (e.g., EDDN event formats)
 - Characteristics:
-  - Pydantic models auto-generated from external JSON Schemas
+  - Pydantic models, some auto-generated from external JSON Schemas
   - Used for ingesting external messages safely
-
----
-
-# Development
-
-## Key Makefile Commands
-
-| Command | Purpose |
-|:--------|:--------|
-| `make install` | Set up Python environment |
-| `make lintfixcheck` | Lint, auto-fix, and type-check |
-<!-- | `make export-schema` | Generate and save JSON Schemas from Pydantic models | -->
-| `make run-api` | Run local FastAPI server via Uvicorn |
-| `make cli` | Run CLI entrypoint |
-| `make migrate` | Create new Alembic migration |
-| `make upgrade` | Apply Alembic migrations |
-
----
-
-# Future TODOs
-
-- Set up full **CI/CD pipeline** (likely GitHub Actions)
-- Introduce optional **Command Bus** pattern for CLI and API workflow invocation
-- Explore async ORM integration (SQLAlchemy 2.0 async support)
-- Expand ingestion sources beyond EDSM/EDDN
-- Add in-memory and background workers (for task queues, webhook triggers)
-- Add basic operational monitoring (metrics, logging)
-- If we do a lot of spacial/system coordinate based calculations, may consider **PostGIS**
-
----
-
-# Design Philosophy
-
-This system is engineered for **durability**, **extensibility**, and **clean separation of concerns**.
-We favor slightly more boilerplate up-front to achieve long-term adaptability as project complexity grows.
-
-> *Tech debt is managed by modularity, not shortcuts.*
-
----
-
-# Quickstart Example
-
-```bash
-# Install deps
-make install
-
-# Run Docker-based dev server
-make up
-make down
-```
-
----
-
-# Closing Notes
-
-This project is designed with the assumption that it will grow significantly in scope and complexity over time.
-Architecture choices prioritize **clarity, extensibility, and ergonomics for future developers** — even at some cost to initial verbosity.
-

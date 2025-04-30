@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -11,6 +10,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     Text,
+    UniqueConstraint,
     select,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -136,12 +136,12 @@ class HotspotsDB(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     ring_id: Mapped[int] = mapped_column(ForeignKey("rings.id"))
     ring: Mapped["RingsDB"] = relationship(back_populates="hotspots")
-    commodity_id: Mapped[int] = mapped_column(ForeignKey("commodities.id"))
+    commodity_sym: Mapped[str] = mapped_column(ForeignKey("commodities.symbol"))
 
     count: Mapped[Optional[int]] = mapped_column(Integer)
 
     def __repr__(self) -> str:
-        return f"<HotspotsDB(id={self.id}, commodity_id={self.commodity_id})>"
+        return f"<HotspotsDB(id={self.id}, commodity_sym={self.commodity_sym})>"
 
 
 class StationsDB(BaseModel):
@@ -208,16 +208,16 @@ class StationsDB(BaseModel):
 class CommoditiesDB(BaseModel):
     __tablename__ = "commodities"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    symbol: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    symbol: Mapped[str] = mapped_column(Text, primary_key=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
     category: Mapped[Optional[str]] = mapped_column(Text)
     is_mineable: Mapped[Optional[bool]] = mapped_column(Boolean)
     ring_types: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
     mining_method: Mapped[Optional[str]] = mapped_column(Text)
+    has_hotspots: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     def __repr__(self) -> str:
-        return f"<CommoditiesDB(id={self.id}, name={self.name!r})>"
+        return f"<CommoditiesDB(id='{self.symbol}', name={self.name!r})>"
 
 
 class MarketCommoditiesDB(BaseModel):
@@ -225,7 +225,7 @@ class MarketCommoditiesDB(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
-    commodity_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("commodities.id"), nullable=False)
+    commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("commodities.symbol"), nullable=False)
 
     buy_price: Mapped[Optional[int]] = mapped_column(Integer)
     sell_price: Mapped[Optional[int]] = mapped_column(Integer)
@@ -235,7 +235,7 @@ class MarketCommoditiesDB(BaseModel):
     is_blacklisted: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     def __repr__(self) -> str:
-        return f"<MarketCommoditiesDB(id={self.id}, station_id={self.station_id}, commodity_id={self.commodity_id})>"
+        return f"<MarketCommoditiesDB(id={self.id}, station_id={self.station_id}, commodity_sym={self.commodity_sym})>"
 
 
 class ShipsDB(BaseModel):
@@ -321,10 +321,9 @@ class FactionsDB(BaseModel):
         return f"<FactionsDB(id={self.id}, name={self.name})>"
 
 
-@dataclass
 class FactionPresencesDB(BaseModel):
     __tablename__ = "faction_presences"
-    __allow_unmapped__ = True
+    __table_args__ = (UniqueConstraint("system_id", "faction_id", name="_system_faction_presence_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     system_id: Mapped[int] = mapped_column(ForeignKey("systems.id"))
@@ -344,10 +343,8 @@ class FactionPresencesDB(BaseModel):
         return f"<FactionPresencesDB(id={self.id}, system_id={self.system_id}, faction_id={self.faction_id})>"
 
 
-@dataclass
 class SystemsDB(BaseModel):
     __tablename__ = "systems"
-    __allow_unmapped__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(Text, unique=True)

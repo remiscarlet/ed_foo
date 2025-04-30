@@ -25,37 +25,21 @@ class CommodityPriceSpansh(BaseSpanshModel):
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
 
-class CommoditySpansh(CommodityPriceSpansh, ToCoreModel[Commodity]):
+class CommoditySpansh(CommodityPriceSpansh):
     category: str  # src.core.models.commodity.CommodityCategory
     commodity_id: int
     name: str
     symbol: str
 
-    def to_core_model(self) -> Commodity:
-        return Commodity(
-            buy_price=self.buy_price,
-            demand=self.demand,
-            sell_price=self.sell_price,
-            supply=self.supply,
-            category=self.category,
-            commodity_id=self.commodity_id,
-            name=self.name,
-            symbol=self.symbol,
-            updated_at=self.updated_at,
-        )
 
-
-class MarketSpansh(BaseSpanshModel, ToCoreModel[Market]):
+class MarketSpansh(BaseSpanshModel):
     commodities: Optional[List[CommoditySpansh]] = None
     prohibited_commodities: Optional[List[str]] = None
     updated_at: Optional[datetime] = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
-    def to_core_model(self) -> Market:
-        return Market()
 
-
-class ShipModuleSpansh(BaseSpanshModel, ToCoreModel[ShipModule]):
+class ShipModuleSpansh(BaseSpanshModel):
     category: str
     cls: int = Field(alias="class")
     module_id: int
@@ -115,6 +99,9 @@ class ShipyardSpansh(BaseSpanshModel, ToCoreModel[Shipyard]):
 
 
 class StationSpansh(BaseSpanshModel, ToCoreModel[Station]):
+    def __hash__(self) -> str:
+        return hash((type(self),), (self.id, self.name))
+
     id: int
     name: str
     updated_at: Optional[datetime] = None
