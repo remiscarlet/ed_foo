@@ -21,7 +21,7 @@ def main():
         enums_schema = json.load(f)
 
     schema_store = {
-        "enums.schema.json": enums_schema,
+        ENUMS_SCHEMA.name: enums_schema,
     }
 
     validator = Draft202012Validator(

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import Field
 
@@ -95,8 +95,11 @@ class ShipyardSpansh(BaseSpanshModel):
 
 
 class StationSpansh(BaseSpanshModel):
-    def __hash__(self) -> int:
-        return hash((type(self), self.id, self.name))
+    def __repr__(self) -> str:
+        return f"StationsSpansh(id: {self.id}, name: {self.name})"
+
+    def to_cache_key(self) -> Tuple[Any, ...]:
+        return (self.__class__, self.id, self.name)
 
     id: int
     name: str

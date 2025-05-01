@@ -1,6 +1,21 @@
 # ED Foo (Enhanced Knowledge Analysis and Insights Notification Engine)
 
 <sub>Extremely WIP — initial refactor in progress.</sub>
+---
+
+## Usage
+### Pre-req
+- Install [Poetry](https://python-poetry.org/docs/#installation)
+- `git clone` this repo
+- If you already have a Spansh `galaxy_populated.json` data dump, add it to `data/` with default filename
+
+### Setup
+```
+make setup
+make download-spansh # Optional if you already have the file.
+
+make import-spansh # Plenty left to do on perf
+```
 
 ---
 

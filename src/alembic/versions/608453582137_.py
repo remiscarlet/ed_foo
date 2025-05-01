@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 4b6503d6446d
+Revision ID: 608453582137
 Revises:
-Create Date: 2025-04-29 21:42:28.029777
+Create Date: 2025-05-01 01:27:39.801045
 
 """
 
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "4b6503d6446d"
+revision: str = "608453582137"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -36,17 +36,16 @@ def upgrade() -> None:
     )
     op.create_table(
         "factions",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("allegiance", sa.Text(), nullable=True),
         sa.Column("government", sa.Text(), nullable=True),
         sa.Column("is_player", sa.Boolean(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
     op.create_table(
         "ship_modules",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("module_id", sa.Integer(), nullable=True),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("symbol", sa.Text(), nullable=True),
@@ -54,20 +53,20 @@ def upgrade() -> None:
         sa.Column("rating", sa.Text(), nullable=True),
         sa.Column("ship", sa.Text(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "ships",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("symbol", sa.Text(), nullable=True),
         sa.Column("name", sa.Text(), nullable=True),
         sa.Column("ship_id", sa.Integer(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "stations",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("id_spansh", sa.BigInteger(), nullable=True),
         sa.Column("id_edsm", sa.BigInteger(), nullable=True),
@@ -92,12 +91,12 @@ def upgrade() -> None:
         sa.Column("spansh_updated_at", sa.DateTime(), nullable=True),
         sa.Column("edsm_updated_at", sa.DateTime(), nullable=True),
         sa.Column("eddn_updated_at", sa.DateTime(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name", "owner_id", name="_station_name_and_owner_uc"),
     )
     op.create_table(
         "market_commodities",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("station_id", sa.BigInteger(), nullable=False),
         sa.Column("commodity_sym", sa.Text(), nullable=False),
         sa.Column("buy_price", sa.Integer(), nullable=True),
@@ -106,6 +105,7 @@ def upgrade() -> None:
         sa.Column("demand", sa.BigInteger(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["commodity_sym"],
             ["commodities.symbol"],
@@ -118,10 +118,10 @@ def upgrade() -> None:
     )
     op.create_table(
         "outfitting_ship_modules",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("station_id", sa.BigInteger(), nullable=False),
         sa.Column("module_id", sa.BigInteger(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["module_id"],
             ["ship_modules.id"],
@@ -134,7 +134,6 @@ def upgrade() -> None:
     )
     op.create_table(
         "shipyard_ships",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("station_id", sa.BigInteger(), nullable=False),
         sa.Column("ship_id", sa.BigInteger(), nullable=False),
         sa.Column("buy_price", sa.Integer(), nullable=True),
@@ -143,6 +142,7 @@ def upgrade() -> None:
         sa.Column("demand", sa.BigInteger(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["ship_id"],
             ["ships.id"],
@@ -155,7 +155,6 @@ def upgrade() -> None:
     )
     op.create_table(
         "systems",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("id_spansh", sa.BigInteger(), nullable=True),
@@ -183,6 +182,7 @@ def upgrade() -> None:
         sa.Column("power_state_updated_at", sa.DateTime(), nullable=True),
         sa.Column("powers_updated_at", sa.DateTime(), nullable=True),
         sa.Column("controlling_faction_id", sa.Integer(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["controlling_faction_id"],
             ["factions.id"],
@@ -192,7 +192,6 @@ def upgrade() -> None:
     )
     op.create_table(
         "bodies",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("id_spansh", sa.BigInteger(), nullable=True),
@@ -235,16 +234,16 @@ def upgrade() -> None:
         sa.Column("volcanism_type", sa.Text(), nullable=True),
         sa.Column("mean_anomaly_updated_at", sa.DateTime(), nullable=True),
         sa.Column("distance_to_arrival_updated_at", sa.DateTime(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["system_id"],
             ["systems.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name"),
+        sa.UniqueConstraint("system_id", "name", "type", "sub_type", "body_id", "main_star", name="_bodies_uc"),
     )
     op.create_table(
         "faction_presences",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("system_id", sa.Integer(), nullable=False),
         sa.Column("faction_id", sa.Integer(), nullable=False),
         sa.Column("influence", sa.Float(), nullable=True),
@@ -254,6 +253,7 @@ def upgrade() -> None:
         sa.Column("active_states", sa.ARRAY(sa.Text()), nullable=True),
         sa.Column("pending_states", sa.ARRAY(sa.Text()), nullable=True),
         sa.Column("recovering_states", sa.ARRAY(sa.Text()), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["faction_id"],
             ["factions.id"],
@@ -266,8 +266,24 @@ def upgrade() -> None:
         sa.UniqueConstraint("system_id", "faction_id", name="_system_faction_presence_uc"),
     )
     op.create_table(
-        "rings",
+        "thargoid_wars",
+        sa.Column("system_id", sa.BigInteger(), nullable=False),
+        sa.Column("current_state", sa.Text(), nullable=False),
+        sa.Column("days_remaining", sa.Float(), nullable=False),
+        sa.Column("failure_state", sa.Text(), nullable=False),
+        sa.Column("ports_remaining", sa.Float(), nullable=False),
+        sa.Column("progress", sa.Float(), nullable=False),
+        sa.Column("success_reached", sa.Boolean(), nullable=False),
+        sa.Column("success_state", sa.Text(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["system_id"],
+            ["systems.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
+        "rings",
         sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("body_id", sa.Integer(), nullable=False),
@@ -275,6 +291,7 @@ def upgrade() -> None:
         sa.Column("mass", sa.Float(), nullable=True),
         sa.Column("inner_radius", sa.Float(), nullable=True),
         sa.Column("outer_radius", sa.Float(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["body_id"],
             ["bodies.id"],
@@ -284,11 +301,11 @@ def upgrade() -> None:
     )
     op.create_table(
         "signals",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("body_id", sa.Integer(), nullable=False),
         sa.Column("signal_type", sa.Text(), nullable=True),
         sa.Column("count", sa.Integer(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["body_id"],
             ["bodies.id"],
@@ -298,10 +315,10 @@ def upgrade() -> None:
     )
     op.create_table(
         "hotspots",
-        sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("ring_id", sa.Integer(), nullable=False),
         sa.Column("commodity_sym", sa.Text(), nullable=False),
         sa.Column("count", sa.Integer(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["commodity_sym"],
             ["commodities.symbol"],
@@ -321,6 +338,7 @@ def downgrade() -> None:
     op.drop_table("hotspots")
     op.drop_table("signals")
     op.drop_table("rings")
+    op.drop_table("thargoid_wars")
     op.drop_table("faction_presences")
     op.drop_table("bodies")
     op.drop_table("systems")

@@ -12,6 +12,10 @@ LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
+        "minimal": {
+            "format": "[%(levelname)s][%(name)s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
         "standard": {
             "format": "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
@@ -20,6 +24,7 @@ LOGGING_CONFIG = {
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "minimal",
             "level": "TRACE",
             "stream": "ext://sys.stdout",
         },
@@ -52,9 +57,7 @@ def get_logger(name: str) -> TraceLogger:
     return cast(TraceLogger, logging.getLogger(name))
 
 
-def configure_logger(args: Namespace) -> None:
-    logging.config.dictConfig(LOGGING_CONFIG)
-
+def configure_logger_cli(args: Namespace) -> None:
     match args.verbosity:
         case 0:
             level = logging.getLevelNamesMapping().get(DEFAULT_LOG_LEVEL, logging.INFO)
@@ -62,6 +65,11 @@ def configure_logger(args: Namespace) -> None:
             level = logging.DEBUG
         case _:
             level = TRACE_LEVEL_NUM
+    configure_logger(level)
+
+
+def configure_logger(level: int) -> None:
+    logging.config.dictConfig(LOGGING_CONFIG)
 
     root = logging.getLogger()
     root.setLevel(level)
@@ -75,3 +83,27 @@ def configure_logger(args: Namespace) -> None:
         logger.setLevel(level)
         for h in logger.handlers:
             h.setLevel(level)
+
+    for name in [
+        "sqlalchemy",
+        "sqlalchemy.dialects",
+        "sqlalchemy.dialects.postgresql",
+        "sqlalchemy.engine",
+        "sqlalchemy.engine.Connection",
+        "sqlalchemy.engine.Engine",
+        "sqlalchemy.engine.base.Engine",
+        "sqlalchemy.orm.dependency",
+        "sqlalchemy.orm.instrumentation",
+        "sqlalchemy.orm.mapper",
+        "sqlalchemy.orm.mapper.Mapper",
+        "sqlalchemy.orm.path_registry",
+        "sqlalchemy.orm.properties",
+        "sqlalchemy.orm.relationships",
+        "sqlalchemy.orm.relationships.RelationshipProperty",
+        "sqlalchemy.orm.strategies.LazyLoader",
+        "sqlalchemy.pool",
+        "sqlalchemy.pool.impl.QueuePool",
+    ]:
+        logging.getLogger(name).setLevel(logging.WARNING)
+
+    logging.getLogger("sqlalchemy.engine").disabled = True

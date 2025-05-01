@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from sqlalchemy import (
     ARRAY,
@@ -18,18 +18,21 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, foreign, mapped_column, relationship
 
-from src.adapters.persistence.postgresql import BaseModel
+from src.adapters.persistence.postgresql import BaseModel, BaseModelWithId
 from src.core.models.body_model import Body
 from src.core.models.common_model import Coordinates
 from src.core.models.station_model import Station
 from src.core.models.system_model import Faction, System
+from src.ingestion.spansh.models.body_spansh import BodySpansh
 
 
-class BodiesDB(BaseModel):
+class BodiesDB(BaseModelWithId):
     __tablename__ = "bodies"
+    __table_args__ = (
+        UniqueConstraint("system_id", "name", "type", "sub_type", "body_id", "main_star", name="_bodies_uc"),
+    )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -43,11 +46,12 @@ class BodiesDB(BaseModel):
     stations: Mapped[List["StationsDB"]] = relationship(
         "StationsDB",
         primaryjoin=lambda: and_(foreign(StationsDB.owner_id) == BodiesDB.id, StationsDB.owner_type == literal("body")),
+        overlaps="stations",
     )
 
-    atmosphere_composition: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)
-    materials: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)
-    parents: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)
+    atmosphere_composition: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
+    materials: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
+    parents: Mapped[Optional[Dict[str, int]]] = mapped_column(JSONB)
 
     absolute_magnitude: Mapped[Optional[float]] = mapped_column(Float)
     age: Mapped[Optional[int]] = mapped_column(Integer)
@@ -72,7 +76,7 @@ class BodiesDB(BaseModel):
     semi_major_axis: Mapped[Optional[float]] = mapped_column(Float)
     solar_masses: Mapped[Optional[float]] = mapped_column(Float)
     solar_radius: Mapped[Optional[float]] = mapped_column(Float)
-    solid_composition: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)
+    solid_composition: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
     spectral_class: Mapped[Optional[str]] = mapped_column(Text)
     sub_type: Mapped[Optional[str]] = mapped_column(Text)
     surface_pressure: Mapped[Optional[float]] = mapped_column(Float)
@@ -116,7 +120,7 @@ class BodiesDB(BaseModel):
             semi_major_axis=self.semi_major_axis,
             solar_masses=self.solar_masses,
             solar_radius=self.solar_radius,
-            solid_composition=self.solid_composition,
+            solid_composition={k: float(v) for k, v in (self.solid_composition or {}).items()},
             spectral_class=self.spectral_class,
             sub_type=self.sub_type,
             surface_pressure=self.surface_pressure,
@@ -128,15 +132,17 @@ class BodiesDB(BaseModel):
             distance_to_arrival_updated_at=self.distance_to_arrival_updated_at,
         )
 
+    def to_cache_key(self) -> Tuple[Any, ...]:
+        return (BodySpansh, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star, self.body_id)
+
     def __repr__(self) -> str:
         return f"<BodiesDB(id={self.id}, name={self.name!r})>"
 
 
-class SignalsDB(BaseModel):
+class SignalsDB(BaseModelWithId):
     __tablename__ = "signals"
     __table_args__ = (UniqueConstraint("body_id", "signal_type", name="_signal_on_body_uc"),)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     body_id: Mapped[int] = mapped_column(ForeignKey("bodies.id"))
     body: Mapped["BodiesDB"] = relationship(back_populates="signals")
 
@@ -148,11 +154,10 @@ class SignalsDB(BaseModel):
         return f"<SignalsDB(id={self.id}, signal_type={self.signal_type})>"
 
 
-class RingsDB(BaseModel):
+class RingsDB(BaseModelWithId):
     __tablename__ = "rings"
     __table_args__ = (UniqueConstraint("body_id", "name", name="_ring_on_body_uc"),)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     id64: Mapped[int] = mapped_column(BigInteger, nullable=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -170,10 +175,9 @@ class RingsDB(BaseModel):
         return f"<RingsDB(id={self.id}, name={self.name})>"
 
 
-class HotspotsDB(BaseModel):
+class HotspotsDB(BaseModelWithId):
     __tablename__ = "hotspots"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     ring_id: Mapped[int] = mapped_column(ForeignKey("rings.id"))
     ring: Mapped["RingsDB"] = relationship(back_populates="hotspots")
     commodity_sym: Mapped[str] = mapped_column(ForeignKey("commodities.symbol"))
@@ -184,11 +188,10 @@ class HotspotsDB(BaseModel):
         return f"<HotspotsDB(id={self.id}, commodity_sym={self.commodity_sym})>"
 
 
-class StationsDB(BaseModel):
+class StationsDB(BaseModelWithId):
     __tablename__ = "stations"
     __table_args__ = (UniqueConstraint("name", "owner_id", name="_station_name_and_owner_uc"),)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_edsm: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -201,7 +204,7 @@ class StationsDB(BaseModel):
     controlling_faction: Mapped[Optional[str]] = mapped_column(Text)
     controlling_faction_state: Mapped[Optional[str]] = mapped_column(Text)
     distance_to_arrival: Mapped[Optional[float]] = mapped_column(Float)
-    economies: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)
+    economies: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
     government: Mapped[Optional[str]] = mapped_column(Text)
 
     large_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
@@ -286,10 +289,9 @@ class CommoditiesDB(BaseModel):
         return f"<CommoditiesDB(id='{self.symbol}', name={self.name!r})>"
 
 
-class MarketCommoditiesDB(BaseModel):
+class MarketCommoditiesDB(BaseModelWithId):
     __tablename__ = "market_commodities"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
     commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("commodities.symbol"), nullable=False)
 
@@ -304,10 +306,9 @@ class MarketCommoditiesDB(BaseModel):
         return f"<MarketCommoditiesDB(id={self.id}, station_id={self.station_id}, commodity_sym={self.commodity_sym})>"
 
 
-class ShipsDB(BaseModel):
+class ShipsDB(BaseModelWithId):
     __tablename__ = "ships"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     symbol: Mapped[Optional[str]] = mapped_column(Text)
     name: Mapped[Optional[str]] = mapped_column(Text)
     ship_id: Mapped[Optional[int]] = mapped_column(Integer)
@@ -317,10 +318,9 @@ class ShipsDB(BaseModel):
         return f"<ShipsDB(id={self.id}, name={self.name})>"
 
 
-class ShipyardShipsDB(BaseModel):
+class ShipyardShipsDB(BaseModelWithId):
     __tablename__ = "shipyard_ships"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
     ship_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("ships.id"), nullable=False)
 
@@ -335,10 +335,9 @@ class ShipyardShipsDB(BaseModel):
         return f"<ShipyardShipsDB(id={self.id}, station_id={self.station_id}, ship_id={self.ship_id})>"
 
 
-class ShipModulesDB(BaseModel):
+class ShipModulesDB(BaseModelWithId):
     __tablename__ = "ship_modules"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     module_id: Mapped[Optional[int]] = mapped_column(Integer)
     name: Mapped[str] = mapped_column(Text, nullable=False)
     symbol: Mapped[Optional[str]] = mapped_column(Text)
@@ -351,10 +350,9 @@ class ShipModulesDB(BaseModel):
         return f"<ShipModulesDB(id={self.id}, name={self.name})>"
 
 
-class OutfittingShipModulesDB(BaseModel):
+class OutfittingShipModulesDB(BaseModelWithId):
     __tablename__ = "outfitting_ship_modules"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
     module_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("ship_modules.id"), nullable=False)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
@@ -363,10 +361,26 @@ class OutfittingShipModulesDB(BaseModel):
         return f"<OutfittingShipModulesDB(id={self.id}, station_id={self.station_id}, module_id={self.module_id})>"
 
 
-class FactionsDB(BaseModel):
+class ThargoidWarDB(BaseModelWithId):
+    __tablename__ = "thargoid_wars"
+
+    system_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("systems.id"), nullable=False)
+
+    current_state: Mapped[str] = mapped_column(Text)
+    days_remaining: Mapped[float] = mapped_column(Float)
+    failure_state: Mapped[str] = mapped_column(Text)
+    ports_remaining: Mapped[float] = mapped_column(Float)
+    progress: Mapped[float] = mapped_column(Float)
+    success_reached: Mapped[bool] = mapped_column(Boolean)
+    success_state: Mapped[str] = mapped_column(Text)
+
+    def __repr__(self) -> str:
+        return f"<ThargoidWarDB(id={self.id}, system_id={self.system_id}, current_state={self.current_state})>"
+
+
+class FactionsDB(BaseModelWithId):
     __tablename__ = "factions"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
 
     allegiance: Mapped[Optional[str]] = mapped_column(Text)
@@ -387,11 +401,10 @@ class FactionsDB(BaseModel):
         return f"<FactionsDB(id={self.id}, name={self.name})>"
 
 
-class FactionPresencesDB(BaseModel):
+class FactionPresencesDB(BaseModelWithId):
     __tablename__ = "faction_presences"
     __table_args__ = (UniqueConstraint("system_id", "faction_id", name="_system_faction_presence_uc"),)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     system_id: Mapped[int] = mapped_column(ForeignKey("systems.id"))
     system: Mapped["SystemsDB"] = relationship(back_populates="faction_presences")
     faction_id: Mapped[int] = mapped_column(ForeignKey("factions.id"))
@@ -409,10 +422,9 @@ class FactionPresencesDB(BaseModel):
         return f"<FactionPresencesDB(id={self.id}, system_id={self.system_id}, faction_id={self.faction_id})>"
 
 
-class SystemsDB(BaseModel):
+class SystemsDB(BaseModelWithId):
     __tablename__ = "systems"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(Text, unique=True)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -432,13 +444,13 @@ class SystemsDB(BaseModel):
     government: Mapped[Optional[str]] = mapped_column(Text)
     body_count: Mapped[Optional[int]] = mapped_column(Integer)
     controlling_power: Mapped[Optional[str]] = mapped_column(Text)
-    power_conflict_progress: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSONB)
+    power_conflict_progress: Mapped[Optional[List[Dict[str, float]]]] = mapped_column(JSONB)
     power_state: Mapped[Optional[str]] = mapped_column(Text)
     power_state_control_progress: Mapped[Optional[float]] = mapped_column(Float)
     power_state_reinforcement: Mapped[Optional[float]] = mapped_column(Float)
     power_state_undermining: Mapped[Optional[float]] = mapped_column(Float)
     powers: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
-    thargoid_war: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)
+    thargoid_war: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
 
     controlling_power_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     power_state_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -454,6 +466,7 @@ class SystemsDB(BaseModel):
         primaryjoin=lambda: and_(
             foreign(StationsDB.owner_id) == SystemsDB.id, StationsDB.owner_type == literal("system")
         ),
+        overlaps="stations",
     )
 
     @classmethod

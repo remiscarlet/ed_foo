@@ -13,6 +13,9 @@ class CoordinatesSpansh(BaseSpanshModel):
     def to_core_model(self) -> Coordinates:
         return Coordinates(x=self.x, y=self.y, z=self.z)
 
+    def __repr__(self) -> str:
+        return f"CoordinatesSpansh(x={self.x}, y={self.y}, z={self.z})"
+
 
 class TimestampsSpansh(BaseSpanshModel):
     controlling_power: Optional[datetime] = None

@@ -3,22 +3,6 @@ from pprint import pformat
 import typer
 
 from src.adapters.persistence.postgresql.adapter import SystemsAdapter
-from src.ingestion.spansh.main import SpanshDataPipeline
-
-# Data CLI
-data_cli = typer.Typer()
-data_pipeline = SpanshDataPipeline()
-
-
-@data_cli.command()
-def download_spansh_dump() -> None:
-    data_pipeline.download_data()
-
-
-@data_cli.command()
-def import_spansh_dump() -> None:
-    data_pipeline.run()
-
 
 # Debug CLI
 debug_cli = typer.Typer()
@@ -44,6 +28,5 @@ def get_world(world_name: str) -> None:
 # Main CLI
 cli = typer.Typer()
 
-cli.add_typer(data_cli, name="data")
 cli.add_typer(debug_cli, name="debug")
 cli.add_typer(system_cli, name="system")

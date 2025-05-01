@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Callable, Type
+from typing import Any, Callable, Tuple, Type
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -31,12 +31,18 @@ def parse_flexible_datetime(v: str) -> datetime:
 
 
 class BaseSpanshModel(BaseModel):
+    def __hash__(self) -> int:
+        return hash(self.to_cache_key())
+
     model_config = ConfigDict(
         alias_generator=lambda s: "".join(word.capitalize() if i > 0 else word for i, word in enumerate(s.split("_"))),
         populate_by_name=True,
         extra="allow",
         frozen=True,
     )
+
+    def to_cache_key(self) -> Tuple[Any, ...]:
+        raise NotImplementedError()
 
     @classmethod
     def flexible_datetime_validator(cls: Type[Any], field_name: str) -> Callable[[str], datetime]:

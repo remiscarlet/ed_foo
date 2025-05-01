@@ -87,3 +87,24 @@ def get_time_since(dt: datetime) -> str:
 
     time_since = ", ".join(parts)
     return f"{time_since} Ago"
+
+
+def seconds_to_str(sec: float) -> str:
+    """Returns a string of hours, minutes, seconds, etc by converting the delta
+    Delta is assumed to be seconds
+    """
+    s = int(sec % 60)
+    m = int(sec // 60) % 60
+    h = int(sec // (60 * 60)) % (60 * 60)
+
+    config = {
+        "h": h,
+        "m": m,
+        "s": s,
+    }
+
+    parts = []
+    for sym, val in config.items():
+        if val > 0:
+            parts.append(f"{val}{sym}")
+    return "".join(parts)

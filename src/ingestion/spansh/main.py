@@ -1,14 +1,14 @@
-import json
-from itertools import batched
+import logging
 from pathlib import Path
-from pprint import pformat, pprint
-from typing import Any, Dict, List, Optional, Type, cast
+from pprint import pformat
+from typing import Any, Callable, Dict, Iterable, List, Type, Union
 
+import ijson  # type: ignore
 import yaml
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.postgresql import BaseModel, SessionLocal
+from src.adapters.persistence.postgresql import BaseModel, BaseModelWithId, SessionLocal
 from src.adapters.persistence.postgresql.db import (
     BodiesDB,
     CommoditiesDB,
@@ -26,10 +26,16 @@ from src.common.constants import (
     GALAXY_POPULATED_JSON_URL,
     METADATA_DIR,
 )
-from src.common.logging import get_logger
+from src.common.logging import configure_logger, get_logger
 from src.common.timer import Timer
-from src.common.utils import download_file, ungzip
-from src.ingestion.spansh.models.system_spansh import SystemSpansh
+from src.common.utils import download_file, seconds_to_str, ungzip
+from src.ingestion.spansh.models import BaseSpanshModel
+from src.ingestion.spansh.models.body_spansh import BodySpansh
+from src.ingestion.spansh.models.system_spansh import (
+    ControllingFactionSpansh,
+    FactionSpansh,
+    SystemSpansh,
+)
 
 logger = get_logger(__name__)
 
@@ -38,12 +44,13 @@ def upsert_all[T: BaseModel](
     session: Session,
     model: Type[T],
     rows: List[Dict[str, Any]],
-    conflict_cols: list[str],
-    exclude_update_cols: list[str] = [],
+    conflict_cols: List[str],
+    exclude_update_cols: List[str] = [],
 ) -> List[T]:
     if not rows:
         return []
-    pprint(rows)
+
+    logger.debug(repr([{k: v for k, v in item.items() if k in conflict_cols} for item in rows]))
 
     updatable_cols = [
         col.name
@@ -59,12 +66,159 @@ def upsert_all[T: BaseModel](
         )
     )
 
-    print(str(stmt))
+    logger.trace(str(stmt))
 
     results = session.scalars(stmt.returning(model), execution_options={"populate_existing": True})
     session.commit()
 
     return list(iter(results.all()))
+
+
+def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+    logger.info("Layer 1: Factions")
+
+    all_factions: dict[str, Union[FactionSpansh, ControllingFactionSpansh]] = {}
+    faction_dicts: dict[str, dict[str, Any]] = {}
+
+    for system in input_systems:
+        for faction in system.factions or []:
+            all_factions[faction.name] = faction
+            faction_dicts[faction.name] = {
+                k: v for k, v in faction.to_sqlalchemy_dict().items() if k in ["allegiance", "government", "name"]
+            }
+
+        controlling = system.controlling_faction
+        if controlling:
+            all_factions[controlling.name] = controlling
+            faction_dicts[controlling.name] = {
+                k: v for k, v in controlling.to_sqlalchemy_dict().items() if k in ["allegiance", "government", "name"]
+            }
+
+    db_factions = upsert_all(partitioner.session, FactionsDB, list(faction_dicts.values()), ["name"], ["id"])
+    for row in db_factions:
+        spansh_faction = all_factions.get(row.name)
+        if spansh_faction is None:
+            raise Exception(f"Missing faction '{row.name}' in original Spansh data.")
+        partitioner.cache_spansh_entity_id(spansh_faction, row.id)
+
+
+def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+    logger.info("Layer 2: Systems")
+
+    systems = []
+    spansh_by_name = {}
+
+    for system in input_systems:
+        spansh_by_name[system.name] = system
+        controlling_id = (
+            partitioner.get_spansh_entity_id(system.controlling_faction) if system.controlling_faction else None
+        )
+        systems.append(system.to_sqlalchemy_dict(controlling_faction_id=controlling_id))
+
+    db_systems = upsert_all(partitioner.session, SystemsDB, systems, ["name"], ["id"])
+    for db_obj in db_systems:
+        original = spansh_by_name.get(db_obj.name)
+        if original is None:
+            raise Exception(f"Spansh system not found for DB system '{db_obj.name}'")
+        partitioner.cache_spansh_entity_id(original, db_obj.id)
+
+
+def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+    logger.info("Layer 3: FactionPresences and Bodies")
+
+    # --- FactionPresences ---
+    presence_rows = []
+    for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
+        for faction in system.factions or []:
+            faction_id = partitioner.get_spansh_entity_id(faction)
+            presence_rows.append(
+                {
+                    "system_id": system_id,
+                    "faction_id": faction_id,
+                    "state": faction.state,
+                    "influence": faction.influence,
+                }
+            )
+
+    upsert_all(partitioner.session, FactionPresencesDB, presence_rows, ["faction_id", "system_id"], ["id"])
+
+    # --- Bodies ---
+    body_rows = []
+    spansh_body_by_key: dict[int, BodySpansh] = {}
+    for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
+        for body in system.bodies or []:
+            key = hash(body.to_cache_key())
+            spansh_body_by_key[key] = body
+            body_rows.append(body.to_sqlalchemy_dict(system_id))
+
+    body_objects = upsert_all(
+        partitioner.session,
+        BodiesDB,
+        body_rows,
+        ["system_id", "name", "type", "sub_type", "body_id", "main_star"],
+        ["id"],
+    )
+
+    for db_obj in body_objects:
+        key = hash(db_obj.to_cache_key())
+        spansh_body = spansh_body_by_key.get(key)
+        if spansh_body is None:
+            raise Exception(f"Body not found in spansh cache for: {pformat(db_obj.to_cache_key())}")
+        partitioner.cache_spansh_entity_id(spansh_body, db_obj.id)
+
+
+def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+    logger.info("Layer 4: Stations, Signals, Rings")
+
+    # --- Stations ---
+    rows_by_pk = {}
+    stations_by_name = {}
+
+    for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
+
+        for station in system.stations or []:
+            row = station.to_sqlalchemy_dict(system_id, "system")
+            rows_by_pk[(row["name"], row["owner_id"])] = row
+            stations_by_name[station.name] = station
+
+        for body in system.bodies or []:
+            for station in body.stations or []:
+                row = station.to_sqlalchemy_dict(system_id, "body")
+                rows_by_pk[(row["name"], row["owner_id"])] = row
+                stations_by_name[station.name] = station
+
+    station_objects = upsert_all(
+        partitioner.session, StationsDB, list(rows_by_pk.values()), ["name", "owner_id"], ["id"]
+    )
+
+    for obj in station_objects:
+        spansh_station = stations_by_name.get(obj.name)
+        if spansh_station is None:
+            raise Exception(f"Missing station: {obj.name}")
+        partitioner.cache_spansh_entity_id(spansh_station, obj.id)
+
+    # --- Signals ---
+    signal_rows = []
+    for system in input_systems:
+        for body in system.bodies or []:
+            if body.signals:
+                body_id = partitioner.get_spansh_entity_id(body)
+                signal_rows.extend(body.signals.to_sqlalchemy_dicts(body_id))
+
+    upsert_all(partitioner.session, SignalsDB, signal_rows, ["body_id", "signal_type"], ["id"])
+
+    # --- Rings ---
+    ring_rows = []
+    for system in input_systems:
+        for body in system.bodies or []:
+            body_id = partitioner.get_spansh_entity_id(body)
+            for ring in body.rings or []:
+                ring_rows.append(ring.to_sqlalchemy_dict(body_id))
+
+    upsert_all(partitioner.session, RingsDB, ring_rows, ["body_id", "name"], ["id"])
 
 
 class SpanshDataLayerPartitioner:
@@ -93,7 +247,7 @@ class SpanshDataLayerPartitioner:
       - SignalsDB
       - RingsDB
         - Used in HotspotsDB.ring_id
-    Layer 5:
+    Layer 5: (TODO)
       - MarketCommoditiesDB
       - ShipyardShipsDB
       - OutfittingShipModulesDB
@@ -103,183 +257,49 @@ class SpanshDataLayerPartitioner:
 
     def __init__(self) -> None:
         self.session = SessionLocal()
+        self.id_cache: Dict[int, int] = {}
 
-    id_cache: Dict[int, int] = {}
+    def cache_spansh_entity_id(self, entity: BaseSpanshModel, db_id: int) -> None:
+        key = hash(entity)
+        if db_id is None:
+            raise ValueError(f"Cannot cache None id for entity: {entity}")
+        self.id_cache[key] = db_id
 
-    def cache_id(self, entity: Any, id: int) -> None:
-        self.id_cache[hash(entity)] = id
+    def get_spansh_entity_id(self, entity: BaseSpanshModel) -> int:
+        key = hash(entity)
+        if key not in self.id_cache:
+            raise KeyError(f"Entity not cached: {entity.to_cache_key()}")
+        return self.id_cache[key]
 
-    def get_entity_id(self, entity: Any) -> int:
-        entity_id = self.id_cache.get(hash(entity))
-        if entity_id is None:
-            logger.warning(pformat(entity))
-            raise Exception("Got an entity that didn't have a cached entity id!")
-        return entity_id
+    def _upsert_and_cache[T: BaseModelWithId](
+        self,
+        model_cls: Type[T],
+        spansh_entities: Iterable[BaseSpanshModel],
+        to_dict_fn: Callable[[BaseSpanshModel], dict[str, Any]],
+        pk_keys: list[str],
+    ) -> None:
+        rows = [to_dict_fn(entity) for entity in spansh_entities]
+        db_objs = upsert_all(self.session, model_cls, rows, pk_keys, ["id"])
 
-    def insert_layer1(self, input_systems: List[SystemSpansh]) -> None:
-        # Layer 1
-        faction_spansh_by_name = {
-            faction.name: faction for system in input_systems for faction in system.factions or []
-        }
-        to_use = ["allegiance", "government", "name"]
-        factions_by_name = {}
-        for system in input_systems:
-            for faction in system.factions or []:
-                factions_by_name[faction.name] = {k: v for k, v in faction.to_sqlalchemy_dict().items() if k in to_use}
-        faction_rows = upsert_all(self.session, FactionsDB, list(factions_by_name.values()), ["name"], ["id"])
-        for row in faction_rows:
-            faction_spansh = faction_spansh_by_name.get(row.name)
-            self.cache_id(faction_spansh, row.id)
-
-            for system in input_systems:
-                if system.controlling_faction and system.controlling_faction.name == row.name:
-                    self.cache_id(system.controlling_faction, row.id)
-
-        pprint("!!!!!")
-        pprint(faction_rows)
-
-    def insert_layer2(self, input_systems: List[SystemSpansh]) -> None:
-        # Layer 2
-        systems_spansh_by_name = {system.name: system for system in input_systems}
-        systems = []
-        for system in input_systems:
-            controlling_faction_id = self.get_entity_id(system.controlling_faction)
-            if controlling_faction_id is None:
-                continue
-            systems.append(system.to_sqlalchemy_dict(controlling_faction_id=controlling_faction_id))
-        system_rows = upsert_all(
-            self.session,
-            SystemsDB,
-            systems,
-            ["name"],
-            ["id"],
-        )
-        for row in system_rows:
-            spansh_system = systems_spansh_by_name.get(row.name)
-            self.cache_id(spansh_system, row.id)
-
-        pprint("!!!!!")
-        pprint(system_rows)
-
-    def insert_layer3(self, input_systems: List[SystemSpansh]) -> None:
-        # Layer 3 - Faction Presences
-        rows = []
-        for system in input_systems:
-            for faction in system.factions or []:
-                system_id = self.get_entity_id(system)
-                faction_id = self.get_entity_id(faction)
-                rows.append(
-                    {
-                        "system_id": system_id,
-                        "faction_id": faction_id,
-                        "state": faction.state,
-                        "influence": faction.influence,
-                    }
-                )
-        faction_presence_rows = upsert_all(
-            self.session,
-            FactionPresencesDB,
-            rows,
-            ["faction_id", "system_id"],
-            ["id"],
-        )
-
-        pprint("!!!!!")
-        pprint(faction_presence_rows)
-
-        # Layer 3 - Bodies
-        rows = []
-        body_by_name = {}
-        for system in input_systems:
-            system_id = self.get_entity_id(system)
-            for body in system.bodies or []:
-                rows.append(body.to_sqlalchemy_dict(system_id))
-                body_by_name[body.name] = body
-        bodies_rows = upsert_all(
-            self.session,
-            BodiesDB,
-            rows,
-            ["name"],
-            ["id"],
-        )
-        for row in bodies_rows:
-            spansh_body = body_by_name.get(row.name)
-            self.cache_id(spansh_body, row.id)
-
-    def insert_layer4(self, input_systems: List[SystemSpansh]) -> None:
-        # Layer 4 - Stations
-        rows = []
-        stations_by_name = {}
-        for system in input_systems:
-            system_id = self.get_entity_id(system)
-            for station in system.stations or []:
-                rows.append(station.to_sqlalchemy_dict(system_id, "system"))
-                stations_by_name[station.name] = station
-            for body in system.bodies or []:
-                for station in body.stations or []:
-                    rows.append(station.to_sqlalchemy_dict(system_id, "body"))
-                    stations_by_name[station.name] = station
-
-        stations_rows = upsert_all(
-            self.session,
-            StationsDB,
-            rows,
-            ["name", "owner_id"],
-            ["id"],
-        )
-        for row in stations_rows:
-            spansh_station = stations_by_name.get(row.name)
-            self.cache_id(spansh_station, row.id)
-
-        # Layer 4 - Signals
-        rows = []
-        for system in input_systems:
-            for body in system.bodies or []:
-                body_id = self.get_entity_id(body)
-                if body.signals:
-                    rows.extend(body.signals.to_sqlalchemy_dicts(body_id))
-
-        upsert_all(
-            self.session,
-            SignalsDB,
-            rows,
-            ["body_id", "signal_type"],
-            ["id"],
-        )
-
-        # Layer 4 - Rings
-        rows = []
-        for system in input_systems:
-            for body in system.bodies or []:
-                body_id = self.get_entity_id(body)
-                if body_id is None:
-                    logger.warning(f"Got a body that didn't have a cached entity id!")
-                    logger.warning(pformat(body))
-                    continue
-
-                for ring in body.rings or []:
-                    rows.append(ring.to_sqlalchemy_dict(body_id))
-
-        upsert_all(
-            self.session,
-            RingsDB,
-            rows,
-            ["body_id", "name"],
-            ["id"],
-        )
+        by_key = {hash(e): e for e in spansh_entities}
+        for db_obj in db_objs:
+            spansh_entity = by_key.get(hash(db_obj))
+            if spansh_entity is None:
+                raise Exception(f"Missing Spansh entity for DB object: {pformat(db_obj)}")
+            self.cache_spansh_entity_id(spansh_entity, db_obj.id)
 
     def insert_systems(self, input_systems: List[SystemSpansh]) -> None:
-        self.insert_layer1(input_systems)
-        self.insert_layer2(input_systems)
-        self.insert_layer3(input_systems)
-        self.insert_layer4(input_systems)
-        # self.insert_layer5(input_systems)
+        insert_layer1(self, input_systems)
+        insert_layer2(self, input_systems)
+        insert_layer3(self, input_systems)
+        insert_layer4(self, input_systems)
 
 
 class SpanshDataPipeline:
     def __init__(self) -> None:
         self.session = SessionLocal()
         self.partitioner = SpanshDataLayerPartitioner()
+        self.pipeline_timer = Timer("Spansh data import pipeline")
 
     def download_data(self) -> None:
         GALAXY_POPULATED_JSON_GZ.parent.mkdir(parents=True, exist_ok=True)
@@ -288,7 +308,7 @@ class SpanshDataPipeline:
         ungzip(GALAXY_POPULATED_JSON_GZ, GALAXY_POPULATED_JSON)
 
     def load_metadata_yaml_into_pg(self, path: Path) -> None:
-        pprint(f"Inserting '{path}'")
+        logger.debug(f"Inserting '{path}'")
 
         with open(path, "r") as f:
             dict = yaml.load(f.read(), Loader=yaml.Loader)
@@ -306,47 +326,94 @@ class SpanshDataPipeline:
                     }
                 )
 
-            commodity_rows = upsert_all(self.session, CommoditiesDB, commodities, ["symbol"], [])
-            pprint(commodity_rows)
+            commodity_objects = upsert_all(self.session, CommoditiesDB, commodities, ["symbol"], [])
+            logger.debug(pformat(commodity_objects))
 
-    def load_data(self) -> Dict[str, SystemSpansh]:
-        spansh_systems_list: List[SystemSpansh] = []
+    def load_and_process_data(self, batch_process_fn: Callable[[List[SystemSpansh]], None]) -> None:
+        start_at = 0
+        skipping_past_every = 1000
 
-        timer = Timer("Spansh datadump load")
+        validated_every = 500  # 250#500
+        process_every = 1500  # 500#1500
+        processed_count = 0
+
         with GALAXY_POPULATED_JSON.open("r") as f:
-            system_dicts = json.load(f)
-            spansh_systems_list = [SystemSpansh.model_validate(system_dict) for system_dict in system_dicts]
-        timer.end()
+            parser = ijson.items(f, "item")
+            batch: List[SystemSpansh] = []
 
-        logger.info("== Loaded Data Dump ==")
-        logger.info(f">> {len(spansh_systems_list)} Systems")
+            skip_timer = Timer("Skipping rows to known min index")
+            validate_timer = Timer("Pydantic validation timer")
+            for idx, system_dict in enumerate(parser, start=1):
+                if idx < start_at:
+                    if idx % skipping_past_every == 0:
+                        time_elapsed = seconds_to_str(skip_timer.lap(False))
+                        running_for = self.pipeline_timer.running_for_str()
+                        logger.info(f"Skipping past {idx} (Took {time_elapsed})(Total Running: {running_for})")
+                    continue
 
-        systems_by_name: Dict[str, SystemSpansh] = {}
-        for system in spansh_systems_list:
-            systems_by_name[system.name] = system
+                processed_count += 1
+                try:
+                    model = SystemSpansh.model_validate(system_dict)
+                    batch.append(model)
+                except Exception as e:
+                    logger.warning(f"Validation failed at item {idx}: {e}")
+                    continue
 
-        test_system = "Col 285 Sector WM-N b22-3"
-        logger.info(f">> '{test_system}' loaded: {'YES' if test_system in systems_by_name else 'NO'}")
+                if idx % validated_every == 0:
+                    time_elapsed = seconds_to_str(skip_timer.lap(False))
+                    running_for = self.pipeline_timer.running_for_str()
+                    logger.info(
+                        f"Validated {validated_every} systems in {time_elapsed} "
+                        f"({idx} total)(Total Running: {running_for})"
+                    )
 
-        return systems_by_name
+                if idx % process_every == 0:
+                    batch_process_fn(batch)
+                    batch.clear()
+                    import gc
 
-    CHUNK_SIZE = 10
+                    gc.collect()
+                    validate_timer.reset()
+
+            if batch:
+                batch_process_fn(batch)
+                batch.clear()
+                gc.collect()
+
+        logger.info(f">> {processed_count} Systems")
+        self.pipeline_timer.end()
+
+        return None
+
+    def process_data_batch(self, system_batch: List[SystemSpansh]) -> None:
+        process_timer = Timer(f"Spansh datadump batch process {len(system_batch)}")
+
+        self.partitioner.insert_systems(system_batch)
+
+        upsert_time = process_timer.running_for_str()
+        pipeline_time = self.pipeline_timer.running_for_str()
+        logger.info(
+            (
+                f"Upserted {len(system_batch)} systems into postgres "
+                f"(Took {upsert_time})(Total Running: {pipeline_time})"
+            )
+        )
 
     def run(self) -> None:
-        # self.download_data()
+        self.download_data()
 
         for path in METADATA_DIR.rglob(COMMODITIES_YAML_FMT):
             self.load_metadata_yaml_into_pg(path)
 
-        # system_adapter = SystemPort()
-        for systems_chunk in list(batched(self.load_data().values(), self.CHUNK_SIZE)):
-            # self.upsert_systems(list(systems_chunk))
+        self.load_and_process_data(self.process_data_batch)
 
-            timer = Timer(f"Batching '{self.CHUNK_SIZE}' items")
-            self.partitioner.insert_systems(list(systems_chunk))
-            timer.end()
+
+def main() -> None:
+    configure_logger(logging.INFO)
+
+    pipeline = SpanshDataPipeline()
+    pipeline.run()
 
 
 if __name__ == "__main__":
-    pipeline = SpanshDataPipeline()
-    pipeline.run()
+    main()

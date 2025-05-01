@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from src.ingestion.spansh.models import BaseSpanshModel
 from src.ingestion.spansh.models.common_spansh import TimestampsSpansh
@@ -12,17 +12,15 @@ class SignalsSpansh(BaseSpanshModel):
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
     def to_sqlalchemy_dicts(self, body_id: int) -> List[Dict[str, Any]]:
-        signals = []
-        for signal_type, count in self.signals.items():
-            signals.append(
-                {
-                    "body_id": body_id,
-                    "signal_type": signal_type,
-                    "count": count,
-                    "updated_at": self.updated_at,
-                }
-            )
-        return signals
+        return [
+            {
+                "body_id": body_id,
+                "signal_type": signal_type,
+                "count": count,
+                "updated_at": self.updated_at,
+            }
+            for signal_type, count in self.signals.items()
+        ]
 
 
 class AsteroidsSpansh(BaseSpanshModel):
@@ -48,8 +46,14 @@ class AsteroidsSpansh(BaseSpanshModel):
 
 
 class BodySpansh(BaseSpanshModel):
-    def __hash__(self) -> int:
-        return hash((type(self), self.body_id, self.name))
+    def to_cache_key(self) -> Tuple[Any, ...]:
+        return (self.__class__, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star)
+
+    def __repr__(self) -> str:
+        return (
+            f"BodySpansh(id64: {self.id64}, name: {self.name}, body_id: {self.body_id}, "
+            f"type: {self.type}, sub_type: {self.sub_type}, main_star: {self.main_star})"
+        )
 
     id64: int
     body_id: int
@@ -62,7 +66,7 @@ class BodySpansh(BaseSpanshModel):
     age: Optional[int] = None
     arg_of_periapsis: Optional[float] = None
     ascending_node: Optional[float] = None
-    atmosphere_composition: Optional[Dict[str, Any]] = None
+    atmosphere_composition: Optional[Dict[str, float]] = None
     atmosphere_type: Optional[str] = None
     axial_tilt: Optional[float] = None
     belts: Optional[List[AsteroidsSpansh]] = None
@@ -72,7 +76,7 @@ class BodySpansh(BaseSpanshModel):
     is_landable: Optional[bool] = None
     luminosity: Optional[str] = None
     main_star: Optional[bool] = None
-    materials: Optional[Dict[str, Any]] = None
+    materials: Optional[Dict[str, float]] = None
     mean_anomaly: Optional[float] = None
     orbital_eccentricity: Optional[float] = None
     orbital_inclination: Optional[float] = None
@@ -87,7 +91,7 @@ class BodySpansh(BaseSpanshModel):
     signals: Optional[SignalsSpansh] = None
     solar_masses: Optional[float] = None
     solar_radius: Optional[float] = None
-    solid_composition: Optional[Any] = None
+    solid_composition: Optional[Dict[str, float]] = None
     spectral_class: Optional[str] = None
     sub_type: Optional[str] = None
     surface_pressure: Optional[float] = None

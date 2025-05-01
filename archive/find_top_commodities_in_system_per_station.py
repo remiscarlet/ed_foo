@@ -120,7 +120,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    with Timer("Script", True):
+    with Timer("Script"):
         args = parse_args()
         configure_logger(args)
         run(args)

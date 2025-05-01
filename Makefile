@@ -5,10 +5,15 @@
 install:
 	poetry install
 
+setup: install up-db alembic-upgrade install-eddn-models
+
 ## Data DL/Import
 
 download-spansh:
 	poetry run cli data download-spansh-dump
+
+import-spansh:
+	poetry run ingestion_pipeline
 
 ## Code Quality
 
@@ -90,5 +95,6 @@ gen-eddn-models: download-eddn-models
 	touch gen/eddn_models/__init__.py
 models: gen-eddn-models
 
+install-eddn-models: download-eddn-models gen-eddn-models
 
 # make nuke-db; make up-db; sleep 1; rm -rf src/alembic/versions/*; make alembic-revision; make alembic-upgrade;
