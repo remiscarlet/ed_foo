@@ -301,7 +301,8 @@ class SpanshDataPipeline:
         self.partitioner = SpanshDataLayerPartitioner()
         self.pipeline_timer = Timer("Spansh data import pipeline")
 
-    def download_data(self) -> None:
+    @staticmethod
+    def download_data() -> None:
         GALAXY_POPULATED_JSON_GZ.parent.mkdir(parents=True, exist_ok=True)
 
         download_file(GALAXY_POPULATED_JSON_URL, GALAXY_POPULATED_JSON_GZ)
@@ -328,6 +329,8 @@ class SpanshDataPipeline:
 
             commodity_objects = upsert_all(self.session, CommoditiesDB, commodities, ["symbol"], [])
             logger.debug(pformat(commodity_objects))
+
+        logger.info(f"Imported {path.name} successfully")
 
     def load_and_process_data(self, batch_process_fn: Callable[[List[SystemSpansh]], None]) -> None:
         start_at = 0
@@ -400,19 +403,26 @@ class SpanshDataPipeline:
         )
 
     def run(self) -> None:
-        self.download_data()
-
         for path in METADATA_DIR.rglob(COMMODITIES_YAML_FMT):
             self.load_metadata_yaml_into_pg(path)
 
         self.load_and_process_data(self.process_data_batch)
 
 
+log_level = logging.INFO
+
+
 def main() -> None:
-    configure_logger(logging.INFO)
+    configure_logger(log_level)
 
     pipeline = SpanshDataPipeline()
     pipeline.run()
+
+
+def download_spansh() -> None:
+    configure_logger(log_level)
+
+    SpanshDataPipeline.download_data()
 
 
 if __name__ == "__main__":

@@ -133,7 +133,7 @@ class BodiesDB(BaseModelWithId):
         )
 
     def to_cache_key(self) -> Tuple[Any, ...]:
-        return (BodySpansh, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star, self.body_id)
+        return (BodySpansh, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star)
 
     def __repr__(self) -> str:
         return f"<BodiesDB(id={self.id}, name={self.name!r})>"

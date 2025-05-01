@@ -10,7 +10,7 @@ setup: install up-db alembic-upgrade install-eddn-models
 ## Data DL/Import
 
 download-spansh:
-	poetry run cli data download-spansh-dump
+	poetry run download_spansh_dump
 
 import-spansh:
 	poetry run ingestion_pipeline
