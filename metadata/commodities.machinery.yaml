@@ -1,96 +1,243 @@
 ---
-Articulation Motors:
+PowerGenerators:
   category: Machinery
   is_mineable: false
+  id64: 128049217
+  name: Power Generators
+  avg_price: 458
+  rare_goods: false
+  corrosive: false
 
-Atmospheric Processors:
+WaterPurifiers:
   category: Machinery
   is_mineable: false
+  id64: 128049218
+  name: Water Purifiers
+  avg_price: 258
+  rare_goods: false
+  corrosive: false
 
-Building Fabricators:
+HeliostaticFurnaces:
   category: Machinery
   is_mineable: false
+  id64: 128049220
+  name: Heliostatic Furnaces
+  avg_price: 236
+  rare_goods: false
+  corrosive: false
 
-Crop Harvesters:
+MineralExtractors:
   category: Machinery
   is_mineable: false
+  id64: 128049221
+  name: Mineral Extractors
+  avg_price: 443
+  rare_goods: false
+  corrosive: false
 
-Emergency Power Cells:
+CropHarvesters:
   category: Machinery
   is_mineable: false
+  id64: 128049222
+  name: Crop Harvesters
+  avg_price: 2021
+  rare_goods: false
+  corrosive: false
 
-Energy Grid Assembly:
+MarineSupplies:
   category: Machinery
   is_mineable: false
+  id64: 128049223
+  name: Marine Supplies
+  avg_price: 3916
+  rare_goods: false
+  corrosive: false
 
-Exhaust Manifold:
+AtmosphericExtractors:
   category: Machinery
   is_mineable: false
+  id64: 128064028
+  name: Atmospheric Extractors
+  avg_price: 357
+  rare_goods: false
+  corrosive: false
 
-Geological Equipment:
+VolkhabBeeDrones:
   category: Machinery
   is_mineable: false
+  id64: 128667044
+  name: Volkhab Bee Drones
+  avg_price: 10198
+  rare_goods: true
+  corrosive: false
 
-Heatsink Interlink:
+WulpaHyperboreSystems:
   category: Machinery
   is_mineable: false
+  id64: 128667067
+  name: Wulpa Hyperbore Systems
+  avg_price: 8726
+  rare_goods: true
+  corrosive: false
 
-HN Shock Mount:
+NonEuclidianExotanks:
   category: Machinery
   is_mineable: false
+  id64: 128667687
+  name: Non Euclidian Exotanks
+  avg_price: 8526
+  rare_goods: true
+  corrosive: false
 
-Ion Distributor:
+GiantVerrix:
   category: Machinery
   is_mineable: false
+  id64: 128667703
+  name: Giant Verrix
+  avg_price: 12496
+  rare_goods: true
+  corrosive: false
 
-Magnetic Emitter Coil:
+GeologicalEquipment:
   category: Machinery
   is_mineable: false
+  id64: 128672307
+  name: Geological Equipment
+  avg_price: 1661
+  rare_goods: false
+  corrosive: false
 
-Marine Equipment:
+ThermalCoolingUnits:
   category: Machinery
   is_mineable: false
+  id64: 128672308
+  name: Thermal Cooling Units
+  avg_price: 256
+  rare_goods: false
+  corrosive: false
 
-Microbial Furnaces:
+BuildingFabricators:
   category: Machinery
   is_mineable: false
+  id64: 128672309
+  name: Building Fabricators
+  avg_price: 980
+  rare_goods: false
+  corrosive: false
 
-Mineral Extractors:
+SkimerComponents:
   category: Machinery
   is_mineable: false
+  id64: 128672313
+  name: Skimer Components
+  avg_price: 859
+  rare_goods: false
+  corrosive: false
 
-Modular Terminals:
+ArticulationMotors:
   category: Machinery
   is_mineable: false
+  id64: 128673859
+  name: Articulation Motors
+  avg_price: 4997
+  rare_goods: false
+  corrosive: false
 
-Power Converter:
+HNShockMount:
   category: Machinery
   is_mineable: false
+  id64: 128673860
+  name: HNShock Mount
+  avg_price: 406
+  rare_goods: false
+  corrosive: false
 
-Power Generators:
+EmergencyPowerCells:
   category: Machinery
   is_mineable: false
+  id64: 128673861
+  name: Emergency Power Cells
+  avg_price: 1011
+  rare_goods: false
+  corrosive: false
 
-Power Transfer Bus:
+PowerConverter:
   category: Machinery
   is_mineable: false
+  id64: 128673862
+  name: Power Converter
+  avg_price: 246
+  rare_goods: false
+  corrosive: false
 
-Radiation Baffle:
+PowerGridAssembly:
   category: Machinery
   is_mineable: false
+  id64: 128673863
+  name: Power Grid Assembly
+  avg_price: 1684
+  rare_goods: false
+  corrosive: false
 
-Reinforced Mounting Plate:
+PowerTransferConduits:
   category: Machinery
   is_mineable: false
+  id64: 128673864
+  name: Power Transfer Conduits
+  avg_price: 857
+  rare_goods: false
+  corrosive: false
 
-Skimmer Components:
+RadiationBaffle:
   category: Machinery
   is_mineable: false
+  id64: 128673865
+  name: Radiation Baffle
+  avg_price: 383
+  rare_goods: false
+  corrosive: false
 
-Thermal Cooling Units:
+ExhaustManifold:
   category: Machinery
   is_mineable: false
+  id64: 128673866
+  name: Exhaust Manifold
+  avg_price: 479
+  rare_goods: false
+  corrosive: false
 
-Water Purifiers:
+ReinforcedMountingPlate:
   category: Machinery
   is_mineable: false
+  id64: 128673867
+  name: Reinforced Mounting Plate
+  avg_price: 1074
+  rare_goods: false
+  corrosive: false
+
+HeatsinkInterlink:
+  category: Machinery
+  is_mineable: false
+  id64: 128673868
+  name: Heatsink Interlink
+  avg_price: 729
+  rare_goods: false
+  corrosive: false
+
+MagneticEmitterCoil:
+  category: Machinery
+  is_mineable: false
+  id64: 128673869
+  name: Magnetic Emitter Coil
+  avg_price: 199
+  rare_goods: false
+  corrosive: false
+
+ModularTerminals:
+  category: Machinery
+  is_mineable: false
+  id64: 128673870
+  name: Modular Terminals
+  avg_price: 695
+  rare_goods: false
+  corrosive: false

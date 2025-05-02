@@ -10,7 +10,7 @@
         },
         "CommodityCategory": {
             "type": "string",
-            "enum": ["Chemicals", "Consumer Items", "Legal Drugs", "Foods", "Industrial Materials", "Machinery", "Medicines", "Metals", "Minerals", "Salvage", "Slavery", "Technology", "Textiles", "Waste", "Weapons"]
+            "enum": ["Chemicals", "Consumer Items", "Foods", "Industrial Materials", "Narcotics", "NonMarketable", "Machinery", "Medicines", "Metals", "Minerals", "Powerplay", "Salvage", "Slavery", "Technology", "Textiles", "Waste", "Weapons"]
         }
     }
   }

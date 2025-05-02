@@ -1,68 +1,189 @@
 ---
-Advanced Catalysers:
+ComputerComponents:
   category: Technology
   is_mineable: false
+  id64: 128049225
+  name: Computer Components
+  avg_price: 513
+  rare_goods: false
+  corrosive: false
 
-Animal Monitors:
+HazardousEnvironmentSuits:
   category: Technology
   is_mineable: false
-
-Aquaponic Systems:
-  category: Technology
-  is_mineable: false
-
-Auto-Fabricators:
-  category: Technology
-  is_mineable: false
-
-Bioreducing Lichen:
-  category: Technology
-  is_mineable: false
-
-Computer Components:
-  category: Technology
-  is_mineable: false
-
-H.E. Suits:
-  category: Technology
-  is_mineable: false
-
-Hardware Diagnostic Sensor:
-  category: Technology
-  is_mineable: false
-
-Land Enrichment Systems:
-  category: Technology
-  is_mineable: false
-
-Medical Diagnostic Equipment:
-  category: Technology
-  is_mineable: false
-
-Micro Controllers:
-  category: Technology
-  is_mineable: false
-
-Muon Imager:
-  category: Technology
-  is_mineable: false
-
-Nanobreakers:
-  category: Technology
-  is_mineable: false
-
-Resonating Separators:
-  category: Technology
-  is_mineable: false
+  id64: 128049226
+  name: Hazardous Environment Suits
+  avg_price: 340
+  rare_goods: false
+  corrosive: false
 
 Robotics:
   category: Technology
   is_mineable: false
+  id64: 128049227
+  name: Robotics
+  avg_price: 1856
+  rare_goods: false
+  corrosive: false
 
-Structural Regulators:
+AutoFabricators:
   category: Technology
   is_mineable: false
+  id64: 128049228
+  name: Auto Fabricators
+  avg_price: 3734
+  rare_goods: false
+  corrosive: false
 
-Telemetry Suite:
+AnimalMonitors:
   category: Technology
   is_mineable: false
+  id64: 128049229
+  name: Animal Monitors
+  avg_price: 324
+  rare_goods: false
+  corrosive: false
+
+AquaponicSystems:
+  category: Technology
+  is_mineable: false
+  id64: 128049230
+  name: Aquaponic Systems
+  avg_price: 314
+  rare_goods: false
+  corrosive: false
+
+AdvancedCatalysers:
+  category: Technology
+  is_mineable: false
+  id64: 128049231
+  name: Advanced Catalysers
+  avg_price: 2947
+  rare_goods: false
+  corrosive: false
+
+TerrainEnrichmentSystems:
+  category: Technology
+  is_mineable: false
+  id64: 128049232
+  name: Terrain Enrichment Systems
+  avg_price: 4887
+  rare_goods: false
+  corrosive: false
+
+ResonatingSeparators:
+  category: Technology
+  is_mineable: false
+  id64: 128049671
+  name: Resonating Separators
+  avg_price: 5958
+  rare_goods: false
+  corrosive: false
+
+BioReducingLichen:
+  category: Technology
+  is_mineable: false
+  id64: 128049672
+  name: Bio Reducing Lichen
+  avg_price: 998
+  rare_goods: false
+  corrosive: false
+
+XiheCompanions:
+  category: Technology
+  is_mineable: false
+  id64: 128667075
+  name: Xihe Companions
+  avg_price: 11058
+  rare_goods: true
+  corrosive: false
+
+AZCancriFormula42:
+  category: Technology
+  is_mineable: false
+  id64: 128667080
+  name: AZ Cancri Formula 42
+  avg_price: 12440
+  rare_goods: true
+  corrosive: false
+
+MuTomImager:
+  category: Technology
+  is_mineable: false
+  id64: 128672310
+  name: Mu Tom Imager
+  avg_price: 6353
+  rare_goods: false
+  corrosive: false
+
+StructuralRegulators:
+  category: Technology
+  is_mineable: false
+  id64: 128672311
+  name: Structural Regulators
+  avg_price: 1791
+  rare_goods: false
+  corrosive: false
+
+Nanobreakers:
+  category: Technology
+  is_mineable: false
+  id64: 128673871
+  name: Nanobreakers
+  avg_price: 639
+  rare_goods: false
+  corrosive: false
+
+TelemetrySuite:
+  category: Technology
+  is_mineable: false
+  id64: 128673872
+  name: Telemetry Suite
+  avg_price: 2080
+  rare_goods: false
+  corrosive: false
+
+MicroControllers:
+  category: Technology
+  is_mineable: false
+  id64: 128673873
+  name: Micro Controllers
+  avg_price: 3274
+  rare_goods: false
+  corrosive: false
+
+IonDistributor:
+  category: Technology
+  is_mineable: false
+  id64: 128673874
+  name: Ion Distributor
+  avg_price: 1133
+  rare_goods: false
+  corrosive: false
+
+DiagnosticSensor:
+  category: Technology
+  is_mineable: false
+  id64: 128673875
+  name: Diagnostic Sensor
+  avg_price: 4337
+  rare_goods: false
+  corrosive: false
+
+MedicalDiagnosticEquipment:
+  category: Technology
+  is_mineable: false
+  id64: 128682047
+  name: Medical Diagnostic Equipment
+  avg_price: 2848
+  rare_goods: false
+  corrosive: false
+
+ClassifiedExperimentalEquipment:
+  category: Technology
+  is_mineable: false
+  id64: 129002574
+  name: Classified Experimental Equipment
+  avg_price: 0
+  rare_goods: true
+  corrosive: false

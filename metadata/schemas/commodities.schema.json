@@ -7,8 +7,12 @@
             "type": "object",
             "required": ["category", "is_mineable"],
             "properties": {
-                "symbol": { "type": ["string", "null"] },
+                "name": { "type": ["string"] },
                 "category": { "$ref": "enums.schema.json#/$defs/CommodityCategory" },
+                "id64": { "type": ["number"]},
+                "avg_price": { "type": ["number"]},
+                "rare_goods": { "type": "boolean" },
+                "corrosive": { "type": "boolean" },
                 "is_mineable": { "type": "boolean" },
                 "mining_method": {
                     "anyOf": [

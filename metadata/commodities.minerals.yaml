@@ -1,126 +1,276 @@
 ---
-Alexandrite:
-  category: Minerals
-  is_mineable: true
-  mining_method: Core
-  ring_types: [Rocky, Metal Rich, Icy]
-  has_hotspots: true
-
-Bauxite:
-  category: Minerals
-  is_mineable: true
-  mining_method: Laser
-  ring_types: [Rocky]
-  has_hotspots: false
-
-Benitoite:
-  category: Minerals
-  is_mineable: true
-  mining_method: Core
-  ring_types: [Rocky]
-  has_hotspots: true
-
 Bertrandite:
   category: Minerals
   is_mineable: true
+  id64: 128049156
+  name: Bertrandite
+  avg_price: 2374
+  rare_goods: false
+  corrosive: false
   mining_method: Laser
   ring_types: [Metallic]
   has_hotspots: false
-
-Bromellite:
-  category: Minerals
-  is_mineable: true
-  mining_method: Core
-  ring_types: [Icy]
-  has_hotspots: true
-
-Coltan:
-  category: Minerals
-  is_mineable: true
-  mining_method: Laser
-  ring_types: [Rocky]
-  has_hotspots: false
-
-Cryolite:
-  category: Minerals
-  is_mineable: false
-
-Gallite:
-  category: Minerals
-  is_mineable: true
-  mining_method: Laser
-  ring_types: [Metallic]
-  has_hotspots: false
-
-Goslarite:
-  category: Minerals
-  is_mineable: false
-
-Grandidierite:
-  category: Minerals
-  is_mineable: true
-  mining_method: Core
-  ring_types: [Rocky, Icy]
-  has_hotspots: true
-
-Haematite:
-  category: Minerals
-  is_mineable: false
 
 Indite:
   category: Minerals
   is_mineable: true
+  id64: 128049157
+  name: Indite
+  avg_price: 2088
+  rare_goods: false
+  corrosive: false
   mining_method: Laser
   ring_types: [Metallic]
   has_hotspots: false
 
-Jadeite:
+Gallite:
   category: Minerals
-  is_mineable: false
+  is_mineable: true
+  id64: 128049158
+  name: Gallite
+  avg_price: 1819
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Coltan:
+  category: Minerals
+  is_mineable: true
+  id64: 128049159
+  name: Coltan
+  avg_price: 1319
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Rocky]
+  has_hotspots: false
+
+Uraninite:
+  category: Minerals
+  is_mineable: true
+  id64: 128049160
+  name: Uraninite
+  avg_price: 836
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
 
 Lepidolite:
   category: Minerals
   is_mineable: true
+  id64: 128049161
+  name: Lepidolite
+  avg_price: 544
+  rare_goods: false
+  corrosive: false
   mining_method: Laser
   ring_types: [Metallic]
   has_hotspots: false
 
-Lithium Hydroxide:
+Rutile:
   category: Minerals
   is_mineable: true
+  id64: 128049163
+  name: Rutile
+  avg_price: 299
+  rare_goods: false
+  corrosive: false
   mining_method: Laser
   ring_types: [Metallic]
   has_hotspots: false
 
-Low Temperature Diamonds:
+Bauxite:
   category: Minerals
   is_mineable: true
-  mining_method: Core
-  symbol: LowTemperatureDiamond
-  ring_types: [Icy]
+  id64: 128049165
+  name: Bauxite
+  avg_price: 120
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Rocky]
+  has_hotspots: false
+
+CherbonesBloodCrystals:
+  category: Minerals
+  is_mineable: false
+  id64: 128667675
+  name: Cherbones Blood Crystals
+  avg_price: 16714
+  rare_goods: true
+  corrosive: false
+
+NgadandariFireOpals:
+  category: Minerals
+  is_mineable: false
+  id64: 128667694
+  name: Ngadandari Fire Opals
+  avg_price: 19112
+  rare_goods: true
+  corrosive: false
+
+Painite:
+  category: Minerals
+  is_mineable: true
+  id64: 128668550
+  name: Painite
+  avg_price: 40508
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Metallic]
   has_hotspots: true
 
-Methane Clathrate:
+Cryolite:
   category: Minerals
-  is_mineable: true
-  mining_method: Laser
-  ring_types: [Metallic]
-  has_hotspots: false
+  is_mineable: false
+  id64: 128672294
+  name: Cryolite
+  avg_price: 2266
+  rare_goods: false
+  corrosive: false
 
-Methanol Monohydrate Crystals:
+Goslarite:
   category: Minerals
-  is_mineable: true
-  mining_method: Laser
-  ring_types: [Metallic]
-  has_hotspots: false
+  is_mineable: false
+  id64: 128672295
+  name: Goslarite
+  avg_price: 916
+  rare_goods: false
+  corrosive: false
 
 Moissanite:
   category: Minerals
   is_mineable: false
+  id64: 128672296
+  name: Moissanite
+  avg_price: 8273
+  rare_goods: false
+  corrosive: false
+
+Pyrophyllite:
+  category: Minerals
+  is_mineable: false
+  id64: 128672297
+  name: Pyrophyllite
+  avg_price: 1565
+  rare_goods: false
+  corrosive: false
+
+Taaffeite:
+  category: Minerals
+  is_mineable: false
+  id64: 128672775
+  name: Taaffeite
+  avg_price: 20696
+  rare_goods: false
+  corrosive: false
+
+Jadeite:
+  category: Minerals
+  is_mineable: false
+  id64: 128672776
+  name: Jadeite
+  avg_price: 13474
+  rare_goods: false
+  corrosive: false
+
+Bromellite:
+  category: Minerals
+  is_mineable: true
+  id64: 128673846
+  name: Bromellite
+  avg_price: 7062
+  rare_goods: false
+  corrosive: false
+  mining_method: Core
+  ring_types: [Icy]
+  has_hotspots: true
+
+LowTemperatureDiamond:
+  category: Minerals
+  is_mineable: true
+  id64: 128673848
+  name: Low Temperature Diamond
+  avg_price: 57445
+  rare_goods: false
+  corrosive: false
+  mining_method: Core
+  ring_types: [Icy]
+  has_hotspots: true
+
+MethanolMonohydrateCrystals:
+  category: Minerals
+  is_mineable: false
+  id64: 128673852
+  name: Methanol Monohydrate Crystals
+  avg_price: 2282
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+LithiumHydroxide:
+  category: Minerals
+  is_mineable: true
+  id64: 128673853
+  name: Lithium Hydroxide
+  avg_price: 5646
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+MethaneClathrate:
+  category: Minerals
+  is_mineable: false
+  id64: 128673854
+  name: Methane Clathrate
+  avg_price: 629
+  rare_goods: false
+  corrosive: false
+  mining_method: Laser
+  ring_types: [Metallic]
+  has_hotspots: false
+
+Rhodplumsite:
+  category: Minerals
+  is_mineable: true
+  id64: 128924325
+  name: Rhodplumsite
+  avg_price: 176791
+  rare_goods: false
+  corrosive: false
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Metallic]
+  has_hotspots: true
+
+Serendibite:
+  category: Minerals
+  is_mineable: true
+  id64: 128924326
+  name: Serendibite
+  avg_price: 172634
+  rare_goods: false
+  corrosive: false
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Metallic]
+  has_hotspots: true
 
 Monazite:
   category: Minerals
   is_mineable: true
+  id64: 128924327
+  name: Monazite
+  avg_price: 200925
+  rare_goods: false
+  corrosive: false
   mining_method: Core
   ring_types: [Rocky, Metal Rich, Metallic]
   has_hotspots: true
@@ -128,57 +278,68 @@ Monazite:
 Musgravite:
   category: Minerals
   is_mineable: true
+  id64: 128924328
+  name: Musgravite
+  avg_price: 198527
+  rare_goods: false
+  corrosive: false
   mining_method: Core
   ring_types: [Rocky]
   has_hotspots: true
 
-Painite:
+Benitoite:
   category: Minerals
   is_mineable: true
-  mining_method: Laser
-  ring_types: [Metallic]
-  has_hotspots: true
-
-Pyrophyllite:
-  category: Minerals
-  is_mineable: false
-
-Rhodplumsite:
-  category: Minerals
-  is_mineable: true
+  id64: 128924329
+  name: Benitoite
+  avg_price: 149325
+  rare_goods: false
+  corrosive: false
   mining_method: Core
-  ring_types: [Rocky, Metal Rich, Metallic]
+  ring_types: [Rocky]
   has_hotspots: true
 
-Rutile:
+Grandidierite:
   category: Minerals
   is_mineable: true
-  mining_method: Laser
-  ring_types: [Metallic]
-  has_hotspots: false
-
-Serendibite:
-  category: Minerals
-  is_mineable: true
+  id64: 128924330
+  name: Grandidierite
+  avg_price: 197204
+  rare_goods: false
+  corrosive: false
   mining_method: Core
-  ring_types: [Rocky, Metal Rich, Metallic]
+  ring_types: [Rocky, Icy]
   has_hotspots: true
 
-Taaffeite:
-  category: Minerals
-  is_mineable: false
-
-Uraninite:
+Alexandrite:
   category: Minerals
   is_mineable: true
-  mining_method: Laser
-  ring_types: [Metallic]
-  has_hotspots: false
+  id64: 128924331
+  name: Alexandrite
+  avg_price: 217192
+  rare_goods: false
+  corrosive: false
+  mining_method: Core
+  ring_types: [Rocky, Metal Rich, Icy]
+  has_hotspots: true
 
-Void Opal:
+Opal:
   category: Minerals
-  symbol: Opal
   is_mineable: true
+  id64: 128924332
+  name: Void Opal
+  avg_price: 135218
+  rare_goods: false
+  corrosive: false
   mining_method: Core
   ring_types: [Icy]
   has_hotspots: true
+
+Haematite:
+  category: Minerals
+  is_mineable: false
+  id64: 129031327
+  name: Haematite
+  avg_price: 1791
+  rare_goods: false
+  corrosive: false

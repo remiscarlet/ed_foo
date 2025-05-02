@@ -1,0 +1,9 @@
+---
+Drones:
+  category: NonMarketable
+  is_mineable: false
+  id64: 128066403
+  name: Drones
+  avg_price: 101
+  rare_goods: false
+  corrosive: false

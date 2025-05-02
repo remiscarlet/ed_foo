@@ -1,20 +1,90 @@
 ---
-Battle Weapons:
+PersonalWeapons:
   category: Weapons
   is_mineable: false
+  id64: 128049233
+  name: Personal Weapons
+  avg_price: 4632
+  rare_goods: false
+  corrosive: false
+
+BattleWeapons:
+  category: Weapons
+  is_mineable: false
+  id64: 128049234
+  name: Battle Weapons
+  avg_price: 7259
+  rare_goods: false
+  corrosive: false
+
+ReactiveArmour:
+  category: Weapons
+  is_mineable: false
+  id64: 128049235
+  name: Reactive Armour
+  avg_price: 2113
+  rare_goods: false
+  corrosive: false
+
+NonLethalWeapons:
+  category: Weapons
+  is_mineable: false
+  id64: 128049236
+  name: Non Lethal Weapons
+  avg_price: 1837
+  rare_goods: false
+  corrosive: false
+
+BorasetaniPathogenetics:
+  category: Weapons
+  is_mineable: false
+  id64: 128667032
+  name: Borasetani Pathogenetics
+  avg_price: 13679
+  rare_goods: true
+  corrosive: false
+
+HIP118311Swarm:
+  category: Weapons
+  is_mineable: false
+  id64: 128667033
+  name: HIP 118311 Swarm
+  avg_price: 13448
+  rare_goods: true
+  corrosive: false
+
+HolvaDuellingBlades:
+  category: Weapons
+  is_mineable: false
+  id64: 128667070
+  name: Holva Duelling Blades
+  avg_price: 12493
+  rare_goods: true
+  corrosive: false
+
+KamorinHistoricWeapons:
+  category: Weapons
+  is_mineable: false
+  id64: 128667071
+  name: Kamorin Historic Weapons
+  avg_price: 9766
+  rare_goods: true
+  corrosive: false
+
+GilyaSignatureWeapons:
+  category: Weapons
+  is_mineable: false
+  id64: 128667072
+  name: Gilya Signature Weapons
+  avg_price: 13038
+  rare_goods: true
+  corrosive: false
 
 Landmines:
   category: Weapons
   is_mineable: false
-
-Non-Lethal Weapons:
-  category: Weapons
-  is_mineable: false
-
-Personal Weapons:
-  category: Weapons
-  is_mineable: false
-
-Reactive Armour:
-  category: Weapons
-  is_mineable: false
+  id64: 128672312
+  name: Landmines
+  avg_price: 4602
+  rare_goods: false
+  corrosive: false

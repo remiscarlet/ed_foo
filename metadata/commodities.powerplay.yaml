@@ -1,0 +1,378 @@
+---
+AislingMediaMaterials:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671289
+  name: Aisling Media Materials
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+AislingMediaResources:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671290
+  name: Aisling Media Resources
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+AislingPromotionalMaterials:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671291
+  name: Aisling Promotional Materials
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+AllianceTradeAgreements:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671292
+  name: Alliance Trade Agreements
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+AllianceLegaslativeContracts:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671293
+  name: Alliance Legaslative Contracts
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+AllianceLegaslativeRecords:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671294
+  name: Alliance Legaslative Records
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+LavignyCorruptionDossiers:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671295
+  name: Lavigny Corruption Dossiers
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+LavignyFieldSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671296
+  name: Lavigny Field Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+LavignyGarisonSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671297
+  name: Lavigny Garison Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+RestrictedPackage:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671298
+  name: Restricted Package
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+LiberalCampaignMaterials:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671300
+  name: Liberal Campaign Materials
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+FederalAid:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671301
+  name: Federal Aid
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+FederalTradeContracts:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671302
+  name: Federal Trade Contracts
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+LoanedArms:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671303
+  name: Loaned Arms
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+PatreusFieldSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671304
+  name: Patreus Field Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+PatreusGarisonSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671305
+  name: Patreus Garison Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+RestrictedIntel:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671306
+  name: Restricted Intel
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+RepublicanFieldSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671307
+  name: Republican Field Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+RepublicanGarisonSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671308
+  name: Republican Garison Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+SiriusFranchisePackage:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671309
+  name: Sirius Franchise Package
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+SiriusCommercialContracts:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671310
+  name: Sirius Commercial Contracts
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+SiriusIndustrialEquipment:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671311
+  name: Sirius Industrial Equipment
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+TorvalCommercialContracts:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671312
+  name: Torval Commercial Contracts
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+ImperialPrisoner:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671313
+  name: Imperial Prisoner
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+UtopianPublicity:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671314
+  name: Utopian Publicity
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+UtopianFieldSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671315
+  name: Utopian Field Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+UtopianDissident:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671316
+  name: Utopian Dissident
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+IllicitConsignment:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671317
+  name: Illicit Consignment
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+UnmarkedWeapons:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671318
+  name: Unmarked Weapons
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+OnionheadSamples:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671319
+  name: Onionhead Samples
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+CounterCultureSupport:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671320
+  name: Counter Culture Support
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+MarkedSlaves:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671445
+  name: Marked Slaves
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+TorvalDeeds:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671446
+  name: Torval Deeds
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+OnionheadDerivatives:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671447
+  name: Onionhead Derivatives
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+OutOfDateGoods:
+  category: Powerplay
+  is_mineable: false
+  id64: 128671450
+  name: Out Of DateGoods
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+UndergroundSupport:
+  category: Powerplay
+  is_mineable: false
+  id64: 128732548
+  name: Underground Support
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+GromCounterIntelligence:
+  category: Powerplay
+  is_mineable: false
+  id64: 128732549
+  name: Grom Counter Intelligence
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+GromWarTrophies:
+  category: Powerplay
+  is_mineable: false
+  id64: 128732550
+  name: Grom War Trophies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+KaineAidSupplies:
+  category: Powerplay
+  is_mineable: false
+  id64: 0
+  name: Kaine Aid Supplies
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+KaineMisinformation:
+  category: Powerplay
+  is_mineable: false
+  id64: 0
+  name: Kaine Misinformation
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+KaineLobbyingMaterial:
+  category: Powerplay
+  is_mineable: false
+  id64: 0
+  name: Kaine Lobbying Material
+  avg_price: 0
+  rare_goods: false
+  corrosive: false
+
+LavignyStrategicReports:
+  category: Powerplay
+  is_mineable: false
+  id64: 0
+  name: Lavigny Strategic Reports
+  avg_price: 0
+  rare_goods: false
+  corrosive: false

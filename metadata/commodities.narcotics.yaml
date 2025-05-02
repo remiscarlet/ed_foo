@@ -1,0 +1,333 @@
+---
+BasicNarcotics:
+  category: Narcotics
+  is_mineable: false
+  id64: 128049212
+  name: Basic Narcotics
+  avg_price: 9966
+  rare_goods: false
+  corrosive: false
+
+Tobacco:
+  category: Narcotics
+  is_mineable: false
+  id64: 128049213
+  name: Tobacco
+  avg_price: 5035
+  rare_goods: false
+  corrosive: false
+
+Beer:
+  category: Narcotics
+  is_mineable: false
+  id64: 128049214
+  name: Beer
+  avg_price: 186
+  rare_goods: false
+  corrosive: false
+
+Wine:
+  category: Narcotics
+  is_mineable: false
+  id64: 128049215
+  name: Wine
+  avg_price: 260
+  rare_goods: false
+  corrosive: false
+
+Liquor:
+  category: Narcotics
+  is_mineable: false
+  id64: 128049216
+  name: Liquor
+  avg_price: 587
+  rare_goods: false
+  corrosive: false
+
+EraninPearlWhisky:
+  category: Narcotics
+  is_mineable: false
+  id64: 128666746
+  name: Eranin Pearl Whisky
+  avg_price: 9040
+  rare_goods: true
+  corrosive: false
+
+LavianBrandy:
+  category: Narcotics
+  is_mineable: false
+  id64: 128666747
+  name: Lavian Brandy
+  avg_price: 10365
+  rare_goods: true
+  corrosive: false
+
+LyraeWeed:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667028
+  name: Lyrae Weed
+  avg_price: 8937
+  rare_goods: true
+  corrosive: false
+
+OnionHead:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667029
+  name: Onion Head
+  avg_price: 8437
+  rare_goods: true
+  corrosive: false
+
+TarachTorSpice:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667030
+  name: Tarach Tor Spice
+  avg_price: 8642
+  rare_goods: true
+  corrosive: false
+
+Wolf1301Fesh:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667031
+  name: Wolf1301Fesh
+  avg_price: 8399
+  rare_goods: true
+  corrosive: false
+
+KonggaAle:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667034
+  name: Kongga Ale
+  avg_price: 8310
+  rare_goods: true
+  corrosive: false
+
+WuthieloKuFroth:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667035
+  name: Wuthielo Ku Froth
+  avg_price: 8194
+  rare_goods: true
+  corrosive: false
+
+BastSnakeGin:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667065
+  name: Bast Snake Gin
+  avg_price: 8659
+  rare_goods: true
+  corrosive: false
+
+ThrutisCream:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667066
+  name: Thrutis Cream
+  avg_price: 8550
+  rare_goods: true
+  corrosive: false
+
+KamitraCigars:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667081
+  name: Kamitra Cigars
+  avg_price: 12282
+  rare_goods: true
+  corrosive: false
+
+RusaniOldSmokey:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667082
+  name: Rusani Old Smokey
+  avg_price: 11994
+  rare_goods: true
+  corrosive: false
+
+YasoKondiLeaf:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667083
+  name: Yaso Kondi Leaf
+  avg_price: 12171
+  rare_goods: true
+  corrosive: false
+
+ChateauDeAegaeon:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667084
+  name: Chateau De Aegaeon
+  avg_price: 8791
+  rare_goods: true
+  corrosive: false
+
+SaxonWine:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667671
+  name: Saxon Wine
+  avg_price: 8983
+  rare_goods: true
+  corrosive: false
+
+CentauriMegaGin:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667672
+  name: Centauri Mega Gin
+  avg_price: 10217
+  rare_goods: true
+  corrosive: false
+
+MotronaExperienceJelly:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667676
+  name: Motrona Experience Jelly
+  avg_price: 13129
+  rare_goods: true
+  corrosive: false
+
+GeawenDanceDust:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667677
+  name: Geawen Dance Dust
+  avg_price: 8618
+  rare_goods: true
+  corrosive: false
+
+GerasianGueuzeBeer:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667678
+  name: Gerasian Gueuze Beer
+  avg_price: 8215
+  rare_goods: true
+  corrosive: false
+
+BurnhamBileDistillate:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667681
+  name: Burnham Bile Distillate
+  avg_price: 8466
+  rare_goods: true
+  corrosive: false
+
+PavonisEarGrubs:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667701
+  name: Pavonis Ear Grubs
+  avg_price: 8364
+  rare_goods: true
+  corrosive: false
+
+IndiBourbon:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667704
+  name: Indi Bourbon
+  avg_price: 8806
+  rare_goods: true
+  corrosive: false
+
+LeestianEvilJuice:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667715
+  name: Leestian Evil Juice
+  avg_price: 8220
+  rare_goods: true
+  corrosive: false
+
+BlueMilk:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667716
+  name: Blue Milk
+  avg_price: 10805
+  rare_goods: true
+  corrosive: false
+
+TransgenicOnionHead:
+  category: Narcotics
+  is_mineable: false
+  id64: 128667760
+  name: Transgenic Onion Head
+  avg_price: 8472
+  rare_goods: true
+  corrosive: false
+
+BootlegLiquor:
+  category: Narcotics
+  is_mineable: false
+  id64: 128672306
+  name: Bootleg Liquor
+  avg_price: 855
+  rare_goods: false
+  corrosive: false
+
+OnionHeadA:
+  category: Narcotics
+  is_mineable: false
+  id64: 128672812
+  name: Onionhead Alpha Strain
+  avg_price: 8437
+  rare_goods: true
+  corrosive: false
+
+OnionHeadB:
+  category: Narcotics
+  is_mineable: false
+  id64: 128673069
+  name: Onionhead Beta Strain
+  avg_price: 8437
+  rare_goods: true
+  corrosive: false
+
+AnimalEffigies:
+  category: Narcotics
+  is_mineable: false
+  id64: 128727921
+  name: Animal Effigies
+  avg_price: 8399
+  rare_goods: true
+  corrosive: false
+
+HarmaSilverSeaRum:
+  category: Narcotics
+  is_mineable: false
+  id64: 128793113
+  name: Harma Silver SeaRum
+  avg_price: 9762
+  rare_goods: true
+  corrosive: false
+
+ApaVietii:
+  category: Narcotics
+  is_mineable: false
+  id64: 128958679
+  name: Apa Vietii
+  avg_price: 10362
+  rare_goods: true
+  corrosive: false
+
+OnionHeadC:
+  category: Narcotics
+  is_mineable: false
+  id64: 128983059
+  name: Onionhead Gamma Strain
+  avg_price: 5387
+  rare_goods: false
+  corrosive: false
