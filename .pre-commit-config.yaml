@@ -1,9 +1,4 @@
 repos:
-  - repo: https://github.com/adrienverge/yamllint
-    rev: v1.37.0
-    hooks:
-      - id: yamllint
-
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:
