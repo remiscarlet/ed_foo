@@ -1,12 +1,22 @@
+import asyncio
 import logging
+from functools import wraps
 from pprint import pformat
-from typing import Annotated
+from typing import Annotated, Any, Callable, Coroutine
 
 import typer
 
 from src.adapters.persistence.postgresql.adapter import SystemsAdapter
 from src.common.logging import configure_logger
-from src.ingestion.spansh.main import SpanshDataPipeline
+from src.ingestion.spansh.pipeline import SpanshDataPipeline
+
+
+def typer_async[T, **P](f: Callable[P, Coroutine[Any, Any, T]]) -> Callable[P, T]:
+    @wraps(f)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        return asyncio.run(f(*args, **kwargs))
+
+    return wrapper
 
 
 def verbose_count_to_log_level(count: int) -> int:
@@ -33,7 +43,8 @@ ingestion_cli = typer.Typer()
 
 
 @ingestion_cli.command()
-def import_spansh(
+@typer_async
+async def import_spansh(
     verbose: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
     start_at_system_idx: Annotated[
         int, typer.Option("--system-start-idx", "-s", help="System index in the dump to start at.")
@@ -52,7 +63,7 @@ def import_spansh(
     ] = 1500,
     max_market_data_age_days: Annotated[
         int, typer.Option("--max-market-data-age-days", "-M", help="Maximum age of market data to import")
-    ] = 7,
+    ] = 30,
 ) -> None:
     configure_logger(verbose_count_to_log_level(verbose))
 
@@ -63,7 +74,7 @@ def import_spansh(
         process_every=process_every,
         max_market_data_age_days=max_market_data_age_days,
     )
-    pipeline.run()
+    await pipeline.run()
 
 
 @ingestion_cli.command()

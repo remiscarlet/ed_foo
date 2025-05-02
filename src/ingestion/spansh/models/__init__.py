@@ -42,7 +42,7 @@ class BaseSpanshModel(BaseModel):
         return hash(self.to_cache_key_tuple(*args, **kwargs))
 
     def to_cache_key_tuple(self, *args: Any, **kwargs: Any) -> Tuple[Any, ...]:
-        raise NotImplementedError()
+        raise NotImplementedError("SpanshModel's to_cache_key_tuple() unimplemented")
 
     @classmethod
     def flexible_datetime_validator(cls: Type[Any], field_name: str) -> Callable[[str], datetime]:

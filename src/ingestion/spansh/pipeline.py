@@ -1,9 +1,11 @@
+import asyncio
 import logging  # noqa: F401
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from pprint import pformat
 from typing import Any, Callable, Dict, Iterable, List, Type, Union
 
+import aiofiles  # noqa: F401
 import ijson
 import yaml
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -129,10 +131,10 @@ def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: List
     system_objects = upsert_all(partitioner.session, SystemsDB, systems, ["name"], ["id"])
 
     for system_obj in system_objects:
-        original = system_by_key.get(system_obj.to_cache_key())
-        if original is None:
+        spansh_system = system_by_key.get(system_obj.to_cache_key())
+        if spansh_system is None:
             raise Exception(f"Spansh system not found for DB system '{system_obj.to_cache_key_tuple()}'")
-        partitioner.cache_spansh_entity_id(original, system_obj.id)
+        partitioner.cache_spansh_entity_id(spansh_system, system_obj.id)
 
 
 def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
@@ -183,29 +185,31 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List
     logger.info(f"Layer 4: Stations, Signals, Rings ({partitioner.total_running_str_fn()})")
 
     # --- Stations ---
-    rows_by_pk = {}
+    rows_by_key: Dict[int, Dict[str, Any]] = {}
     stations_by_key: Dict[int, StationSpansh] = {}
 
     for system in input_systems:
         system_id = partitioner.get_spansh_entity_id(system)
 
         for station in system.stations or []:
+            cache_key = station.to_cache_key(system_id)
             row = station.to_sqlalchemy_dict(system_id, "system")
-            rows_by_pk[(row["name"], row["owner_id"])] = row
 
-            stations_by_key[station.to_cache_key(system_id)] = station
+            rows_by_key[cache_key] = row
+            stations_by_key[cache_key] = station
 
         for body in system.bodies or []:
             body_id = partitioner.get_spansh_entity_id(body)
 
             for station in body.stations or []:
-                row = station.to_sqlalchemy_dict(system_id, "body")
-                rows_by_pk[(row["name"], row["owner_id"])] = row
+                cache_key = station.to_cache_key(body_id)
+                row = station.to_sqlalchemy_dict(body_id, "body")
 
-                stations_by_key[station.to_cache_key(system_id)] = station
+                rows_by_key[cache_key] = row
+                stations_by_key[cache_key] = station
 
     station_objects = upsert_all(
-        partitioner.session, StationsDB, list(rows_by_pk.values()), ["name", "owner_id"], ["id"]
+        partitioner.session, StationsDB, list(rows_by_key.values()), ["name", "owner_id"], ["id"]
     )
 
     for station_obj in station_objects:
@@ -250,82 +254,88 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
     # --- Market ---
 
+    # commodities: Dict[int, Dict[str, Any]] = {}
     commodities: List[Dict[str, Any]] = []
 
     now = datetime.now(timezone.utc)
     max_data_age = timedelta(days=partitioner.max_market_data_age_days)
 
-    def extract_commodities(system: SystemSpansh, station: StationSpansh) -> None:
+    def extract_commodities(owner_id: int, station: StationSpansh) -> None:
         if station.market is None:
             return
-        elif station.market.updated_at is not None:
-            data_age = now - station.market.updated_at
+        elif station.market.update_time is not None:
+            data_age = now - station.market.update_time
             if data_age > max_data_age:
                 return
 
-        system_id = partitioner.get_spansh_entity_id(system)
-        station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(system_id))
+        logger.trace(pformat(station.to_cache_key_tuple(owner_id)))
+        station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(owner_id))
 
         for commodity in station.market.commodities or []:
+            # commodities[commodity.to_cache_key()] = commodity.to_sqlalchemy_dict(station_id, commodity.symbol)
             commodities.append(commodity.to_sqlalchemy_dict(station_id, commodity.symbol))
 
     for system in input_systems:
         for station in system.stations or []:
-            extract_commodities(system, station)
+            system_id = partitioner.get_spansh_entity_id(system)
+            extract_commodities(system_id, station)
         for body in system.bodies or []:
+            body_id = partitioner.get_spansh_entity_id(body)
             for station in body.stations:
-                extract_commodities(system, station)
+                extract_commodities(body_id, station)
 
     upsert_all(
         partitioner.session,
         MarketCommoditiesDB,
+        # list(commodities.values()),
         commodities,
         ["station_id", "commodity_sym"],
         ["id"],
-        ["is_blacklisted"],
     )
 
     # --- Outfitting ---
 
     modules: List[Dict[str, Any]] = []
 
-    def extract_modules(system: SystemSpansh, station: StationSpansh) -> None:
+    def extract_modules(owner_id: int, station: StationSpansh) -> None:
         if station.outfitting is None:
             return
-        system_id = partitioner.get_spansh_entity_id(system)
-        station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(system_id))  # noqa: F841
+        station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(owner_id))  # noqa: F841
         # TODO: Import module metadata first
         # for module in station.outfitting.modules:
         #     module_id = partitioner.get_metadata_by_name(module.symbol)
         #     modules.append(module.to_sqlalchemy_dict(station_id, module_id))
 
     for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
         for station in system.stations or []:
-            extract_modules(system, station)
+            extract_modules(system_id, station)
         for body in system.bodies or []:
+            body_id = partitioner.get_spansh_entity_id(body)
             for station in body.stations:
-                extract_modules(system, station)
+                extract_modules(body_id, station)
 
     upsert_all(partitioner.session, OutfittingShipModulesDB, modules, ["station_id", "module_id"], ["id"])
 
     # --- Shipyard ---
     ships: List[Dict[str, Any]] = []
 
-    def extract_ships(system: SystemSpansh, station: StationSpansh) -> None:
+    def extract_ships(owner_id: int, station: StationSpansh) -> None:
         if station.outfitting is None:
             return
-        system_id = partitioner.get_spansh_entity_id(system)
-        station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(system_id))  # noqa: F841
+        station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(owner_id))  # noqa: F841
         # for ship in station.shipyard.ships:
         #     ship_id = partitioner.get_metadata_by_name(ship.symbol)
         #     ships.append(ship.to_sqlalchemy_dict(station_id, ship_id))
 
     for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
         for station in system.stations or []:
-            extract_ships(system, station)
+            extract_ships(system_id, station)
         for body in system.bodies or []:
+            body_id = partitioner.get_spansh_entity_id(body)
             for station in body.stations:
-                extract_ships(system, station)
+                extract_ships(body_id, station)
 
     upsert_all(partitioner.session, ShipyardShipsDB, ships, ["station_id", "ship_id"], ["id"])
 
@@ -390,13 +400,17 @@ class SpanshDataLayerPartitioner:
         self.max_market_data_age_days = max_market_data_age_days
 
     def cache_spansh_entity_id(self, entity: BaseSpanshModel, db_id: int) -> None:
-        self.cache_spansh_entity_id_by_key(entity.to_cache_key(), db_id)
+        self.cache_spansh_entity_id_by_key(entity.to_cache_key(), db_id, False)
+        logger.trace(f"CACHED Spansh entity: '{db_id}' - '{repr(entity)}'")
 
-    def cache_spansh_entity_id_by_key(self, key: int, db_id: int) -> None:
+    def cache_spansh_entity_id_by_key(self, key: int, db_id: int, log: bool = True) -> None:
         if db_id is None:
             raise ValueError(f"Cannot cache None id for key: {key}")
+
         self.id_cache[key] = db_id
-        logger.trace(f"CACHED Spansh Key: '{db_id}' - '{key}'")
+
+        if log:
+            logger.trace(f"CACHED Spansh Key: '{db_id}' - '{key}'")
 
     def get_spansh_entity_id(self, entity: BaseSpanshModel) -> int:
         return self.get_spansh_entity_id_by_key(entity.to_cache_key())
@@ -520,16 +534,26 @@ class SpanshDataPipeline:
         download_file(GALAXY_POPULATED_JSON_URL, GALAXY_POPULATED_JSON_GZ)
         ungzip(GALAXY_POPULATED_JSON_GZ, GALAXY_POPULATED_JSON)
 
-    def load_and_process_data(self, batch_process_fn: Callable[[List[SystemSpansh]], None]) -> None:
+    async def load_and_process_data(self, batch_process_fn: Callable[[List[SystemSpansh]], None]) -> None:
         processed_count = 0
+        process_batch_lock = asyncio.Lock()
+        idx_lock = asyncio.Lock()
 
-        with GALAXY_POPULATED_JSON.open("r") as f:
-            parser = ijson.items(f, "item")
-            batch: List[SystemSpansh] = []
-
+        async with aiofiles.open(GALAXY_POPULATED_JSON, mode="r") as f:
+            # with GALAXY_POPULATED_JSON.open("r") as f:
             skip_timer = Timer("Skipping rows to known min index")
             validate_timer = Timer("Pydantic validation timer")
-            for idx, system_dict in enumerate(parser, start=1):
+
+            # parser = ijson.items(f, "item")
+            # for idx, system_dict in enumerate(parser, start=1):
+            batch: List[SystemSpansh] = []
+
+            idx = 0
+            async for system_dict in ijson.items(f, "item"):
+                # for idx, system_dict in enumerate(ijson.items(f, "item"), start=1):
+                async with idx_lock:
+                    idx += 1
+
                 if idx < self.start_at_system_idx:
                     if idx % self.skipping_past_every == 0:
                         time_elapsed = seconds_to_str(skip_timer.lap(False))
@@ -539,7 +563,8 @@ class SpanshDataPipeline:
                 processed_count += 1
                 try:
                     model = SystemSpansh.model_validate(system_dict)
-                    batch.append(model)
+                    async with process_batch_lock:
+                        batch.append(model)
                 except Exception as e:
                     logger.warning(f"Validation failed at item {idx}: {e}")
                     continue
@@ -552,11 +577,17 @@ class SpanshDataPipeline:
                     )
 
                 if idx % self.process_every == 0:
-                    batch_process_fn(batch)
-                    batch.clear()
+                    async with process_batch_lock:
+                        old_batch = []
+                        old_batch, batch = batch, old_batch
+
+                    batch_process_fn(old_batch)
+
+                    old_batch.clear()
                     import gc
 
                     gc.collect()
+
                     validate_timer.reset()
 
             if batch:
@@ -579,8 +610,8 @@ class SpanshDataPipeline:
             (f"Upserted {len(system_batch)} systems into postgres " f"(Took {upsert_time})({self.total_running_str()})")
         )
 
-    def run(self) -> None:
+    async def run(self) -> None:
         for path in METADATA_DIR.rglob(COMMODITIES_YAML_FMT):
             self.partitioner.load_metadata_yaml_into_pg(path)
 
-        self.load_and_process_data(self.process_data_batch)
+        await self.load_and_process_data(self.process_data_batch)

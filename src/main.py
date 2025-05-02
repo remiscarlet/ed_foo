@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 from fastapi import FastAPI
@@ -7,14 +8,18 @@ from src.adapters.ingress.cli.router import cli
 app = None
 
 
-def main() -> None:
+async def run() -> None:
     app_mode = os.getenv("APP_MODE", "cli")
     if app_mode == "cli":
-        cli()
+        await cli()
     else:
         global app
         app = FastAPI()
         # app.include_router(api_router)
+
+
+def main() -> None:
+    asyncio.run(run())
 
 
 if __name__ == "__main__":

@@ -19,11 +19,14 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, foreign, mapped_column, relationship
 
 from src.adapters.persistence.postgresql import BaseModel, BaseModelWithId
+from src.common.logging import get_logger
 from src.core.models.body_model import Body
 from src.core.models.common_model import Coordinates
 from src.core.models.station_model import Station
 from src.core.models.system_model import Faction, System
 from src.ingestion.spansh.models.body_spansh import BodySpansh
+
+logger = get_logger(__name__)
 
 
 class BodiesDB(BaseModelWithId):
@@ -197,7 +200,7 @@ class HotspotsDB(BaseModelWithId):
 
 class StationsDB(BaseModelWithId):
     __tablename__ = "stations"
-    __table_args__ = (UniqueConstraint("name", "owner_id", name="_station_name_and_owner_uc"),)
+    __table_args__ = (UniqueConstraint("name", "owner_id", name="_station_name_owner_distanace_uc"),)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -234,7 +237,9 @@ class StationsDB(BaseModelWithId):
     eddn_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
-        return ("StationsDB", self.owner_id, self.name)
+        tup = ("StationsDB", self.owner_id, self.name)
+        logger.trace(f"STATIONSDB TO CACHE KEY TUPLE: {tup}")
+        return tup
 
     def to_core_model(self) -> Station:
         return Station(

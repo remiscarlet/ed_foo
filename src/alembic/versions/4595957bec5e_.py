@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5cefe09e7540
+Revision ID: 4595957bec5e
 Revises:
-Create Date: 2025-05-01 23:49:28.848103
+Create Date: 2025-05-02 13:29:11.752439
 
 """
 
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "5cefe09e7540"
+revision: str = "4595957bec5e"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -98,7 +98,7 @@ def upgrade() -> None:
         sa.Column("eddn_updated_at", sa.DateTime(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name", "owner_id", name="_station_name_and_owner_uc"),
+        sa.UniqueConstraint("name", "owner_id", name="_station_name_owner_distanace_uc"),
     )
     op.create_table(
         "market_commodities",

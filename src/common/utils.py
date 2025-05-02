@@ -6,7 +6,7 @@ from pathlib import Path
 
 import requests  # type: ignore
 from requests.adapters import HTTPAdapter, Retry  # type: ignore
-from tqdm import tqdm  # type: ignore
+from tqdm import tqdm
 
 
 def download_file(url: str, dest_path: Path, chunk_size: int = 16_384) -> None:
@@ -93,6 +93,9 @@ def seconds_to_str(sec: float) -> str:
     """Returns a string of hours, minutes, seconds, etc by converting the delta
     Delta is assumed to be seconds
     """
+    if not sec:
+        return "0s"
+
     s = int(sec % 60)
     m = int(sec // 60) % 60
     h = int(sec // (60 * 60)) % (60 * 60)

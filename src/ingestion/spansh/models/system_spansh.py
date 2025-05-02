@@ -94,7 +94,8 @@ class PowerConflictProgressSpansh(BaseSpanshModel):
 class SystemSpansh(BaseSpanshModel):
     def __repr__(self) -> str:
         return (
-            f"SystemSpansh(id64: {self.id64}, name: {self.name}, allegiance: {self.allegiance}, coords: {self.coords})"
+            f"SystemSpansh(id64: {self.id64}, name: {self.name}, "
+            f"allegiance: {self.allegiance}, coords: {self.coords})"
         )
 
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
@@ -117,7 +118,7 @@ class SystemSpansh(BaseSpanshModel):
 
     bodies: Optional[List[BodySpansh]] = None
     factions: Optional[List[FactionSpansh]] = None
-    stations: Optional[List[StationSpansh]] = None
+    all_stations: Optional[List[StationSpansh]] = None
 
     body_count: Optional[int] = None
 
@@ -131,6 +132,39 @@ class SystemSpansh(BaseSpanshModel):
 
     thargoid_war: Optional[ThargoidWarSpansh] = None
     timestamps: Optional[TimestampsSpansh] = None
+
+    @property
+    def stations(self) -> Optional[List[StationSpansh]]:
+        """Systems can only have one active System Colonisation Ship at a time.
+        SCS's can also be decommissioned if not "fulfilled in time".
+        Each newly commissioned SCS after previous iterations fail are considered new stations/entities
+        Data aggregation sites like EDSM/Spansh don't de-duplicate;they keep
+        historic 'no-longer-active' SCS's in their data
+        Aside from the internal id64 that the game uses,
+        we don't actually have a way to distinguish these dupe/decommisioned SCS's from the active SCS
+        As such the best workaround is that if there are multiple SCS's in a given system from a datadump,
+        just take the newest one, even though the newest one might also technically be decommissioned.
+
+        SCS's are only ever system-level stations - never planetary stations.
+        """
+        if self.all_stations is None:
+            return None
+
+        stations = []
+        colonisation_ships = []
+        for station in self.all_stations:
+            if station.name == "System Colonisation Ship":
+                colonisation_ships.append(station)
+            else:
+                stations.append(station)
+        newest_scs = max(
+            colonisation_ships,
+            key=lambda scs: (scs.updated_at if scs.updated_at is not None else datetime(year=1, month=1, day=1)),
+        )
+        if newest_scs:
+            stations.append(newest_scs)
+
+        return stations
 
     def to_sqlalchemy_dict(self, controlling_faction_id: Optional[int]) -> Dict[str, Any]:
         return {

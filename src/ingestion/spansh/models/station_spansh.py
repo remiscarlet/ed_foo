@@ -3,7 +3,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import Field
 
+from src.common.logging import get_logger
 from src.ingestion.spansh.models import BaseSpanshModel
+
+logger = get_logger(__name__)
 
 
 class CommodityPriceSpansh(BaseSpanshModel):
@@ -49,8 +52,8 @@ class CommoditySpansh(CommodityPriceSpansh):
 class MarketSpansh(BaseSpanshModel):
     commodities: Optional[List[CommoditySpansh]] = None
     prohibited_commodities: Optional[List[str]] = None
-    updated_at: Optional[datetime] = None
-    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
+    update_time: Optional[datetime] = None
+    _validate_update_time = BaseSpanshModel.flexible_datetime_validator("update_time")
 
 
 class ShipModuleSpansh(BaseSpanshModel):
@@ -98,8 +101,11 @@ class StationSpansh(BaseSpanshModel):
     def __repr__(self) -> str:
         return f"StationsSpansh(id: {self.id}, name: {self.name})"
 
-    def to_cache_key_tuple(self, owner_id: str) -> Tuple[Any, ...]:
-        return ("StationsDB", owner_id, self.name)
+    def to_cache_key_tuple(self, owner_id: int) -> Tuple[Any, ...]:
+        # return ("StationsDB", owner_id, self.name)
+        tup = ("StationsDB", owner_id, self.name)
+        logger.trace(f"STATIONS SPANSH TO CACHE KEY TUPLE: {tup}")
+        return tup
 
     id: int
     name: str

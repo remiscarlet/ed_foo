@@ -18,7 +18,7 @@ class BaseModel(DeclarativeBase):
         return hash(self.to_cache_key_tuple(*args, **kwargs))
 
     def to_cache_key_tuple(self, *args: Any, **kwargs: Any) -> Tuple[Any, ...]:
-        raise NotImplementedError()
+        raise NotImplementedError("Declarative BaseModel's to_cache_key_tuple() unimplemented")
 
 
 class BaseModelWithId(BaseModel):
