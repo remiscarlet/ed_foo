@@ -1,4 +1,4 @@
-.PHONY: install download-spansh lint lint-fix type check lint-fix-check download-eddn-models gen-eddn-models models
+.PHONY: install setup download-spansh import-spansh run-pipeline lint lint-fix type check lint-fix-check download-eddn-models gen-eddn-models models
 
 ## Setup
 
@@ -10,25 +10,33 @@ setup: install up-db alembic-upgrade install-eddn-models
 ## Data DL/Import
 
 download-spansh:
-	poetry run download_spansh_dump
+	poetry run cli ingestion download-spansh
 
 import-spansh:
-	poetry run ingestion_pipeline
+	poetry run cli ingestion import-spansh
+
+import-spansh-v:
+	poetry run cli ingestion import-spansh -v
+
+import-spansh-vv:
+	poetry run cli ingestion import-spansh -vv
+
+run-pipeline: download-spansh import-spansh-v
 
 ## Code Quality
 
 lint:
 	poetry run yamllint **/*.yaml
 	poetry run lint_metadata
-	poetry run black --check .
-	poetry run isort --check-only .
-	poetry run flake8 . -v
+	poetry run black --check src/
+	poetry run isort --check-only src/
+	poetry run flake8 src/ -v
 
 lint-fix:
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
-	poetry run black .
-	poetry run isort .
+	poetry run black src/
+	poetry run isort src/
 
 type:
 	poetry run mypy src/
@@ -38,9 +46,9 @@ check: lint type
 lint-fix-check:
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
-	poetry run black .
-	poetry run isort .
-	poetry run flake8 . -v
+	poetry run black src/
+	poetry run isort src/
+	poetry run flake8 src/ -v
 	poetry run mypy src/
 
 ## Docker (Dev Only)
@@ -73,7 +81,6 @@ alembic-revision:
 	poetry run alembic revision --autogenerate
 
 ## Code Gen
-
 
 download-eddn-models:
 	mkdir data

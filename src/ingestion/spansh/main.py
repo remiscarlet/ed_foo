@@ -1,9 +1,10 @@
-import logging
+import logging  # noqa: F401
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from pprint import pformat
 from typing import Any, Callable, Dict, Iterable, List, Type, Union
 
-import ijson  # type: ignore
+import ijson
 import yaml
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
@@ -32,12 +33,12 @@ from src.common.constants import (
     GALAXY_POPULATED_JSON_URL,
     METADATA_DIR,
 )
-from src.common.logging import configure_logger, get_logger
+from src.common.logging import get_logger
 from src.common.timer import Timer
 from src.common.utils import download_file, seconds_to_str, ungzip
 from src.ingestion.spansh.models import BaseSpanshModel
 from src.ingestion.spansh.models.body_spansh import AsteroidsSpansh, BodySpansh
-from src.ingestion.spansh.models.station_spansh import CommoditySpansh, StationSpansh
+from src.ingestion.spansh.models.station_spansh import StationSpansh
 from src.ingestion.spansh.models.system_spansh import (
     ControllingFactionSpansh,
     FactionSpansh,
@@ -59,7 +60,8 @@ def upsert_all[T: BaseModel](
         return []
 
     cols_to_print = conflict_cols + debug_print_extra_cols
-    logger.debug(repr([{k: v for k, v in item.items() if k in cols_to_print} for item in rows]))
+    logger.debug(f"{len(rows)} {model.__name__} items being upserted...")
+    logger.trace(repr([{k: v for k, v in item.items() if k in cols_to_print} for item in rows]))
 
     updatable_cols = [
         col.name
@@ -75,7 +77,7 @@ def upsert_all[T: BaseModel](
         )
     )
 
-    logger.trace(str(stmt))
+    # logger.trace(str(stmt))
 
     results = session.scalars(stmt.returning(model), execution_options={"populate_existing": True})
     session.commit()
@@ -84,7 +86,7 @@ def upsert_all[T: BaseModel](
 
 
 def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
-    logger.info("Layer 1: Factions")
+    logger.info(f"Layer 1: Factions ({partitioner.total_running_str_fn()})")
 
     all_factions: dict[str, Union[FactionSpansh, ControllingFactionSpansh]] = {}
     faction_dicts: dict[str, dict[str, Any]] = {}
@@ -112,7 +114,7 @@ def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
 
 def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
-    logger.info("Layer 2: Systems")
+    logger.info(f"Layer 2: Systems ({partitioner.total_running_str_fn()})")
 
     systems = []
     system_by_key: Dict[int, SystemSpansh] = {}
@@ -134,7 +136,7 @@ def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
 
 def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
-    logger.info("Layer 3: FactionPresences and Bodies")
+    logger.info(f"Layer 3: FactionPresences and Bodies ({partitioner.total_running_str_fn()})")
 
     # --- FactionPresences ---
     presence_rows = []
@@ -178,7 +180,7 @@ def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
 
 def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
-    logger.info("Layer 4: Stations, Signals, Rings")
+    logger.info(f"Layer 4: Stations, Signals, Rings ({partitioner.total_running_str_fn()})")
 
     # --- Stations ---
     rows_by_pk = {}
@@ -244,34 +246,28 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
 
 def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
-    logger.info("Layer 4: Market, Outfitting, Shipyard, Hotspots")
+    logger.info(f"Layer 4: Market, Outfitting, Shipyard, Hotspots ({partitioner.total_running_str_fn()})")
 
     # --- Market ---
 
     commodities: List[Dict[str, Any]] = []
 
+    now = datetime.now(timezone.utc)
+    max_data_age = timedelta(days=partitioner.max_market_data_age_days)
+
     def extract_commodities(system: SystemSpansh, station: StationSpansh) -> None:
         if station.market is None:
             return
+        elif station.market.updated_at is not None:
+            data_age = now - station.market.updated_at
+            if data_age > max_data_age:
+                return
+
         system_id = partitioner.get_spansh_entity_id(system)
         station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(system_id))
 
         for commodity in station.market.commodities or []:
             commodities.append(commodity.to_sqlalchemy_dict(station_id, commodity.symbol))
-
-        names: set[str] = set()
-        for commodity_name in station.market.prohibited_commodities or []:
-            if commodity_name in ["Narcotics"]:
-                # Prohibited list can either be commodity _name_ or some category names
-                names.update(list(partitioner.get_commodity_names_by_category(commodity_name)))
-            else:
-                names.add(commodity_name)
-
-        for commodity_name in names:
-            commodity_obj = partitioner.get_metadata_by_name(commodity_name)
-            if commodity_obj is None:
-                raise RuntimeError(f"Got a commodity we didn't know about! '{commodity_name}'")
-            commodities.append(CommoditySpansh.to_blacklisted_sqlalchemy_dict(station_id, commodity_obj.symbol))
 
     for system in input_systems:
         for station in system.stations or []:
@@ -284,12 +280,13 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
         partitioner.session,
         MarketCommoditiesDB,
         commodities,
-        ["station_id", "commodity_sym", "is_blacklisted"],
+        ["station_id", "commodity_sym"],
         ["id"],
-        ["buy_price"],
+        ["is_blacklisted"],
     )
 
     # --- Outfitting ---
+
     modules: List[Dict[str, Any]] = []
 
     def extract_modules(system: SystemSpansh, station: StationSpansh) -> None:
@@ -386,9 +383,11 @@ class SpanshDataLayerPartitioner:
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self, total_running_str_fn: Callable[[], str], max_market_data_age_days: int) -> None:
         self.session = SessionLocal()
         self.id_cache: Dict[int, int] = {}
+        self.total_running_str_fn = total_running_str_fn
+        self.max_market_data_age_days = max_market_data_age_days
 
     def cache_spansh_entity_id(self, entity: BaseSpanshModel, db_id: int) -> None:
         self.cache_spansh_entity_id_by_key(entity.to_cache_key(), db_id)
@@ -397,7 +396,7 @@ class SpanshDataLayerPartitioner:
         if db_id is None:
             raise ValueError(f"Cannot cache None id for key: {key}")
         self.id_cache[key] = db_id
-        logger.debug(f"CACHED Spansh Key: '{db_id}' - '{key}'")
+        logger.trace(f"CACHED Spansh Key: '{db_id}' - '{key}'")
 
     def get_spansh_entity_id(self, entity: BaseSpanshModel) -> int:
         return self.get_spansh_entity_id_by_key(entity.to_cache_key())
@@ -493,10 +492,26 @@ class SpanshDataLayerPartitioner:
 
 
 class SpanshDataPipeline:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        start_at_system_idx: int = 0,
+        skipping_past_every: int = 1000,
+        validated_every: int = 500,
+        process_every: int = 1500,
+        max_market_data_age_days: int = 30,
+    ) -> None:
+        self.start_at_system_idx = start_at_system_idx
+        self.skipping_past_every = skipping_past_every
+        self.validated_every = validated_every
+        self.process_every = process_every
+        self.max_market_data_age_days = max_market_data_age_days
+
         self.session = SessionLocal()
-        self.partitioner = SpanshDataLayerPartitioner()
         self.pipeline_timer = Timer("Spansh data import pipeline")
+        self.partitioner = SpanshDataLayerPartitioner(self.total_running_str, self.max_market_data_age_days)
+
+    def total_running_str(self) -> str:
+        return f"Total Running: {self.pipeline_timer.running_for_str()}"
 
     @staticmethod
     def download_data() -> None:
@@ -506,11 +521,6 @@ class SpanshDataPipeline:
         ungzip(GALAXY_POPULATED_JSON_GZ, GALAXY_POPULATED_JSON)
 
     def load_and_process_data(self, batch_process_fn: Callable[[List[SystemSpansh]], None]) -> None:
-        start_at = 0
-        skipping_past_every = 1000
-
-        validated_every = 500  # 250#500
-        process_every = 1500  # 500#1500
         processed_count = 0
 
         with GALAXY_POPULATED_JSON.open("r") as f:
@@ -520,11 +530,10 @@ class SpanshDataPipeline:
             skip_timer = Timer("Skipping rows to known min index")
             validate_timer = Timer("Pydantic validation timer")
             for idx, system_dict in enumerate(parser, start=1):
-                if idx < start_at:
-                    if idx % skipping_past_every == 0:
+                if idx < self.start_at_system_idx:
+                    if idx % self.skipping_past_every == 0:
                         time_elapsed = seconds_to_str(skip_timer.lap(False))
-                        running_for = self.pipeline_timer.running_for_str()
-                        logger.info(f"Skipping past {idx} (Took {time_elapsed})(Total Running: {running_for})")
+                        logger.info(f"Skipping past {idx} (Took {time_elapsed})({self.total_running_str()})")
                     continue
 
                 processed_count += 1
@@ -535,15 +544,14 @@ class SpanshDataPipeline:
                     logger.warning(f"Validation failed at item {idx}: {e}")
                     continue
 
-                if idx % validated_every == 0:
+                if idx % self.validated_every == 0:
                     time_elapsed = seconds_to_str(skip_timer.lap(False))
-                    running_for = self.pipeline_timer.running_for_str()
                     logger.info(
-                        f"Validated {validated_every} systems in {time_elapsed} "
-                        f"({idx} total)(Total Running: {running_for})"
+                        f"Validated {self.validated_every} systems in {time_elapsed} "
+                        f"({idx} total)({self.total_running_str()})"
                     )
 
-                if idx % process_every == 0:
+                if idx % self.process_every == 0:
                     batch_process_fn(batch)
                     batch.clear()
                     import gc
@@ -567,12 +575,8 @@ class SpanshDataPipeline:
         self.partitioner.insert_systems(system_batch)
 
         upsert_time = process_timer.running_for_str()
-        pipeline_time = self.pipeline_timer.running_for_str()
         logger.info(
-            (
-                f"Upserted {len(system_batch)} systems into postgres "
-                f"(Took {upsert_time})(Total Running: {pipeline_time})"
-            )
+            (f"Upserted {len(system_batch)} systems into postgres " f"(Took {upsert_time})({self.total_running_str()})")
         )
 
     def run(self) -> None:
@@ -580,23 +584,3 @@ class SpanshDataPipeline:
             self.partitioner.load_metadata_yaml_into_pg(path)
 
         self.load_and_process_data(self.process_data_batch)
-
-
-log_level = logging.DEBUG
-
-
-def main() -> None:
-    configure_logger(log_level)
-
-    pipeline = SpanshDataPipeline()
-    pipeline.run()
-
-
-def download_spansh() -> None:
-    configure_logger(log_level)
-
-    SpanshDataPipeline.download_data()
-
-
-if __name__ == "__main__":
-    main()

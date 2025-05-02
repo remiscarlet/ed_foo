@@ -65,8 +65,6 @@ We organize our data definitions into three major categories (Exact locations su
   - SQLAlchemy models
   - Manual migrations with Alembic
 
-> **Note**: This introduces some unavoidable boilerplate but pays off in flexibility and clarity.
-
 ## External Schemas
 - Location: `gen/`, `src/ingestion/spansh/models/`
 - Purpose: Represent third-party schema definitions (e.g., EDDN event formats)

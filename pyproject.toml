@@ -68,9 +68,7 @@ pgcli = "^4.3.0"
 [tool.poetry.scripts]
 main = "src.main:main"
 cli = "src.main:cli"
-ingestion_pipeline = "src.main:ingestion_main"
 lint_metadata = "tools.scripts.validate_yaml_schema:main"
-download_spansh_dump = "src.main:download_spansh"
 
 [tool.isort]
 profile = "black"

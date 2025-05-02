@@ -1,16 +1,21 @@
 repos:
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.0
+    hooks:
+      - id: yamllint
+
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:
       - id: black
-        args: ["--config=pyproject.toml", "-v"]
+        args: ["--config=pyproject.toml", "-v", "src/"]
         language_version: python3.13
 
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.1
     hooks:
       - id: isort
-        args: ["--profile", "black"]
+        args: ["--profile", "black", "src/"]
 
   - repo: https://github.com/pycqa/flake8
     rev: 7.2.0
@@ -18,13 +23,14 @@ repos:
       - id: flake8
         additional_dependencies:
           - flake8-pyproject
-        args:
-          - --verbose
+        args: ["--verbose", "src/"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.15.0
     hooks:
       - id: mypy
+        language: system
+        entry: poetry run mypy
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

@@ -1,49 +1,4 @@
 ---
-BasicNarcotics:
-  category: Narcotics
-  is_mineable: false
-  id64: 128049212
-  name: Basic Narcotics
-  avg_price: 9966
-  rare_goods: false
-  corrosive: false
-
-Tobacco:
-  category: Narcotics
-  is_mineable: false
-  id64: 128049213
-  name: Tobacco
-  avg_price: 5035
-  rare_goods: false
-  corrosive: false
-
-Beer:
-  category: Narcotics
-  is_mineable: false
-  id64: 128049214
-  name: Beer
-  avg_price: 186
-  rare_goods: false
-  corrosive: false
-
-Wine:
-  category: Narcotics
-  is_mineable: false
-  id64: 128049215
-  name: Wine
-  avg_price: 260
-  rare_goods: false
-  corrosive: false
-
-Liquor:
-  category: Narcotics
-  is_mineable: false
-  id64: 128049216
-  name: Liquor
-  avg_price: 587
-  rare_goods: false
-  corrosive: false
-
 EraninPearlWhisky:
   category: Narcotics
   is_mineable: false
@@ -269,15 +224,6 @@ TransgenicOnionHead:
   rare_goods: true
   corrosive: false
 
-BootlegLiquor:
-  category: Narcotics
-  is_mineable: false
-  id64: 128672306
-  name: Bootleg Liquor
-  avg_price: 855
-  rare_goods: false
-  corrosive: false
-
 OnionHeadA:
   category: Narcotics
   is_mineable: false
@@ -321,13 +267,4 @@ ApaVietii:
   name: Apa Vietii
   avg_price: 10362
   rare_goods: true
-  corrosive: false
-
-OnionHeadC:
-  category: Narcotics
-  is_mineable: false
-  id64: 128983059
-  name: Onionhead Gamma Strain
-  avg_price: 5387
-  rare_goods: false
   corrosive: false

@@ -3,6 +3,7 @@ from typing import Any
 
 TRACE_LEVEL_NUM = 5
 logging.addLevelName(TRACE_LEVEL_NUM, "TRACE")
+setattr(logging, "TRACE", TRACE_LEVEL_NUM)
 
 
 class TraceLogger(logging.Logger):

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 7b11f5b4198e
+Revision ID: 5cefe09e7540
 Revises:
-Create Date: 2025-05-01 20:51:58.005791
+Create Date: 2025-05-01 23:49:28.848103
 
 """
 
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "7b11f5b4198e"
+revision: str = "5cefe09e7540"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -89,6 +89,7 @@ def upgrade() -> None:
         sa.Column("primary_economy", sa.Text(), nullable=True),
         sa.Column("services", sa.ARRAY(sa.Text()), nullable=True),
         sa.Column("type", sa.Text(), nullable=True),
+        sa.Column("prohibited_commodities", sa.ARRAY(sa.Text()), nullable=True),
         sa.Column("carrier_name", sa.Text(), nullable=True),
         sa.Column("latitude", sa.Float(), nullable=True),
         sa.Column("longitude", sa.Float(), nullable=True),
@@ -108,7 +109,6 @@ def upgrade() -> None:
         sa.Column("supply", sa.BigInteger(), nullable=True),
         sa.Column("demand", sa.BigInteger(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column("is_blacklisted", sa.Boolean(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["commodity_sym"],
@@ -119,7 +119,7 @@ def upgrade() -> None:
             ["stations.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("station_id", "commodity_sym", "is_blacklisted", name="_station_market_commodity_uc"),
+        sa.UniqueConstraint("station_id", "commodity_sym", name="_station_market_commodity_uc"),
     )
     op.create_table(
         "outfitting_ship_modules",

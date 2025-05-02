@@ -222,6 +222,9 @@ class StationsDB(BaseModelWithId):
     services: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
     type: Mapped[Optional[str]] = mapped_column(Text)
 
+    # It kind of is a station-level detail...
+    prohibited_commodities: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
+
     carrier_name: Mapped[Optional[str]] = mapped_column(Text)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
     longitude: Mapped[Optional[float]] = mapped_column(Float)
@@ -308,9 +311,7 @@ class CommoditiesDB(BaseModel):
 
 class MarketCommoditiesDB(BaseModelWithId):
     __tablename__ = "market_commodities"
-    __table_args__ = (
-        UniqueConstraint("station_id", "commodity_sym", "is_blacklisted", name="_station_market_commodity_uc"),
-    )
+    __table_args__ = (UniqueConstraint("station_id", "commodity_sym", name="_station_market_commodity_uc"),)
 
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
     commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("commodities.symbol"), nullable=False)
@@ -320,7 +321,6 @@ class MarketCommoditiesDB(BaseModelWithId):
     supply: Mapped[Optional[int]] = mapped_column(BigInteger)
     demand: Mapped[Optional[int]] = mapped_column(BigInteger)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
-    is_blacklisted: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     def __repr__(self) -> str:
         return f"<MarketCommoditiesDB(id={self.id}, station_id={self.station_id}, commodity_sym={self.commodity_sym})>"

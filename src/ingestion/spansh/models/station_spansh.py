@@ -29,7 +29,6 @@ class CommoditySpansh(CommodityPriceSpansh):
             "sell_price": self.sell_price,
             "supply": self.supply,
             "demand": self.demand,
-            "is_blacklisted": False,
             "updated_at": self.updated_at,
         }
 
@@ -149,6 +148,7 @@ class StationSpansh(BaseSpanshModel):
             "medium_landing_pads": medium_pads,
             "small_landing_pads": small_pads,
             "primary_economy": self.primary_economy,
+            "prohibited_commodities": self.market.prohibited_commodities if self.market is not None else None,
             "services": self.services,
             "type": self.type,
             "carrier_name": self.carrier_name,

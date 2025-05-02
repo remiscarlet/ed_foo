@@ -3,20 +3,14 @@ import os
 from fastapi import FastAPI
 
 from src.adapters.ingress.cli.router import cli
-from src.ingestion.spansh.main import download_spansh
-from src.ingestion.spansh.main import main as ingestion_main
 
 app = None
 
 
 def main() -> None:
-    app_mode = os.getenv("APP_MODE", "ingestion")
+    app_mode = os.getenv("APP_MODE", "cli")
     if app_mode == "cli":
         cli()
-    elif app_mode == "download":
-        download_spansh()
-    elif app_mode == "ingestion":
-        ingestion_main()
     else:
         global app
         app = FastAPI()
