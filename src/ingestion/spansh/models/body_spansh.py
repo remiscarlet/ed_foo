@@ -22,6 +22,17 @@ class SignalsSpansh(BaseSpanshModel):
             for signal_type, count in self.signals.items()
         ]
 
+    def to_sqlalchemy_hotspot_dicts(self, ring_id: int) -> List[Dict[str, Any]]:
+        return [
+            {
+                "ring_id": ring_id,
+                "commodity_sym": signal_type,
+                "count": count,
+                "updated_at": self.updated_at,
+            }
+            for signal_type, count in self.signals.items()
+        ]
+
 
 class AsteroidsSpansh(BaseSpanshModel):
     name: str
@@ -33,7 +44,11 @@ class AsteroidsSpansh(BaseSpanshModel):
     id64: Optional[int] = None
     signals: Optional[SignalsSpansh] = None
 
+    def to_cache_key_tuple(self, spansh_body_id: int) -> Tuple[Any, ...]:
+        return ("RingsDB", spansh_body_id, self.name)
+
     def to_sqlalchemy_dict(self, body_id: int) -> Dict[str, Any]:
+        """Returns a RingsDB dict"""
         return {
             "body_id": body_id,
             "id64": self.id64,
@@ -46,7 +61,7 @@ class AsteroidsSpansh(BaseSpanshModel):
 
 
 class BodySpansh(BaseSpanshModel):
-    def to_cache_key(self) -> Tuple[Any, ...]:
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (self.__class__, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star)
 
     def __repr__(self) -> str:

@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 
 from src.adapters.ingress.cli.router import cli
-from src.ingestion.spansh.main import download_spansh  # type: ignore
+from src.ingestion.spansh.main import download_spansh
 from src.ingestion.spansh.main import main as ingestion_main
 
 app = None

@@ -1,4 +1,5 @@
 import os
+from typing import Any, Tuple
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import (
@@ -12,6 +13,12 @@ from sqlalchemy.orm import (
 
 class BaseModel(DeclarativeBase):
     __abstract__ = True
+
+    def to_cache_key(self, *args: Any, **kwargs: Any) -> int:
+        return hash(self.to_cache_key_tuple(*args, **kwargs))
+
+    def to_cache_key_tuple(self, *args: Any, **kwargs: Any) -> Tuple[Any, ...]:
+        raise NotImplementedError()
 
 
 class BaseModelWithId(BaseModel):

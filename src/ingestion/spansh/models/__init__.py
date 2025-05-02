@@ -31,9 +31,6 @@ def parse_flexible_datetime(v: str) -> datetime:
 
 
 class BaseSpanshModel(BaseModel):
-    def __hash__(self) -> int:
-        return hash(self.to_cache_key())
-
     model_config = ConfigDict(
         alias_generator=lambda s: "".join(word.capitalize() if i > 0 else word for i, word in enumerate(s.split("_"))),
         populate_by_name=True,
@@ -41,7 +38,10 @@ class BaseSpanshModel(BaseModel):
         frozen=True,
     )
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
+    def to_cache_key(self, *args: Any, **kwargs: Any) -> int:
+        return hash(self.to_cache_key_tuple(*args, **kwargs))
+
+    def to_cache_key_tuple(self, *args: Any, **kwargs: Any) -> Tuple[Any, ...]:
         raise NotImplementedError()
 
     @classmethod

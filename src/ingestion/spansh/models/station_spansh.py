@@ -3,12 +3,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import Field
 
-from src.core.models.station_model import (
-    Outfitting,
-    Ship,
-    ShipModule,
-    Shipyard,
-)
 from src.ingestion.spansh.models import BaseSpanshModel
 
 
@@ -26,6 +20,31 @@ class CommoditySpansh(CommodityPriceSpansh):
     commodity_id: int
     name: str
     symbol: str
+
+    def to_sqlalchemy_dict(self, station_id: int, commodity_sym: str) -> Dict[str, Any]:
+        return {
+            "station_id": station_id,
+            "commodity_sym": commodity_sym,
+            "buy_price": self.buy_price,
+            "sell_price": self.sell_price,
+            "supply": self.supply,
+            "demand": self.demand,
+            "is_blacklisted": False,
+            "updated_at": self.updated_at,
+        }
+
+    @staticmethod
+    def to_blacklisted_sqlalchemy_dict(station_id: int, commodity_sym: str) -> Dict[str, Any]:
+        return {
+            "station_id": station_id,
+            "commodity_sym": commodity_sym,
+            "is_blacklisted": True,
+            "buy_price": None,
+            "sell_price": None,
+            "supply": None,
+            "demand": None,
+            "updated_at": None,
+        }
 
 
 class MarketSpansh(BaseSpanshModel):
@@ -45,16 +64,11 @@ class ShipModuleSpansh(BaseSpanshModel):
 
     ship: Optional[str] = None
 
-    def to_core_model(self) -> ShipModule:
-        return ShipModule(
-            category=self.category,
-            cls=self.cls,
-            module_id=self.module_id,
-            name=self.name,
-            rating=self.rating,
-            symbol=self.symbol,
-            ship=self.ship,
-        )
+    def to_sqlalchemy_dict(self, station_id: int, module_id: int) -> Dict[str, Any]:
+        return {
+            "station_id": station_id,
+            "module_id": module_id,
+        }
 
 
 class OutfittingSpansh(BaseSpanshModel):
@@ -62,24 +76,17 @@ class OutfittingSpansh(BaseSpanshModel):
     updated_at: Optional[datetime] = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
-    def to_core_model(self) -> Outfitting:
-        return Outfitting(
-            modules=[module.to_core_model() for module in self.modules or []],
-            updated_at=self.updated_at,
-        )
-
 
 class ShipSpansh(BaseSpanshModel):
     name: str
     ship_id: int
     symbol: str
 
-    def to_core_model(self) -> Ship:
-        return Ship(
-            name=self.name,
-            ship_id=self.ship_id,
-            symbol=self.symbol,
-        )
+    def to_sqlalchemy_dict(self, station_id: int, ship_id: int) -> Dict[str, Any]:
+        return {
+            "station_id": station_id,
+            "ship_id": ship_id,
+        }
 
 
 class ShipyardSpansh(BaseSpanshModel):
@@ -87,19 +94,13 @@ class ShipyardSpansh(BaseSpanshModel):
     updated_at: Optional[datetime] = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
-    def to_core_model(self) -> Shipyard:
-        return Shipyard(
-            ships=[ship.to_core_model() for ship in self.ships or []],
-            updated_at=self.updated_at,
-        )
-
 
 class StationSpansh(BaseSpanshModel):
     def __repr__(self) -> str:
         return f"StationsSpansh(id: {self.id}, name: {self.name})"
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
-        return (self.__class__, self.id, self.name)
+    def to_cache_key_tuple(self, owner_id: str) -> Tuple[Any, ...]:
+        return ("StationsDB", owner_id, self.name)
 
     id: int
     name: str

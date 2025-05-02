@@ -19,7 +19,7 @@ class ThargoidWarSpansh(BaseSpanshModel):
     success_reached: bool
     success_state: str
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (
             self.__class__,
             self.current_state,
@@ -51,7 +51,7 @@ class FactionSpansh(BaseSpanshModel):
     allegiance: Optional[str] = None
     state: Optional[str] = None
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (self.__class__, self.name)
 
     def to_sqlalchemy_dict(self) -> Dict[str, Any]:
@@ -69,7 +69,7 @@ class ControllingFactionSpansh(BaseSpanshModel):
     allegiance: Optional[str] = None
     government: Optional[str] = None
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (FactionSpansh, self.name)
 
     def to_sqlalchemy_dict(self) -> Dict[str, Any]:
@@ -97,8 +97,8 @@ class SystemSpansh(BaseSpanshModel):
             f"SystemSpansh(id64: {self.id64}, name: {self.name}, allegiance: {self.allegiance}, coords: {self.coords})"
         )
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
-        return (self.__class__, self.id64, self.name)
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
+        return ("SystemsDB", self.name)
 
     id64: int
     name: str

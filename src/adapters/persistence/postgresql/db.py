@@ -132,7 +132,7 @@ class BodiesDB(BaseModelWithId):
             distance_to_arrival_updated_at=self.distance_to_arrival_updated_at,
         )
 
-    def to_cache_key(self) -> Tuple[Any, ...]:
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (BodySpansh, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star)
 
     def __repr__(self) -> str:
@@ -171,18 +171,25 @@ class RingsDB(BaseModelWithId):
 
     hotspots: Mapped[List["HotspotsDB"]] = relationship(back_populates="ring")
 
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
+        # String classname to work around circular imports from body_spansh.py
+        return ("RingsDB", self.body_id, self.name)
+
     def __repr__(self) -> str:
         return f"<RingsDB(id={self.id}, name={self.name})>"
 
 
 class HotspotsDB(BaseModelWithId):
     __tablename__ = "hotspots"
+    __table_args__ = (UniqueConstraint("ring_id", "commodity_sym", name="_ring_and_commodity_uc"),)
 
     ring_id: Mapped[int] = mapped_column(ForeignKey("rings.id"))
     ring: Mapped["RingsDB"] = relationship(back_populates="hotspots")
     commodity_sym: Mapped[str] = mapped_column(ForeignKey("commodities.symbol"))
 
     count: Mapped[Optional[int]] = mapped_column(Integer)
+
+    updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     def __repr__(self) -> str:
         return f"<HotspotsDB(id={self.id}, commodity_sym={self.commodity_sym})>"
@@ -222,6 +229,9 @@ class StationsDB(BaseModelWithId):
     spansh_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     edsm_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     eddn_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
+        return ("StationsDB", self.owner_id, self.name)
 
     def to_core_model(self) -> Station:
         return Station(
@@ -277,8 +287,15 @@ class StationsDB(BaseModelWithId):
 class CommoditiesDB(BaseModel):
     __tablename__ = "commodities"
 
+    id64: Mapped[Optional[int]] = mapped_column(BigInteger)
+
     symbol: Mapped[str] = mapped_column(Text, primary_key=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
+
+    avg_price: Mapped[Optional[int]] = mapped_column(BigInteger)
+    rare_goods: Mapped[Optional[bool]] = mapped_column(Boolean)
+    corrosive: Mapped[Optional[bool]] = mapped_column(Boolean)
+
     category: Mapped[Optional[str]] = mapped_column(Text)
     is_mineable: Mapped[Optional[bool]] = mapped_column(Boolean)
     ring_types: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
@@ -291,13 +308,16 @@ class CommoditiesDB(BaseModel):
 
 class MarketCommoditiesDB(BaseModelWithId):
     __tablename__ = "market_commodities"
+    __table_args__ = (
+        UniqueConstraint("station_id", "commodity_sym", "is_blacklisted", name="_station_market_commodity_uc"),
+    )
 
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
     commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("commodities.symbol"), nullable=False)
 
     buy_price: Mapped[Optional[int]] = mapped_column(Integer)
     sell_price: Mapped[Optional[int]] = mapped_column(Integer)
-    stock: Mapped[Optional[int]] = mapped_column(BigInteger)
+    supply: Mapped[Optional[int]] = mapped_column(BigInteger)
     demand: Mapped[Optional[int]] = mapped_column(BigInteger)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
     is_blacklisted: Mapped[Optional[bool]] = mapped_column(Boolean)
@@ -309,7 +329,7 @@ class MarketCommoditiesDB(BaseModelWithId):
 class ShipsDB(BaseModelWithId):
     __tablename__ = "ships"
 
-    symbol: Mapped[Optional[str]] = mapped_column(Text)
+    symbol: Mapped[str] = mapped_column(Text)
     name: Mapped[Optional[str]] = mapped_column(Text)
     ship_id: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
@@ -324,13 +344,6 @@ class ShipyardShipsDB(BaseModelWithId):
     station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("stations.id"), nullable=False)
     ship_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("ships.id"), nullable=False)
 
-    buy_price: Mapped[Optional[int]] = mapped_column(Integer)
-    sell_price: Mapped[Optional[int]] = mapped_column(Integer)
-    stock: Mapped[Optional[int]] = mapped_column(BigInteger)
-    demand: Mapped[Optional[int]] = mapped_column(BigInteger)
-    updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
-    is_blacklisted: Mapped[Optional[bool]] = mapped_column(Boolean)
-
     def __repr__(self) -> str:
         return f"<ShipyardShipsDB(id={self.id}, station_id={self.station_id}, ship_id={self.ship_id})>"
 
@@ -340,7 +353,7 @@ class ShipModulesDB(BaseModelWithId):
 
     module_id: Mapped[Optional[int]] = mapped_column(Integer)
     name: Mapped[str] = mapped_column(Text, nullable=False)
-    symbol: Mapped[Optional[str]] = mapped_column(Text)
+    symbol: Mapped[str] = mapped_column(Text)
     category: Mapped[Optional[str]] = mapped_column(Text)
     rating: Mapped[Optional[str]] = mapped_column(Text)
     ship: Mapped[Optional[str]] = mapped_column(Text)
@@ -468,6 +481,9 @@ class SystemsDB(BaseModelWithId):
         ),
         overlaps="stations",
     )
+
+    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
+        return ("SystemsDB", self.name)
 
     @classmethod
     def from_core_model_to_dict(cls, system: System) -> Dict[str, Any]:
