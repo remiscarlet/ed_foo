@@ -5,7 +5,7 @@
 install:
 	poetry install
 
-setup: install up-db alembic-upgrade install-eddn-models
+setup: install up alembic-upgrade install-eddn-models
 
 ## Data DL/Import
 
@@ -61,16 +61,16 @@ nuke-db:
 	docker rm ekaine_db
 
 up:
-	docker compose -f tools/docker/docker-compose.yaml up --build
+	docker compose -f tools/docker/docker-compose.yaml up --build -d
 
 down:
 	docker compose -f tools/docker/docker-compose.yaml down
 
 up-db:
-	docker compose -f tools/docker/docker-compose.yaml up --build -d db
+	docker compose -f tools/docker/docker-compose.yaml up --build -d postgres
 
 down-db:
-	docker compose -f tools/docker/docker-compose.yaml stop db
+	docker compose -f tools/docker/docker-compose.yaml stop postgres
 
 ## Alembic
 
@@ -83,14 +83,14 @@ alembic-revision:
 ## Code Gen
 
 download-eddn-models:
-	mkdir data
+	mkdir -p data
 	git clone https://github.com/EDCD/EDDN.git data/eddn/ 2>/dev/null || true
 	git -C data/eddn pull
 
 gen-eddn-models: download-eddn-models
 	mkdir -p data/_tmp
 	cp data/eddn/schemas/*.json data/_tmp
-	mkdir gen
+	mkdir -p gen
 	poetry run datamodel-codegen \
 		--reuse-model \
 		--strict-nullable \

@@ -375,7 +375,7 @@ class SpanshDataLayerPartitioner:
       - SignalsDB
       - RingsDB
         - Used in HotspotsDB.ring_id
-    Layer 5: (TODO)
+    Layer 5:
       - MarketCommoditiesDB
       - ShipyardShipsDB
       - OutfittingShipModulesDB

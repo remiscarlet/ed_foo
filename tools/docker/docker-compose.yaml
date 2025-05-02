@@ -1,6 +1,6 @@
 ---
 services:
-  db:
+  postgres:
     container_name: ekaine_db
     image: timescale/timescaledb-ha:pg17
     restart: always
@@ -8,6 +8,11 @@ services:
       POSTGRES_USER: e_kaine
       POSTGRES_PASSWORD: e_kaine_pw
       POSTGRES_DB: e_kaine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "e_kaine"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
     ports: [5432:5432]
     volumes: [pgdata:/var/lib/postgresql/data]
   api:
@@ -15,7 +20,9 @@ services:
     build:
       context: ../../
       dockerfile: tools/docker/e_kaine/Dockerfile
-    depends_on: [db]
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgres://e_kaine:e_kaine_pw@db:5432/e_kaine
     ports: [8000:8000]
