@@ -4,8 +4,8 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests  # type: ignore
-from requests.adapters import HTTPAdapter, Retry  # type: ignore
+import requests
+from requests.adapters import HTTPAdapter, Retry
 from tqdm import tqdm
 
 

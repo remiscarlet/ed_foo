@@ -1,15 +1,15 @@
 drop function if exists api.get_hotspots_in_system;
 create or replace function api.get_hotspots_in_system(
-    p_system_name TEXT
+    p_system_name text
 ) returns table (
-    body_name TEXT,
-    ring_name TEXT,
-    ring_type TEXT,
-    commodity TEXT,
-    count INTEGER
+    body_name text,
+    ring_name text,
+    ring_type text,
+    commodity text,
+    count integer
 )
 as $$
-BEGIN
+begin
     return query
     select
         h.body_name,
@@ -19,5 +19,5 @@ BEGIN
         h.count
       from derived.hotspot_ring_view h
 	 where h.system_name = p_system_name;
-END;
+end;
 $$ language plpgsql;

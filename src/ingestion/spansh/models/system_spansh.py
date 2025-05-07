@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from pydantic import Field
+
 from src.ingestion.spansh.models import BaseSpanshModel
 from src.ingestion.spansh.models.body_spansh import BodySpansh
 from src.ingestion.spansh.models.common_spansh import (
@@ -118,7 +120,7 @@ class SystemSpansh(BaseSpanshModel):
 
     bodies: Optional[List[BodySpansh]] = None
     factions: Optional[List[FactionSpansh]] = None
-    all_stations: Optional[List[StationSpansh]] = None
+    all_stations: Optional[List[StationSpansh]] = Field(alias="stations")
 
     body_count: Optional[int] = None
 
@@ -157,11 +159,12 @@ class SystemSpansh(BaseSpanshModel):
                 colonisation_ships.append(station)
             else:
                 stations.append(station)
-        newest_scs = max(
-            colonisation_ships,
-            key=lambda scs: (scs.updated_at if scs.updated_at is not None else datetime(year=1, month=1, day=1)),
-        )
-        if newest_scs:
+
+        if colonisation_ships:
+            newest_scs = max(
+                colonisation_ships,
+                key=lambda scs: (scs.updated_at if scs.updated_at is not None else datetime(year=1, month=1, day=1)),
+            )
             stations.append(newest_scs)
 
         return stations

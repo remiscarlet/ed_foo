@@ -44,7 +44,7 @@ class BodiesDB(BaseModelWithId):
 
     body_id: Mapped[Optional[int]] = mapped_column(BigInteger)  # The "idx" of the body _within the system_
 
-    system_id: Mapped[int] = mapped_column(ForeignKey("core.systems.id"))
+    system_id: Mapped[int] = mapped_column(ForeignKey("core.systems.id"), nullable=False, index=True)
     system: Mapped["SystemsDB"] = relationship(back_populates="bodies")
 
     stations: Mapped[List["StationsDB"]] = relationship(
@@ -147,7 +147,7 @@ class SignalsDB(BaseModelWithId):
     __tablename__ = "signals"
     __table_args__ = (UniqueConstraint("body_id", "signal_type", name="_signal_on_body_uc"), {"schema": "core"})
 
-    body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"))
+    body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="signals")
 
     signal_type: Mapped[Optional[str]] = mapped_column(Text)
@@ -165,7 +165,7 @@ class RingsDB(BaseModelWithId):
     id64: Mapped[int] = mapped_column(BigInteger, nullable=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
 
-    body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"))
+    body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="rings")
 
     type: Mapped[Optional[str]] = mapped_column(Text)
@@ -187,9 +187,9 @@ class HotspotsDB(BaseModelWithId):
     __tablename__ = "hotspots"
     __table_args__ = (UniqueConstraint("ring_id", "commodity_sym", name="_ring_and_commodity_uc"), {"schema": "core"})
 
-    ring_id: Mapped[int] = mapped_column(ForeignKey("core.rings.id"))
+    ring_id: Mapped[int] = mapped_column(ForeignKey("core.rings.id"), nullable=False, index=True)
     ring: Mapped["RingsDB"] = relationship(back_populates="hotspots")
-    commodity_sym: Mapped[str] = mapped_column(ForeignKey("core.commodities.symbol"))
+    commodity_sym: Mapped[str] = mapped_column(ForeignKey("core.commodities.symbol"))  # Small lookup table; no index
 
     count: Mapped[Optional[int]] = mapped_column(Integer)
 
@@ -206,10 +206,10 @@ class StationsDB(BaseModelWithId):
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_edsm: Mapped[Optional[int]] = mapped_column(BigInteger)
-    name: Mapped[str] = mapped_column(Text, nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False, index=True)  # Station name is NOT unique
 
-    owner_id: Mapped[int] = mapped_column(nullable=False)
-    owner_type: Mapped[str] = mapped_column(Text, nullable=False)
+    owner_id: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
+    owner_type: Mapped[str] = mapped_column(Text, nullable=False, index=True)
 
     allegiance: Mapped[Optional[str]] = mapped_column(Text)
     controlling_faction: Mapped[Optional[str]] = mapped_column(Text)
@@ -302,7 +302,7 @@ class CommoditiesDB(BaseModel):
     symbol: Mapped[str] = mapped_column(Text, primary_key=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
 
-    avg_price: Mapped[Optional[int]] = mapped_column(BigInteger)
+    avg_price: Mapped[Optional[int]] = mapped_column(Integer)
     rare_goods: Mapped[Optional[bool]] = mapped_column(Boolean)
     corrosive: Mapped[Optional[bool]] = mapped_column(Boolean)
 
@@ -323,13 +323,13 @@ class MarketCommoditiesDB(BaseModelWithId):
         {"schema": "core"},
     )
 
-    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False)
+    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False, index=True)
     commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("core.commodities.symbol"), nullable=False)
 
     buy_price: Mapped[Optional[int]] = mapped_column(Integer)
     sell_price: Mapped[Optional[int]] = mapped_column(Integer)
-    supply: Mapped[Optional[int]] = mapped_column(BigInteger)
-    demand: Mapped[Optional[int]] = mapped_column(BigInteger)
+    supply: Mapped[Optional[int]] = mapped_column(Integer)
+    demand: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     def __repr__(self) -> str:
@@ -353,8 +353,10 @@ class ShipyardShipsDB(BaseModelWithId):
     __tablename__ = "shipyard_ships"
     __table_args__ = {"schema": "core"}
 
-    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False)
-    ship_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.ships.id"), nullable=False)
+    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False, index=True)
+    ship_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("core.ships.id"), nullable=False
+    )  # Small lookup table; no index
 
     def __repr__(self) -> str:
         return f"<ShipyardShipsDB(id={self.id}, station_id={self.station_id}, ship_id={self.ship_id})>"
@@ -380,8 +382,10 @@ class OutfittingShipModulesDB(BaseModelWithId):
     __tablename__ = "outfitting_ship_modules"
     __table_args__ = {"schema": "core"}
 
-    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False)
-    module_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.ship_modules.id"), nullable=False)
+    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False, index=True)
+    module_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("core.ship_modules.id"), nullable=False
+    )  # Small lookup table; no index
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     def __repr__(self) -> str:
@@ -392,7 +396,7 @@ class ThargoidWarDB(BaseModelWithId):
     __tablename__ = "thargoid_wars"
     __table_args__ = {"schema": "core"}
 
-    system_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.systems.id"), nullable=False)
+    system_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.systems.id"), nullable=False, index=True)
 
     current_state: Mapped[str] = mapped_column(Text)
     days_remaining: Mapped[float] = mapped_column(Float)
@@ -410,7 +414,7 @@ class FactionsDB(BaseModelWithId):
     __tablename__ = "factions"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
 
     allegiance: Mapped[Optional[str]] = mapped_column(Text)
     government: Mapped[Optional[str]] = mapped_column(Text)
@@ -437,9 +441,9 @@ class FactionPresencesDB(BaseModelWithId):
         {"schema": "core"},
     )
 
-    system_id: Mapped[int] = mapped_column(ForeignKey("core.systems.id"))
+    system_id: Mapped[int] = mapped_column(ForeignKey("core.systems.id"), nullable=False, index=True)
     system: Mapped["SystemsDB"] = relationship(back_populates="faction_presences")
-    faction_id: Mapped[int] = mapped_column(ForeignKey("core.factions.id"))
+    faction_id: Mapped[int] = mapped_column(ForeignKey("core.factions.id"), nullable=False, index=True)
     faction: Mapped["FactionsDB"] = relationship(back_populates="faction_presences")
 
     influence: Mapped[Optional[float]] = mapped_column(Float)
@@ -458,7 +462,7 @@ class SystemsDB(BaseModelWithId):
     __tablename__ = "systems"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(Text, unique=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -489,7 +493,7 @@ class SystemsDB(BaseModelWithId):
     power_state_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     powers_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    controlling_faction_id: Mapped[Optional[int]] = mapped_column(ForeignKey("core.factions.id"))
+    controlling_faction_id: Mapped[Optional[int]] = mapped_column(ForeignKey("core.factions.id"), index=True)
     controlling_faction: Mapped[Optional["FactionsDB"]] = relationship()
 
     bodies: Mapped[List["BodiesDB"]] = relationship(back_populates="system")

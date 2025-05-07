@@ -161,5 +161,5 @@ Tritium:
   rare_goods: false
   corrosive: false
   ring_types: [Icy]
-  mining_type: Laser
+  mining_method: Laser
   has_hotspots: true

@@ -1,6 +1,6 @@
 """Create initial tables
 
-Revision ID: 4b0be5c0bf46
+Revision ID: 6b82a9368504
 Revises:
 Create Date: 2025-05-06 23:21:18.360145
 
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "4b0be5c0bf46"
+revision: str = "6b82a9368504"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("symbol", sa.Text(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
-        sa.Column("avg_price", sa.BigInteger(), nullable=True),
+        sa.Column("avg_price", sa.Integer(), nullable=True),
         sa.Column("rare_goods", sa.Boolean(), nullable=True),
         sa.Column("corrosive", sa.Boolean(), nullable=True),
         sa.Column("category", sa.Text(), nullable=True),
@@ -82,7 +82,7 @@ def upgrade() -> None:
         sa.Column("id_spansh", sa.BigInteger(), nullable=True),
         sa.Column("id_edsm", sa.BigInteger(), nullable=True),
         sa.Column("name", sa.Text(), nullable=False),
-        sa.Column("owner_id", sa.Integer(), nullable=False),
+        sa.Column("owner_id", sa.BigInteger(), nullable=False),
         sa.Column("owner_type", sa.Text(), nullable=False),
         sa.Column("allegiance", sa.Text(), nullable=True),
         sa.Column("controlling_faction", sa.Text(), nullable=True),
@@ -108,14 +108,17 @@ def upgrade() -> None:
         sa.UniqueConstraint("name", "owner_id", name="_station_name_owner_distanace_uc"),
         schema="core",
     )
+    op.create_index(op.f("ix_core_stations_name"), "stations", ["name"], unique=False, schema="core")
+    op.create_index(op.f("ix_core_stations_owner_id"), "stations", ["owner_id"], unique=False, schema="core")
+    op.create_index(op.f("ix_core_stations_owner_type"), "stations", ["owner_type"], unique=False, schema="core")
     op.create_table(
         "market_commodities",
         sa.Column("station_id", sa.BigInteger(), nullable=False),
         sa.Column("commodity_sym", sa.Text(), nullable=False),
         sa.Column("buy_price", sa.Integer(), nullable=True),
         sa.Column("sell_price", sa.Integer(), nullable=True),
-        sa.Column("supply", sa.BigInteger(), nullable=True),
-        sa.Column("demand", sa.BigInteger(), nullable=True),
+        sa.Column("supply", sa.Integer(), nullable=True),
+        sa.Column("demand", sa.Integer(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
@@ -129,6 +132,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("station_id", "commodity_sym", name="_station_market_commodity_uc"),
         schema="core",
+    )
+    op.create_index(
+        op.f("ix_core_market_commodities_station_id"), "market_commodities", ["station_id"], unique=False, schema="core"
     )
     op.create_table(
         "outfitting_ship_modules",
@@ -147,6 +153,13 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         schema="core",
     )
+    op.create_index(
+        op.f("ix_core_outfitting_ship_modules_station_id"),
+        "outfitting_ship_modules",
+        ["station_id"],
+        unique=False,
+        schema="core",
+    )
     op.create_table(
         "shipyard_ships",
         sa.Column("station_id", sa.BigInteger(), nullable=False),
@@ -162,6 +175,9 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         schema="core",
+    )
+    op.create_index(
+        op.f("ix_core_shipyard_ships_station_id"), "shipyard_ships", ["station_id"], unique=False, schema="core"
     )
     op.create_table(
         "systems",
@@ -199,6 +215,13 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
+        schema="core",
+    )
+    op.create_index(
+        op.f("ix_core_systems_controlling_faction_id"),
+        "systems",
+        ["controlling_faction_id"],
+        unique=False,
         schema="core",
     )
     op.create_table(
@@ -254,6 +277,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("system_id", "name", "type", "sub_type", "body_id", "main_star", name="_bodies_uc"),
         schema="core",
     )
+    op.create_index(op.f("ix_core_bodies_system_id"), "bodies", ["system_id"], unique=False, schema="core")
     op.create_table(
         "faction_presences",
         sa.Column("system_id", sa.Integer(), nullable=False),
@@ -278,6 +302,12 @@ def upgrade() -> None:
         sa.UniqueConstraint("system_id", "faction_id", name="_system_faction_presence_uc"),
         schema="core",
     )
+    op.create_index(
+        op.f("ix_core_faction_presences_faction_id"), "faction_presences", ["faction_id"], unique=False, schema="core"
+    )
+    op.create_index(
+        op.f("ix_core_faction_presences_system_id"), "faction_presences", ["system_id"], unique=False, schema="core"
+    )
     op.create_table(
         "thargoid_wars",
         sa.Column("system_id", sa.BigInteger(), nullable=False),
@@ -295,6 +325,9 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         schema="core",
+    )
+    op.create_index(
+        op.f("ix_core_thargoid_wars_system_id"), "thargoid_wars", ["system_id"], unique=False, schema="core"
     )
     op.create_table(
         "rings",
@@ -314,6 +347,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("body_id", "name", name="_ring_on_body_uc"),
         schema="core",
     )
+    op.create_index(op.f("ix_core_rings_body_id"), "rings", ["body_id"], unique=False, schema="core")
     op.create_table(
         "signals",
         sa.Column("body_id", sa.Integer(), nullable=False),
@@ -329,6 +363,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("body_id", "signal_type", name="_signal_on_body_uc"),
         schema="core",
     )
+    op.create_index(op.f("ix_core_signals_body_id"), "signals", ["body_id"], unique=False, schema="core")
     op.create_table(
         "hotspots",
         sa.Column("ring_id", sa.Integer(), nullable=False),
@@ -348,6 +383,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("ring_id", "commodity_sym", name="_ring_and_commodity_uc"),
         schema="core",
     )
+    op.create_index(op.f("ix_core_hotspots_ring_id"), "hotspots", ["ring_id"], unique=False, schema="core")
     # ### end Alembic commands ###
 
 

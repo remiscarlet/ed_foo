@@ -12,7 +12,7 @@ create or replace function api.get_hotspots_in_system_by_commodities(
     count integer
 )
 as $$
-BEGIN
+begin
     return query
     select
         h.body_name,
@@ -25,5 +25,5 @@ BEGIN
 	    on h.commodity = c.symbol
 	 where h.system_name = p_system_name
        and c.symbol=any(commodities);
-END;
+end;
 $$ language plpgsql;
