@@ -79,8 +79,6 @@ def upsert_all[T: BaseModel](
         )
     )
 
-    # logger.trace(str(stmt))
-
     results = session.scalars(stmt.returning(model), execution_options={"populate_existing": True})
     session.commit()
 
@@ -213,9 +211,6 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List
     )
 
     for station_obj in station_objects:
-        # spansh_station = stations_by_name.get(station_obj.to_cache_key())
-        # if spansh_station is None:
-        #     raise Exception(f"Missing station: {station_obj.name} - {station_obj.to_cache_key_tuple()}")
         partitioner.cache_spansh_entity_id_by_key(station_obj.to_cache_key(), station_obj.id)
 
     # --- Signals ---
@@ -254,7 +249,6 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
     # --- Market ---
 
-    # commodities: Dict[int, Dict[str, Any]] = {}
     commodities: List[Dict[str, Any]] = []
 
     now = datetime.now(timezone.utc)
@@ -272,7 +266,6 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
         station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(owner_id))
 
         for commodity in station.market.commodities or []:
-            # commodities[commodity.to_cache_key()] = commodity.to_sqlalchemy_dict(station_id, commodity.symbol)
             commodities.append(commodity.to_sqlalchemy_dict(station_id, commodity.symbol))
 
     for system in input_systems:
@@ -287,7 +280,6 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
     upsert_all(
         partitioner.session,
         MarketCommoditiesDB,
-        # list(commodities.values()),
         commodities,
         ["station_id", "commodity_sym"],
         ["id"],

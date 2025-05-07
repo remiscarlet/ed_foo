@@ -44,6 +44,7 @@ dependencies = [
     "ijson (>=3.3.0,<4.0.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
     "types-aiofiles (>=24.1.0.20250326,<25.0.0.0)",
+    "sqlfluff (>=3.4.0,<4.0.0)",
 ]
 
 [build-system]
@@ -96,3 +97,8 @@ strict = true
 namespace_packages = true
 mypy_path = "typings"
 exclude = "(archive|data|gen)/"
+
+[tool.sqlfluff]
+dialect = "postgres"
+sql_file_exts = [".sql"]
+max_line_length = 100

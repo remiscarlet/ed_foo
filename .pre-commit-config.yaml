@@ -27,6 +27,18 @@ repos:
         language: system
         entry: poetry run mypy
 
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.4.0
+    hooks:
+      - id: sqlfluff-lint
+        name: SQLFluff Lint
+        args: ["--dialect", "postgres"]
+        files: \.sql$
+      - id: sqlfluff-fix
+        name: SQLFluff Auto-Fix
+        args: ["--dialect", "postgres"]
+        files: \.sql$
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:

@@ -154,9 +154,12 @@ AgronomicTreatment:
 
 Tritium:
   category: Chemicals
-  is_mineable: false
+  is_mineable: true
   id64: 128961249
   name: Tritium
   avg_price: 41684
   rare_goods: false
   corrosive: false
+  ring_types: [Icy]
+  mining_type: Laser
+  has_hotspots: true

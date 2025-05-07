@@ -26,3 +26,6 @@ METADATA_SCHEMAS_DIR = METADATA_DIR / "schemas"
 ENUMS_SCHEMA = METADATA_SCHEMAS_DIR / "enums.schema.json"
 COMMODITIES_SCHEMA = METADATA_SCHEMAS_DIR / "commodities.schema.json"
 COMMODITIES_YAML_FMT = "commodities.*.yaml"
+
+# Others
+SQL_DIR = REL_ROOT_PATH / "src" / "adapters" / "persistence" / "postgresql" / "sql"

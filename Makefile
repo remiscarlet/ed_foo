@@ -31,12 +31,14 @@ lint:
 	poetry run black --check src/
 	poetry run isort --check-only src/
 	poetry run flake8 src/ -v
+	poetry run sqlfluff lint --dialect postgres .
 
 lint-fix:
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black src/
 	poetry run isort src/
+	poetry run sqlfluff fix --dialect postgres .
 
 type:
 	poetry run mypy src/
@@ -50,6 +52,7 @@ lint-fix-check:
 	poetry run isort src/
 	poetry run flake8 src/ -v
 	poetry run mypy src/
+	poetry run sqlfluff fix --dialect postgres .
 
 ## Docker (Dev Only)
 
@@ -73,6 +76,9 @@ down-db:
 	docker compose -f tools/docker/docker-compose.yaml stop postgres
 
 ## Alembic
+
+alembic-downgrade-one:
+	poetry run alembic downgrade -1
 
 alembic-upgrade:
 	poetry run alembic upgrade head
@@ -104,4 +110,4 @@ models: gen-eddn-models
 
 install-eddn-models: download-eddn-models gen-eddn-models
 
-# make nuke-db; make up-db; sleep 1; rm -rf src/alembic/versions/*; make alembic-revision; make alembic-upgrade;
+# make nuke-db; make up-db; sleep 1; make alembic-upgrade; make alembic-revision; make alembic-upgrade;
