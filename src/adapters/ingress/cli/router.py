@@ -2,12 +2,18 @@ import asyncio
 import logging
 from functools import wraps
 from pprint import pformat
-from typing import Annotated, Any, Callable, Coroutine
+from typing import Annotated, Any, Callable, Coroutine, List
 
 import typer
+from tabulate import tabulate
 
-from src.adapters.persistence.postgresql.adapter import SystemsAdapter
+from src.adapters.persistence.postgresql.adapter import (
+    ApiCommandAdapter,
+    SystemsAdapter,
+)
+from src.adapters.persistence.postgresql.types import HotspotResult
 from src.common.logging import configure_logger
+from src.common.utils import get_time_since
 from src.ingestion.spansh.pipeline import SpanshDataPipeline
 
 
@@ -98,9 +104,86 @@ def get_world(world_name: str) -> None:
     typer.echo(pformat(system))
 
 
+# API CLI
+api_cli = typer.Typer()
+
+api_adapter = ApiCommandAdapter()
+
+
+def print_hotspot_results(system_name: str, hotspots: List[HotspotResult]) -> None:
+    typer.echo("")
+    typer.echo("====== SYSTEM ======")
+    typer.echo(f"Name: {system_name}")
+    typer.echo("")
+    if not hotspots:
+        typer.echo("!! Found NO hotspots in this system!")
+
+    headers = ["Ring", "Ring Type", "Commodity", "Count"]
+    table = []
+    for hotspot in hotspots:
+        table.append(
+            [
+                hotspot.ring_name,
+                hotspot.ring_type,
+                hotspot.commodity,
+                hotspot.count,
+            ]
+        )
+    typer.echo(tabulate(table, headers))
+    typer.echo("")
+
+
+@api_cli.command()
+def get_hotspots_in_system(system_name: str) -> None:
+    hotspots = api_adapter.get_hotspots_in_system(system_name)
+    print_hotspot_results(system_name, hotspots)
+
+
+@api_cli.command()
+def get_hotspots_in_system_by_commodities(system_name: str, commodities_filter: List[str]) -> None:
+    hotspots = api_adapter.get_hotspots_in_system_by_commodities(system_name, commodities_filter)
+    print_hotspot_results(system_name, hotspots)
+
+
+@api_cli.command()
+def get_top_commodities_in_system(
+    system_name: str, comms_per_station: int = 5, min_supplydemand: int = 1, is_selling: bool = True
+) -> None:
+    commodities = api_adapter.get_top_commodities_in_system(
+        system_name, comms_per_station, min_supplydemand, is_selling
+    )
+
+    typer.echo("")
+    typer.echo("====== SYSTEM ======")
+    typer.echo(f"Name: {system_name}")
+    typer.echo("")
+    if not commodities:
+        typer.echo("!! Found NO stations with known markets!")
+
+    headers = ["Station Name", "Distance", "Commodity", "Sell Price", "Demand", "Buy Price", "Supply", "Updated Last"]
+    table = []
+    for commodity in commodities:
+        time_since_update = get_time_since(commodity.updated_at) if commodity.updated_at is not None else "Unknown"
+        table.append(
+            [
+                commodity.station_name,
+                f"{commodity.distance_to_arrival:.2f} LY",
+                commodity.commodity,
+                f"{commodity.sell_price} CR",
+                commodity.demand,
+                f"{commodity.buy_price} CR",
+                commodity.supply,
+                time_since_update,
+            ]
+        )
+    typer.echo(tabulate(table, headers))
+    typer.echo("")
+
+
 # Main CLI
 cli = typer.Typer()
 
 cli.add_typer(ingestion_cli, name="ingestion")
 cli.add_typer(debug_cli, name="debug")
 cli.add_typer(system_cli, name="system")
+cli.add_typer(api_cli, name="api")

@@ -5,6 +5,7 @@ create or replace function api.get_hotspots_in_system_by_commodities(
     p_system_name text,
     commodities text []
 ) returns table (
+    system_name text,
     body_name text,
     ring_name text,
     ring_type text,
@@ -15,6 +16,7 @@ as $$
 begin
     return query
     select
+        h.system_name,
         h.body_name,
         h.ring_name,
         h.ring_type,

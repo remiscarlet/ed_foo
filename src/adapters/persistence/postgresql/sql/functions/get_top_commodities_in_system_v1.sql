@@ -1,5 +1,5 @@
-drop function if exists api.find_top_commodities_in_system;
-create or replace function api.find_top_commodities_in_system(
+drop function if exists api.get_top_commodities_in_system;
+create or replace function api.get_top_commodities_in_system(
     p_system_name text,
     p_number_commodities integer,
     p_min_demandsupply integer,
