@@ -25,6 +25,44 @@ make pg-shell
 - We'll eventually expose more like an HTTP API and crons/webhooks
 
 ```
+$ poetry run cli api get-mining-expandable 'Col 285 Sector OJ-M b22-6'
+
+====== DETAILS ======
+Target Unoccupied System: Col 285 Sector OJ-M b22-6
+
+====== MINING ACQUISITION ROUTES ======
+Mine                   In                                   Sell In                    At                For    Demand
+---------------------  -----------------------------------  -------------------------  -------------  ------  --------
+LowTemperatureDiamond  Col 285 Sector UE-G c11-27 5 B Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  305239        60
+LowTemperatureDiamond  Col 285 Sector UE-G c11-27 7 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  305239        60
+Tritium                Col 285 Sector UE-G c11-27 7 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat   61865       497
+LowTemperatureDiamond  Col 285 Sector UE-G c11-27 8 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  305239        60
+Tritium                Col 285 Sector UE-G c11-27 8 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat   61865       497
+Platinum               Col 285 Sector UE-G c11-27 6 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  183325        90
+```
+
+```
+$ poetry run cli api get-acquirable-systems 'Col 285 Sector UE-G c11-27'
+
+====== CURRENT SYSTEM (ACQUIRING) ======
+Name: Col 285 Sector UE-G c11-27
+
+====== ACQUIRABLE SYSTEMS (UNOCCUPIED) ======
+System Name                 Population    Primary Economy    Power Conflict Progress
+--------------------------  ------------  -----------------  ---------------------------------------------------------------------------
+Col 285 Sector MD-O b21-0   13,049,935    High Tech          Nakato Kaine: 0.0
+Col 285 Sector QJ-M b22-0   53,241        Military           Nakato Kaine: 0.000517
+Col 285 Sector UP-K b23-0   13,000        Colony             Nakato Kaine: 0.0
+HIP 71629                   1,244,291     Extraction         Nakato Kaine: 0.0
+HIP 67572                   15,000        Extraction         Nakato Kaine: 0.0
+HR 5252                     18,444,892    Extraction         Nakato Kaine: 0.000175
+Col 285 Sector VE-G c11-6   6,000         Industrial         Nakato Kaine: 0.0044
+HIP 67783                   4,500         Industrial         Nakato Kaine: 0.0
+Col 285 Sector QJ-M b22-1   10,000        Military           Nakato Kaine: 0.004825
+...etc
+```
+
+```
 $ poetry run cli api get-hotspots-in-system-by-commodities 'San Xiang' Monazite Platinum
 
 ====== SYSTEM ======
