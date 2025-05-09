@@ -6,6 +6,7 @@ from src.adapters.persistence.postgresql import SessionLocal
 from src.adapters.persistence.postgresql.db import SystemsDB
 from src.adapters.persistence.postgresql.types import (
     HotspotResult,
+    MiningAcquisitionResult,
     SystemResult,
     TopCommodityResult,
 )
@@ -65,6 +66,14 @@ class ApiCommandAdapter(ApiCommandPort):
 
         timer.end()
         return rtn
+
+    def get_mining_expandable_systems_in_range(self, system_name: str) -> list[MiningAcquisitionResult]:
+        stmt = text("SELECT * FROM api.get_mining_expandable_systems_in_range(:system_name)")
+
+        result = self.session.execute(stmt, {"system_name": system_name})
+
+        rows: Sequence[RowMapping] = result.mappings().all()
+        return [MiningAcquisitionResult(**row) for row in rows]
 
     def get_systems_with_power(self, power_name: str, power_states: list[str] | None = None) -> list[SystemResult]:
         params: dict[str, str | list[str]] = {"power_name": power_name}

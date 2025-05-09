@@ -58,10 +58,13 @@ def upgrade() -> None:
         op.execute(f.read())
     with open(functions_sql_dir / "api_get_top_commodities_in_system_v1.sql") as f:
         op.execute(f.read())
+    with open(functions_sql_dir / "api_get_mining_expandable_systems_in_range_v1.sql") as f:
+        op.execute(f.read())
 
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.execute("drop function if exists api.get_mining_expandable_systems_in_range")
     op.execute("drop function if exists api.get_acquirable_systems_from_origin")
     op.execute("drop function if exists api.get_expandable_systems_in_range")
     op.execute("drop function if exists api.get_hotspots_in_system")

@@ -138,8 +138,24 @@ def run_get_hotspots(args: Namespace) -> None:
     timer.end()
 
 
+def run_get_mining_expandable_systems_in_range(args: Namespace) -> None:
+    timer = Timer("Get Mining Expandable Systems In Range")
+    routes = ApiCommandAdapter().get_mining_expandable_systems_in_range(args.system_name)
+
+    logger.info("")
+    logger.info("====== DETAILS ======")
+    logger.info(f"Target Unoccupied System: {args.system_name}\n")
+
+    logger.info("====== MINING ACQUISITION ROUTES ======")
+    headers = ["Mine", "In", "Sell In", "At", "For", "Demand"]
+    table = [[r.commodity, r.ring_name, r.unoccupied_system, r.station_name, r.sell_price, r.demand] for r in routes]
+    logger.info(tabulate(table, headers))
+
+    timer.end()
+
+
 def run_get_systems_with_power(args: Namespace) -> None:
-    timer = Timer("Get Expandable Systems In Range")
+    timer = Timer("Get Systems With Power")
     systems = ApiCommandAdapter().get_systems_with_power(args.power_name, args.power_states)
 
     logger.info("")
@@ -241,6 +257,11 @@ def configure_api_parser(subparsers: Any) -> None:
     api_hotspots_by_comm.add_argument("commodities_filter", nargs="+")
     api_hotspots_by_comm.add_argument("-v", "--verbose", action="count", default=0)
     api_hotspots_by_comm.set_defaults(func=run_get_hotspots_by_commodities)
+
+    api_mining_expansion = api_sub.add_parser("get-mining-expandable")
+    api_mining_expansion.add_argument("system_name")
+    api_mining_expansion.add_argument("-v", "--verbose", action="count", default=0)
+    api_mining_expansion.set_defaults(func=run_get_mining_expandable_systems_in_range)
 
     api_hotspots = api_sub.add_parser("get-systems-with-power")
     api_hotspots.add_argument("power_name")

@@ -1,4 +1,3 @@
-drop function if exists api.get_top_commodities_in_system;
 create or replace function api.get_top_commodities_in_system(
     p_system_name text,
     p_number_commodities integer,
@@ -19,14 +18,33 @@ returns table (
     rank bigint
 ) as $$
 declare
-    demandsupply_column text := case when p_is_buying then 'supply' else 'demand' end;
-    price_column text := case when p_is_buying then 'buy_price' else 'sell_price' end;
+    func_name text := case
+        when p_is_buying then 'derived.get_top_buy_commodities_in_system'
+        else 'derived.get_top_sell_commodities_in_system'
+    end;
     sql text;
 begin
-    if p_is_buying then
-        return query select * from derived.get_top_buy_commodities_in_system(p_system_name, p_number_commodities, p_min_supplydemand);
-    else
-        return query select * from derived.get_top_sell_commodities_in_system(p_system_name, p_number_commodities, p_min_supplydemand);
-    end if;
+    sql := format($f$
+        select
+            r.system_name,
+            r.station_name,
+            r.type as station_type,
+            r.distance_to_arrival,
+            r.commodity_sym as commodity,
+            r.sell_price,
+            r.demand,
+            r.buy_price,
+            r.supply,
+            r.updated_at,
+            r.rank
+        from %s(%L, %s, %s) r
+    $f$,
+        func_name,
+        p_system_name,
+        p_number_commodities,
+        p_min_supplydemand
+    );
+
+    return query execute sql;
 end;
 $$ language plpgsql;

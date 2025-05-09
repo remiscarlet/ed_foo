@@ -4,8 +4,8 @@ from typing import Any
 from pydantic import BaseModel
 
 
-# From: sql/functions/get_hotspots_in_system_v1.sql
-# From: sql/functions/get_hotspots_in_system_by_commodities_v1.sql
+# From: sql/functions/api_get_hotspots_in_system_v1.sql
+# From: sql/functions/api_get_hotspots_in_system_by_commodities_v1.sql
 class HotspotResult(BaseModel):
     system_name: str
     body_name: str
@@ -15,7 +15,7 @@ class HotspotResult(BaseModel):
     count: int
 
 
-# From: sql/functions/get_top_commodities_in_system_v1.sql
+# From: sql/functions/api_get_top_commodities_in_system_v1.sql
 class TopCommodityResult(BaseModel):
     system_name: str
     station_name: str
@@ -30,6 +30,9 @@ class TopCommodityResult(BaseModel):
     rank: int
 
 
+# From: sql/functions/api_get_acquirable_systems_from_origin_v1.sql
+# From: sql/functions/api_get_expandable_systems_in_range_v1.sql
+# From: sql/functions/api_get_systems_with_power_v1.sql
 class SystemResult(BaseModel):
     name: str
     x: float
@@ -63,3 +66,14 @@ class SystemResult(BaseModel):
             power_strs.append(f"{power.get('power')}: {power.get('progress')}")
 
         return ", ".join(power_strs)
+
+
+# From: sql/functions/api_get_mining_expandable_systems_in_range.sql
+class MiningAcquisitionResult(BaseModel):
+    expanding_system: str
+    ring_name: str
+    commodity: str
+    unoccupied_system: str
+    station_name: str
+    sell_price: int
+    demand: int

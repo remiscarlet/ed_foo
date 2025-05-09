@@ -34,6 +34,7 @@ create function api.get_systems_with_power(
 )
 as $$
 begin
+    -- Ugly/un-DRY but func signatures changing based on input makes dynamic query execution ugly too.
     if p_valid_power_states is null or array_length(p_valid_power_states, 1) = 0 then
         return query select
             s.id, s.id64, s.id_spansh, s.id_edsm, s.name,
