@@ -1,5 +1,5 @@
-drop function if exists api.get_acquirable_systems_from_origin;
-create or replace function api.get_acquirable_systems_from_origin(
+drop function if exists derived.get_acquirable_systems_from_origin;
+create or replace function derived.get_acquirable_systems_from_origin(
     p_system_name text
 )
 returns table (
@@ -33,8 +33,11 @@ returns table (
     power_state_updated_at timestamp,
     powers_updated_at timestamp
 ) as $$
-begin
-    return query
+    with system_data as (
+        select s.coords, s.power_state
+        from core.systems s
+        where s.name = p_system_name
+    )
     select
         s.id, s.id64, s.id_spansh, s.id_edsm, s.name,
         s.controlling_faction_id, s.x, s.y, s.z, s.coords,
@@ -45,6 +48,10 @@ begin
         s.power_state_reinforcement, s.power_state_undermining,
         s.powers, s.thargoid_war, s.controlling_power_updated_at,
         s.power_state_updated_at, s.powers_updated_at
-    from derived.get_acquirable_systems_from_origin(p_system_name) s;
-end;
-$$ language plpgsql;
+    from derived.unoccupied_systems_view s
+    where st_3ddwithin(
+        s.coords,
+        (select coords from system_data),
+        case when (select power_state from system_data) = 'Stronghold' then 30 else 20 end
+    );
+$$ language sql;

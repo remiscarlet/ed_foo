@@ -26,7 +26,7 @@ run-pipeline: download-spansh import-spansh-v
 ## Code Quality
 
 lint:
-	poetry run sqlfluff lint --dialect postgres .
+	poetry run sqlfluff lint --dialect postgres . --verbose
 	poetry run yamllint **/*.yaml
 	poetry run lint_metadata
 	poetry run black --check src/
@@ -34,7 +34,7 @@ lint:
 	poetry run flake8 src/ -v
 
 lint-fix:
-	poetry run sqlfluff fix --dialect postgres .
+	poetry run sqlfluff fix --dialect postgres . --verbose
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black src/
@@ -46,7 +46,7 @@ type:
 check: lint type
 
 lint-fix-check:
-	poetry run sqlfluff fix --dialect postgres .
+	poetry run sqlfluff fix --dialect postgres . --verbose
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black src/

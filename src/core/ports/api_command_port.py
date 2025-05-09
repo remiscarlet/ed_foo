@@ -16,6 +16,6 @@ class ApiCommandPort(ABC):
 
     @abstractmethod
     def get_top_commodities_in_system(
-        self, system_name: str, comms_per_station: int, min_supplydemand: int, is_selling: bool
+        self, system_name: str, comms_per_station: int, min_supplydemand: int, is_buying: bool
     ) -> list[TopCommodityResult]:
         pass

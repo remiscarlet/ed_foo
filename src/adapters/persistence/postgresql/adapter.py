@@ -80,11 +80,11 @@ class ApiCommandAdapter(ApiCommandPort):
         return [SystemResult(**row) for row in rows]
 
     def get_top_commodities_in_system(
-        self, system_name: str, comms_per_station: int, min_supplydemand: int, is_selling: bool
+        self, system_name: str, comms_per_station: int, min_supplydemand: int, is_buying: bool
     ) -> list[TopCommodityResult]:
         stmt = text(
             """SELECT * FROM api.get_top_commodities_in_system(
-                :system_name, :comms_per_station, :min_supplydemand, :is_selling)"""
+                :system_name, :comms_per_station, :min_supplydemand, :is_buying)"""
         )
 
         result = self.session.execute(
@@ -93,7 +93,7 @@ class ApiCommandAdapter(ApiCommandPort):
                 "system_name": system_name,
                 "comms_per_station": comms_per_station,
                 "min_supplydemand": min_supplydemand,
-                "is_selling": is_selling,
+                "is_buying": is_buying,
             },
         )
 

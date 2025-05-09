@@ -168,7 +168,7 @@ def run_get_top_commodities(args: Namespace) -> None:
     adapter = ApiCommandAdapter()
     timer = Timer("Get Top Commodities In System")
     commodities = adapter.get_top_commodities_in_system(
-        args.system_name, args.comms_per_station, args.min_supplydemand, args.is_selling
+        args.system_name, args.comms_per_station, args.min_supplydemand, args.is_buying
     )
 
     logger.info("")
@@ -252,7 +252,7 @@ def configure_api_parser(subparsers: Any) -> None:
     api_top_commodities.add_argument("system_name")
     api_top_commodities.add_argument("--comms-per-station", type=int, default=5)
     api_top_commodities.add_argument("--min-supplydemand", type=int, default=1)
-    api_top_commodities.add_argument("--is-selling", action="store_true")
+    api_top_commodities.add_argument("--is-buying", action="store_true", default=False)
     api_top_commodities.add_argument("-v", "--verbose", action="count", default=0)
     api_top_commodities.set_defaults(func=run_get_top_commodities)
 

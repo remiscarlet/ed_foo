@@ -32,11 +32,23 @@ def upgrade() -> None:
         op.execute(f.read())
     with open(views_sql_dir / "derived_unoccupied_systems_view_v1.sql") as f:
         op.execute(f.read())
+    with open(functions_sql_dir / "derived_calculate_commodity_score_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "derived_get_top_buy_commodities_in_system_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "derived_get_top_sell_commodities_in_system_v1.sql") as f:
+        op.execute(f.read())
     with open(functions_sql_dir / "derived_get_systems_with_power_and_state_v1.sql") as f:
         op.execute(f.read())
     with open(functions_sql_dir / "derived_get_systems_with_power_v1.sql") as f:
         op.execute(f.read())
+    with open(functions_sql_dir / "derived_get_acquirable_systems_from_origin_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "derived_get_expandable_systems_in_range_v1.sql") as f:
+        op.execute(f.read())
     with open(functions_sql_dir / "api_get_acquirable_systems_from_origin_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "api_get_expandable_systems_in_range_v1.sql") as f:
         op.execute(f.read())
     with open(functions_sql_dir / "api_get_hotspots_in_system_by_commodities_v1.sql") as f:
         op.execute(f.read())
@@ -46,13 +58,12 @@ def upgrade() -> None:
         op.execute(f.read())
     with open(functions_sql_dir / "api_get_top_commodities_in_system_v1.sql") as f:
         op.execute(f.read())
-    with open(functions_sql_dir / "api_get_expandable_systems_in_range_v1.sql") as f:
-        op.execute(f.read())
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     op.execute("drop function if exists api.get_acquirable_systems_from_origin")
+    op.execute("drop function if exists api.get_expandable_systems_in_range")
     op.execute("drop function if exists api.get_hotspots_in_system")
     op.execute("drop function if exists api.get_hotspots_in_system_by_commodities")
     op.execute("drop function if exists api.get_top_commodities_in_system")
@@ -60,6 +71,11 @@ def downgrade() -> None:
     op.execute("drop function if exists api.get_expandable_systems_in_range")
     op.execute("drop function if exists derived.get_systems_with_power_and_state")
     op.execute("drop function if exists derived.get_systems_with_power")
+    op.execute("drop function if exists derived.get_acquirable_systems_from_origin")
+    op.execute("drop function if exists derived.get_expandable_systems_in_range")
+    op.execute("drop function if exists derived.get_top_buy_commodities_in_system")
+    op.execute("drop function if exists derived.get_top_sell_commodities_in_system")
+    op.execute("drop function if exists derived.calculate_commodity_score")
     op.execute("drop view if exists derived.hotspot_ring_view")
     op.execute("drop view if exists derived.station_commodities_view")
     op.execute("drop view if exists derived.resolved_stations_view")

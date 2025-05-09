@@ -1,5 +1,7 @@
-drop function if exists api.get_acquirable_systems_from_origin;
-create or replace function api.get_acquirable_systems_from_origin(
+-- gets fortified and stronghold systems in range of `p_system_name`
+-- that can expand into current unoccupied system
+drop function if exists derived.get_expandable_systems_in_range;
+create or replace function derived.get_expandable_systems_in_range(
     p_system_name text
 )
 returns table (
@@ -33,8 +35,6 @@ returns table (
     power_state_updated_at timestamp,
     powers_updated_at timestamp
 ) as $$
-begin
-    return query
     select
         s.id, s.id64, s.id_spansh, s.id_edsm, s.name,
         s.controlling_faction_id, s.x, s.y, s.z, s.coords,
@@ -45,6 +45,13 @@ begin
         s.power_state_reinforcement, s.power_state_undermining,
         s.powers, s.thargoid_war, s.controlling_power_updated_at,
         s.power_state_updated_at, s.powers_updated_at
-    from derived.get_acquirable_systems_from_origin(p_system_name) s;
-end;
-$$ language plpgsql;
+    from derived.get_systems_with_power_and_state(
+        'Nakato Kaine',
+        array['Stronghold', 'Fortified']
+    ) s
+    where st_3ddwithin(
+        s.coords,
+        (select s.coords from core.systems s where s.name = p_system_name),
+        case when s.power_state = 'Stronghold' then 30 else 20 end
+    );
+$$ language sql;

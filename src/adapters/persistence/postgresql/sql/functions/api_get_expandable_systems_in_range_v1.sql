@@ -1,41 +1,41 @@
--- Gets fortified and stronghold systems in range of `p_system_name`
+-- gets fortified and stronghold systems in range of `p_system_name`
 -- that can expand into current unoccupied system
 drop function if exists api.get_expandable_systems_in_range;
 create or replace function api.get_expandable_systems_in_range(
-    p_system_name TEXT
+    p_system_name text
 )
 returns table (
-    id INT,
-    id64 BIGINT,
-    id_spansh BIGINT,
-    id_edsm BIGINT,
-    name TEXT,
-    controlling_faction_id INT,
-    x FLOAT,
-    y FLOAT,
-    z FLOAT,
-    coords GEOMETRY,
-    date TIMESTAMP,
-    allegiance TEXT,
-    population BIGINT,
-    primary_economy TEXT,
-    secondary_economy TEXT,
-    security TEXT,
-    government TEXT,
-    body_count INT,
-    controlling_power TEXT,
-    power_conflict_progress JSONB,
-    power_state TEXT,
-    power_state_control_progress FLOAT,
-    power_state_reinforcement FLOAT,
-    power_state_undermining FLOAT,
-    powers TEXT [],
-    thargoid_war JSONB,
-    controlling_power_updated_at TIMESTAMP,
-    power_state_updated_at TIMESTAMP,
-    powers_updated_at TIMESTAMP
+    id int,
+    id64 bigint,
+    id_spansh bigint,
+    id_edsm bigint,
+    name text,
+    controlling_faction_id int,
+    x float,
+    y float,
+    z float,
+    coords geometry,
+    date timestamp,
+    allegiance text,
+    population bigint,
+    primary_economy text,
+    secondary_economy text,
+    security text,
+    government text,
+    body_count int,
+    controlling_power text,
+    power_conflict_progress jsonb,
+    power_state text,
+    power_state_control_progress float,
+    power_state_reinforcement float,
+    power_state_undermining float,
+    powers text [],
+    thargoid_war jsonb,
+    controlling_power_updated_at timestamp,
+    power_state_updated_at timestamp,
+    powers_updated_at timestamp
 ) as $$
-BEGIN
+begin
     return query
     select
         s.id, s.id64, s.id_spansh, s.id_edsm, s.name,
@@ -47,14 +47,6 @@ BEGIN
         s.power_state_reinforcement, s.power_state_undermining,
         s.powers, s.thargoid_war, s.controlling_power_updated_at,
         s.power_state_updated_at, s.powers_updated_at
-    from derived.get_systems_with_power_and_state(
-        'Nakato Kaine',
-        array['Stronghold', 'Fortified']
-    ) s
-    where ST_3DDWithin(
-        s.coords,
-        (select s.coords from core.systems s where s.name = p_system_name),
-        case when s.power_state = 'Stronghold' then 30 else 20 end
-    );
-END;
+    from derived.get_expandable_systems_in_range(p_system_name) s;
+end;
 $$ language plpgsql;
