@@ -34,9 +34,6 @@ returns table (
     power_state_updated_at timestamp,
     powers_updated_at timestamp
 ) as $$
-declare
-    sql text;
-begin
     select
         s.id, s.id64, s.id_spansh, s.id_edsm, s.name,
         s.controlling_faction_id, s.x, s.y, s.z, s.coords, s.date,
@@ -50,5 +47,4 @@ begin
     from core.systems s
     where s.controlling_power = p_power_name
     and s.power_state = any(p_power_states)
-end;
 $$ language sql;

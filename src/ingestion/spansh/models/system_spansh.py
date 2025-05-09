@@ -176,6 +176,7 @@ class SystemSpansh(BaseSpanshModel):
             "x": self.coords.x,
             "y": self.coords.y,
             "z": self.coords.z,
+            "coords": self.coords.to_sqlalchemy_dict(),
             "date": self.date,
             "government": self.government,
             "id64": self.id64,

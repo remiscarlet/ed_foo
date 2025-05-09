@@ -16,6 +16,11 @@ make setup
 make run-pipeline
 ```
 
+### Adhoc SQL Queries
+```
+make pg-shell
+```
+
 ### CLI Usage
 - We'll eventually expose more like an HTTP API and crons/webhooks
 

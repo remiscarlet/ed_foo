@@ -22,10 +22,10 @@ begin
         h.ring_type,
         h.commodity,
         h.count
-	  from derived.hotspot_ring_view h
-	  join core.commodities c
-	    on h.commodity = c.symbol
-	 where h.system_name = p_system_name
+      from derived.hotspot_ring_view h
+      join core.commodities c
+        on h.commodity = c.symbol
+     where h.system_name = p_system_name
        and c.symbol=any(commodities);
 end;
 $$ language plpgsql;

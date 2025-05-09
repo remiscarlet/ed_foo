@@ -20,6 +20,6 @@ begin
         h.commodity,
         h.count
       from derived.hotspot_ring_view h
-	 where h.system_name = p_system_name;
+     where h.system_name = p_system_name;
 end;
 $$ language plpgsql;

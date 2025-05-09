@@ -190,7 +190,11 @@ def upgrade() -> None:
         sa.Column("x", sa.Float(), nullable=False),
         sa.Column("y", sa.Float(), nullable=False),
         sa.Column("z", sa.Float(), nullable=False),
-        sa.Column("coords", Geometry(geometry_type="POINT", srid=0), nullable=False),
+        sa.Column(
+            "coords",
+            Geometry(geometry_type="POINTZ", srid=0, from_text="ST_GeomFromEWKT", name="geometry"),
+            nullable=False,
+        ),
         sa.Column("date", sa.DateTime(), nullable=True),
         sa.Column("allegiance", sa.Text(), nullable=True),
         sa.Column("population", sa.BigInteger(), nullable=True),

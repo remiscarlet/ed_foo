@@ -19,6 +19,14 @@ class ApiCommandAdapter(ApiCommandPort):
     def __init__(self) -> None:
         self.session = SessionLocal()
 
+    def get_acquirable_systems_from_origin(self, system_name: str) -> List[SystemResult]:
+        stmt = text("SELECT * FROM api.get_acquirable_systems_from_origin(:system_name)")
+
+        result = self.session.execute(stmt, {"system_name": system_name})
+
+        rows: Sequence[RowMapping] = result.mappings().all()
+        return [SystemResult(**row) for row in rows]
+
     def get_expandable_systems_in_range(self, system_name: str) -> List[SystemResult]:
         stmt = text("SELECT * FROM api.get_expandable_systems_in_range(:system_name)")
 

@@ -26,13 +26,17 @@ def upgrade() -> None:
     """Upgrade schema."""
     with open(views_sql_dir / "derived_resolved_stations_view_v1.sql") as f:
         op.execute(f.read())
-    with open(views_sql_dir / "derived_station_commodities_v1.sql") as f:
+    with open(views_sql_dir / "derived_station_commodities_view_v1.sql") as f:
         op.execute(f.read())
     with open(views_sql_dir / "derived_hotspot_ring_view_v1.sql") as f:
+        op.execute(f.read())
+    with open(views_sql_dir / "derived_unoccupied_systems_view_v1.sql") as f:
         op.execute(f.read())
     with open(functions_sql_dir / "derived_get_systems_with_power_and_state_v1.sql") as f:
         op.execute(f.read())
     with open(functions_sql_dir / "derived_get_systems_with_power_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "api_get_acquirable_systems_from_origin_v1.sql") as f:
         op.execute(f.read())
     with open(functions_sql_dir / "api_get_hotspots_in_system_by_commodities_v1.sql") as f:
         op.execute(f.read())
@@ -48,6 +52,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.execute("drop function if exists api.get_acquirable_systems_from_origin")
     op.execute("drop function if exists api.get_hotspots_in_system")
     op.execute("drop function if exists api.get_hotspots_in_system_by_commodities")
     op.execute("drop function if exists api.get_top_commodities_in_system")
@@ -57,4 +62,5 @@ def downgrade() -> None:
     op.execute("drop function if exists derived.get_systems_with_power")
     op.execute("drop view if exists derived.hotspot_ring_view")
     op.execute("drop view if exists derived.station_commodities_view")
-    op.execute("drop view if exists derived.resolved_stations")
+    op.execute("drop view if exists derived.resolved_stations_view")
+    op.execute("drop view if exists derived.derived_unoccupied_systems_view")

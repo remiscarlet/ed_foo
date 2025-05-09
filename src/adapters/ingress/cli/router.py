@@ -10,7 +10,7 @@ from src.adapters.persistence.postgresql.adapter import (
     ApiCommandAdapter,
     SystemsAdapter,
 )
-from src.adapters.persistence.postgresql.types import HotspotResult
+from src.adapters.persistence.postgresql.types import HotspotResult, SystemResult
 from src.common.logging import configure_logger, get_logger
 from src.common.timer import Timer
 from src.common.utils import get_time_since
@@ -40,6 +40,19 @@ def print_hotspot_results(system_name: str, hotspots: list[HotspotResult]) -> No
     headers = ["Ring", "Ring Type", "Commodity", "Count"]
     table = [[h.ring_name, h.ring_type, h.commodity, h.count] for h in hotspots]
     logger.info(tabulate(table, headers))
+
+
+def print_system_and_power_states(systems: list[SystemResult]) -> None:
+    headers = ["System Name", "Power State"]
+    table = [
+        [
+            s.name,
+            s.power_state,
+        ]
+        for s in systems
+    ]
+    logger.info(tabulate(table, headers))
+    logger.info("")
 
 
 # Data Ingestion CLI
@@ -74,6 +87,20 @@ def run_get_world(args: Namespace) -> None:
 # API CLI
 
 
+def run_get_acquirable_systems_in_range(args: Namespace) -> None:
+    timer = Timer("Get Acquirable Systems In Range")
+    systems = ApiCommandAdapter().get_acquirable_systems_from_origin(args.system_name)
+
+    logger.info("")
+    logger.info("====== CURRENT SYSTEM (ACQUIRING) ======")
+    logger.info(f"Name: {args.system_name}\n")
+
+    logger.info("====== ACQUIRABLE SYSTEMS (UNOCCUPIED) ======")
+    print_system_and_power_states(systems)
+
+    timer.end()
+
+
 def run_get_expandable_systems_in_range(args: Namespace) -> None:
     timer = Timer("Get Expandable Systems In Range")
     systems = ApiCommandAdapter().get_expandable_systems_in_range(args.system_name)
@@ -83,16 +110,7 @@ def run_get_expandable_systems_in_range(args: Namespace) -> None:
     logger.info(f"Name: {args.system_name}\n")
 
     logger.info("====== SYSTEMS THAT CAN EXPAND INTO CURRENT ======")
-    headers = ["System Name", "Power State"]
-    table = [
-        [
-            s.name,
-            s.power_state,
-        ]
-        for s in systems
-    ]
-    logger.info(tabulate(table, headers))
-    logger.info("")
+    print_system_and_power_states(systems)
 
     timer.end()
 
@@ -122,16 +140,7 @@ def run_get_systems_with_power(args: Namespace) -> None:
         logger.info(f"Systems States: {pformat(args.power_states)}\n")
 
     logger.info(f"====== SYSTEMS INFLUENCED BY {args.power_name} ======")
-    headers = ["System Name", "Power State"]
-    table = [
-        [
-            s.name,
-            s.power_state,
-        ]
-        for s in systems
-    ]
-    logger.info(tabulate(table, headers))
-    logger.info("")
+    print_system_and_power_states(systems)
 
     timer.end()
 
@@ -175,11 +184,11 @@ def configure_ingestion_parser(subparsers: Any) -> None:
     ingestion = subparsers.add_parser("ingestion")
     ingestion_sub = ingestion.add_subparsers(dest="subcommand")
 
-    spansh_dl = ingestion_sub.add_parser("download")
+    spansh_dl = ingestion_sub.add_parser("download-spansh")
     spansh_dl.add_argument("-v", "--verbose", action="count", default=0)
     spansh_dl.set_defaults(func=run_download_spansh)
 
-    spansh_import = ingestion_sub.add_parser("import")
+    spansh_import = ingestion_sub.add_parser("import-spansh")
     spansh_import.add_argument("-v", "--verbose", action="count", default=0)
     spansh_import.add_argument("-s", "--system-start-idx", type=int, default=0)
     spansh_import.add_argument("-S", "--skipping-past-every", type=int, default=1000)
@@ -192,6 +201,11 @@ def configure_ingestion_parser(subparsers: Any) -> None:
 def configure_api_parser(subparsers: Any) -> None:
     api = subparsers.add_parser("api")
     api_sub = api.add_subparsers(dest="subcommand")
+
+    api_acquirable_sys = api_sub.add_parser("get-acquirable-systems")
+    api_acquirable_sys.add_argument("system_name")
+    api_acquirable_sys.add_argument("-v", "--verbose", action="count", default=0)
+    api_acquirable_sys.set_defaults(func=run_get_acquirable_systems_in_range)
 
     api_expandable_sys = api_sub.add_parser("get-expandable-systems")
     api_expandable_sys.add_argument("system_name")

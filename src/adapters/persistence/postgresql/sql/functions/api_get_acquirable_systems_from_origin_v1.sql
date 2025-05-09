@@ -1,6 +1,6 @@
-drop function if exists derived.get_systems_with_power;
-create or replace function derived.get_systems_with_power(
-    p_power_name text
+drop function if exists api.get_acquirable_systems_from_origin;
+create or replace function api.get_acquirable_systems_from_origin(
+    p_system_name text
 )
 returns table (
     id int,
@@ -33,16 +33,31 @@ returns table (
     power_state_updated_at timestamp,
     powers_updated_at timestamp
 ) as $$
+declare
+    v_coords geometry;
+    v_power_state text;
+begin
+    select s.coords, s.power_state
+    from core.systems s
+    where s.name = p_system_name
+    into v_coords, v_power_state;
+
+    return query
     select
         s.id, s.id64, s.id_spansh, s.id_edsm, s.name,
-        s.controlling_faction_id, s.x, s.y, s.z, s.coords, s.date,
-        s.allegiance, s.population, s.primary_economy,
+        s.controlling_faction_id, s.x, s.y, s.z, s.coords,
+        s.date, s.allegiance, s.population, s.primary_economy,
         s.secondary_economy, s.security, s.government,
         s.body_count, s.controlling_power, s.power_conflict_progress,
         s.power_state, s.power_state_control_progress,
         s.power_state_reinforcement, s.power_state_undermining,
         s.powers, s.thargoid_war, s.controlling_power_updated_at,
         s.power_state_updated_at, s.powers_updated_at
-    from core.systems s
-    where s.controlling_power = p_power_name;
-$$ language sql;
+    from derived.unoccupied_systems_view s
+    where st_3ddwithin(
+        s.coords,
+        v_coords,
+        case when v_power_state = 'stronghold' then 30 else 20 end
+    );
+end;
+$$ language plpgsql;
