@@ -135,6 +135,10 @@ To run the linter, fix lint issues, and type check:
 make lint-fix-check
 ```
 
+## DB Schema
+- See https://dbdiagram.io/d/EKAINE-680e5f821ca52373f58ba72d
+![DB Schema](docs/schema.png)
+
 ---
 
 # Design Overview
