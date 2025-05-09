@@ -3,6 +3,8 @@ from typing import Any
 
 from pydantic import BaseModel
 
+# TODO: Should these all be core models?
+
 
 # From: sql/functions/api_get_hotspots_in_system_v1.sql
 # From: sql/functions/api_get_hotspots_in_system_by_commodities_v1.sql

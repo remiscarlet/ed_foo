@@ -135,7 +135,20 @@ To run the linter, fix lint issues, and type check:
 make lint-fix-check
 ```
 
-## DB Schema
+### Interesting Locations (For Now)
+- `src/adapters/ingress/cli/router.py`
+  - CLI entrypoint
+- `src/adapters/persistence/postgres/`
+  - Any and all database-specific things like SQL files, sqlalchemy schemas, etc
+  - Except DB migrations.
+- `src/alembic/`
+  - Stores all DB migrations
+- `src/ingestion/`
+  - Data ingestion logic
+  - Currently only contains Spansh dump import pipeline
+  - Will soon contain EDDN live update listener
+
+### DB Schema
 - See https://dbdiagram.io/d/EKAINE-680e5f821ca52373f58ba72d
 ![DB Schema](docs/schema.png)
 
