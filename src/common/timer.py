@@ -1,7 +1,6 @@
 import inspect
 import time
 from types import TracebackType
-from typing import Optional
 
 from src.common.logging import get_logger
 from src.common.utils import seconds_to_str
@@ -10,7 +9,7 @@ logger = get_logger(__name__)
 
 
 class Timer:
-    def __init__(self, name: Optional[str] = None) -> None:
+    def __init__(self, name: str | None = None) -> None:
         self.__start = time.time()
         if name:
             self.__name = name

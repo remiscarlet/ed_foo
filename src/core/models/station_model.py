@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -9,7 +8,7 @@ class CommodityPrice(BaseModel):
     demand: int
     sell_price: int
     supply: int
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
 
 class Commodity(CommodityPrice):
@@ -20,9 +19,9 @@ class Commodity(CommodityPrice):
 
 
 class Market(BaseModel):
-    commodities: Optional[List[Commodity]] = None
-    prohibited_commodities: Optional[List[str]] = None
-    updated_at: Optional[datetime] = None
+    commodities: list[Commodity] | None = None
+    prohibited_commodities: list[str] | None = None
+    updated_at: datetime | None = None
 
 
 class ShipModule(BaseModel):
@@ -33,12 +32,12 @@ class ShipModule(BaseModel):
     rating: str
     symbol: str
 
-    ship: Optional[str] = None
+    ship: str | None = None
 
 
 class Outfitting(BaseModel):
-    modules: List[ShipModule]
-    updated_at: Optional[datetime] = None
+    modules: list[ShipModule]
+    updated_at: datetime | None = None
 
 
 class Ship(BaseModel):
@@ -48,36 +47,36 @@ class Ship(BaseModel):
 
 
 class Shipyard(BaseModel):
-    ships: List[Ship]
-    updated_at: Optional[datetime] = None
+    ships: list[Ship]
+    updated_at: datetime | None = None
 
 
 class Station(BaseModel):
     name: str
 
-    id64: Optional[int] = None
-    id_spansh: Optional[int] = None
-    id_edsm: Optional[int] = None
-    updated_at: Optional[datetime] = None
+    id64: int | None = None
+    id_spansh: int | None = None
+    id_edsm: int | None = None
+    updated_at: datetime | None = None
 
-    allegiance: Optional[str] = None
-    controlling_faction: Optional[str] = None
-    controlling_faction_state: Optional[str] = None
-    distance_to_arrival: Optional[float] = None
-    economies: Optional[Dict[str, float]] = None
-    government: Optional[str] = None
-    landing_pads: Optional[Dict[str, int]] = None
-    market: Optional[Market] = None
-    outfitting: Optional[Outfitting] = None
-    primary_economy: Optional[str] = None
-    services: Optional[List[str]] = None
-    shipyard: Optional[Shipyard] = None
-    type: Optional[str] = None
+    allegiance: str | None = None
+    controlling_faction: str | None = None
+    controlling_faction_state: str | None = None
+    distance_to_arrival: float | None = None
+    economies: dict[str, float] | None = None
+    government: str | None = None
+    landing_pads: dict[str, int] | None = None
+    market: Market | None = None
+    outfitting: Outfitting | None = None
+    primary_economy: str | None = None
+    services: list[str] | None = None
+    shipyard: Shipyard | None = None
+    type: str | None = None
 
-    carrier_name: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    carrier_name: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
-    spansh_updated_at: Optional[datetime] = None
-    edsm_updated_at: Optional[datetime] = None
-    eddn_updated_at: Optional[datetime] = None
+    spansh_updated_at: datetime | None = None
+    edsm_updated_at: datetime | None = None
+    eddn_updated_at: datetime | None = None

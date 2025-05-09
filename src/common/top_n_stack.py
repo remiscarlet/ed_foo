@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional
+from typing import Callable
 
 
 class TopNStack[T]:
@@ -7,14 +7,14 @@ class TopNStack[T]:
 
         Stack should be sorted high to low in the list (Eg, [10, 5, 1])
         """
-        self.stack: List[T] = []
+        self.stack: list[T] = []
         self.n = n
         self.scoring_fn = scoring_fn
 
     def __repr__(self) -> str:
         return f"TopNStack({len(self.stack)})"
 
-    def to_list(self) -> List[T]:
+    def to_list(self) -> list[T]:
         return self.stack
 
     def insert(self, to_insert: T) -> None:
@@ -36,7 +36,7 @@ class TopNStack[T]:
         if self.size() > self.n:
             self.stack.pop(-1)
 
-    def pop(self) -> Optional[T]:
+    def pop(self) -> T | None:
         if self.is_empty():
             return None
         return self.stack.pop(0)

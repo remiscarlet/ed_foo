@@ -1,6 +1,5 @@
 import math
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -18,8 +17,8 @@ class Coordinates(BaseModel):
 
 
 class Timestamps(BaseModel):
-    controlling_power: Optional[datetime] = None
-    power_state: Optional[datetime] = None
-    powers: Optional[datetime] = None
-    distance_to_arrival: Optional[datetime] = None
-    mean_anomaly: Optional[datetime] = None
+    controlling_power: datetime | None = None
+    power_state: datetime | None = None
+    powers: datetime | None = None
+    distance_to_arrival: datetime | None = None
+    mean_anomaly: datetime | None = None

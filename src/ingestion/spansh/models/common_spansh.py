@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from geoalchemy2 import WKBElement
 from geoalchemy2.shape import from_shape
@@ -22,11 +21,11 @@ class CoordinatesSpansh(BaseSpanshModel):
 
 
 class TimestampsSpansh(BaseSpanshModel):
-    controlling_power: Optional[datetime] = None
-    power_state: Optional[datetime] = None
-    powers: Optional[datetime] = None
-    distance_to_arrival: Optional[datetime] = None
-    mean_anomaly: Optional[datetime] = None
+    controlling_power: datetime | None = None
+    power_state: datetime | None = None
+    powers: datetime | None = None
+    distance_to_arrival: datetime | None = None
+    mean_anomaly: datetime | None = None
 
     _validate_controlling_power = BaseSpanshModel.flexible_datetime_validator("controlling_power")
     _validate_power_state = BaseSpanshModel.flexible_datetime_validator("power_state")

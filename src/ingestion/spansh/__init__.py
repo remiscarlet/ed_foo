@@ -2,7 +2,7 @@ import traceback
 import types
 from datetime import datetime
 from pprint import pformat
-from typing import Any, Dict, Protocol, Union, get_args, get_origin
+from typing import Any, Protocol, Union, get_args, get_origin
 
 import dataclasses_json
 import dataclasses_json.core as _core
@@ -21,8 +21,8 @@ _original_decode = _core._decode_generic
 def _decode_generic(type_: Any, value: Any, infer_missing: bool) -> Any:
     """Custom decoder for dataclasses_json
 
-    dataclasses_json can't handle `Optional[datetime]` because at runtime,
-    the field value is either None or datetime, not `Optional[datetime]`.
+    dataclasses_json can't handle `datetime|None` because at runtime,
+    the field value is either None or datetime, not `datetime|None`.
     As such if the target type was an Optional,unwrap that Optional and
     just use the inner type for the purposes of decoding.
     """
@@ -56,7 +56,7 @@ class HasSchema(Protocol):
     def schema(cls) -> Schema: ...
 
 
-def debug_dataclasses_json_load(schema_type: type[HasSchema], data: Dict[str, Any]) -> None:
+def debug_dataclasses_json_load(schema_type: type[HasSchema], data: dict[str, Any]) -> None:
     schema = schema_type.schema()
     for name, field in schema.fields.items():
         try:

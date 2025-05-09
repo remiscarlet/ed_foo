@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -8,13 +8,13 @@ from src.core.models.station_model import Station
 
 
 class HotSpots(BaseModel):
-    hotspots: Dict[str, int]  # Commodity Name -> number
-    updated_at: Optional[datetime] = None
+    hotspots: dict[str, int]  # Commodity Name -> number
+    updated_at: datetime | None = None
 
 
 class Signals(BaseModel):
-    signals: Dict[str, int]
-    updated_at: Optional[datetime] = None
+    signals: dict[str, int]
+    updated_at: datetime | None = None
 
 
 class Asteroids(BaseModel):
@@ -24,54 +24,54 @@ class Asteroids(BaseModel):
     inner_radius: float
     outer_radius: float
 
-    id64: Optional[int] = None
-    signals: Optional[Signals] = None
+    id64: int | None = None
+    signals: Signals | None = None
 
 
 class Body(BaseModel):
     name: str
 
-    body_id: Optional[int] = None
-    id64: Optional[int] = None
-    stations: Optional[List[Station]] = None
-    absolute_magnitude: Optional[float] = None
-    age: Optional[int] = None
-    arg_of_periapsis: Optional[float] = None
-    ascending_node: Optional[float] = None
-    atmosphere_composition: Optional[Dict[str, Any]] = None
-    atmosphere_type: Optional[str] = None
-    axial_tilt: Optional[float] = None
-    belts: Optional[List[Asteroids]] = None
-    distance_to_arrival: Optional[float] = None
-    earth_masses: Optional[float] = None
-    gravity: Optional[float] = None
-    is_landable: Optional[bool] = None
-    luminosity: Optional[str] = None
-    main_star: Optional[bool] = None
-    materials: Optional[Dict[str, Any]] = None
-    mean_anomaly: Optional[float] = None
-    orbital_eccentricity: Optional[float] = None
-    orbital_inclination: Optional[float] = None
-    orbital_period: Optional[float] = None
-    parents: Optional[List[Dict[str, int]]] = None
-    radius: Optional[float] = None
-    reserve_level: Optional[str] = None
-    rings: Optional[List[Asteroids]] = None
-    rotational_period: Optional[float] = None
-    rotational_period_tidally_locked: Optional[bool] = None
-    semi_major_axis: Optional[float] = None
-    signals: Optional[Signals] = None
-    solar_masses: Optional[float] = None
-    solar_radius: Optional[float] = None
-    solid_composition: Optional[Any] = None
-    spectral_class: Optional[str] = None
-    sub_type: Optional[str] = None
-    surface_pressure: Optional[float] = None
-    surface_temperature: Optional[float] = None
-    terraforming_state: Optional[str] = None
-    timestamps: Optional[Timestamps] = None
-    type: Optional[str] = None
-    volcanism_type: Optional[str] = None
+    body_id: int | None = None
+    id64: int | None = None
+    stations: list[Station] | None = None
+    absolute_magnitude: float | None = None
+    age: int | None = None
+    arg_of_periapsis: float | None = None
+    ascending_node: float | None = None
+    atmosphere_composition: dict[str, Any] | None = None
+    atmosphere_type: str | None = None
+    axial_tilt: float | None = None
+    belts: list[Asteroids] | None = None
+    distance_to_arrival: float | None = None
+    earth_masses: float | None = None
+    gravity: float | None = None
+    is_landable: bool | None = None
+    luminosity: str | None = None
+    main_star: bool | None = None
+    materials: dict[str, Any] | None = None
+    mean_anomaly: float | None = None
+    orbital_eccentricity: float | None = None
+    orbital_inclination: float | None = None
+    orbital_period: float | None = None
+    parents: list[dict[str, int]] | None = None
+    radius: float | None = None
+    reserve_level: str | None = None
+    rings: list[Asteroids] | None = None
+    rotational_period: float | None = None
+    rotational_period_tidally_locked: bool | None = None
+    semi_major_axis: float | None = None
+    signals: Signals | None = None
+    solar_masses: float | None = None
+    solar_radius: float | None = None
+    solid_composition: Any | None = None
+    spectral_class: str | None = None
+    sub_type: str | None = None
+    surface_pressure: float | None = None
+    surface_temperature: float | None = None
+    terraforming_state: str | None = None
+    timestamps: Timestamps | None = None
+    type: str | None = None
+    volcanism_type: str | None = None
 
-    mean_anomaly_updated_at: Optional[datetime] = None
-    distance_to_arrival_updated_at: Optional[datetime] = None
+    mean_anomaly_updated_at: datetime | None = None
+    distance_to_arrival_updated_at: datetime | None = None

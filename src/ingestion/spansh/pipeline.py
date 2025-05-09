@@ -3,7 +3,7 @@ import logging  # noqa: F401
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Callable, Dict, Iterable, List, Type, Union
+from typing import Any, Callable, Iterable, Type
 
 import aiofiles  # noqa: F401
 import ijson
@@ -53,11 +53,11 @@ logger = get_logger(__name__)
 def upsert_all[T: BaseModel](
     session: Session,
     model: Type[T],
-    rows: List[Dict[str, Any]],
-    conflict_cols: List[str],
-    exclude_update_cols: List[str] = [],
-    debug_print_extra_cols: List[str] = [],
-) -> List[T]:
+    rows: list[dict[str, Any]],
+    conflict_cols: list[str],
+    exclude_update_cols: list[str] = [],
+    debug_print_extra_cols: list[str] = [],
+) -> list[T]:
     if not rows:
         return []
 
@@ -85,10 +85,10 @@ def upsert_all[T: BaseModel](
     return list(iter(results.all()))
 
 
-def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: list[SystemSpansh]) -> None:
     logger.info(f"Layer 1: Factions ({partitioner.total_running_str_fn()})")
 
-    all_factions: dict[str, Union[FactionSpansh, ControllingFactionSpansh]] = {}
+    all_factions: dict[str, FactionSpansh | ControllingFactionSpansh] = {}
     faction_dicts: dict[str, dict[str, Any]] = {}
 
     for system in input_systems:
@@ -113,11 +113,11 @@ def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: List
         partitioner.cache_spansh_entity_id(spansh_faction, faction_obj.id)
 
 
-def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: list[SystemSpansh]) -> None:
     logger.info(f"Layer 2: Systems ({partitioner.total_running_str_fn()})")
 
     systems = []
-    system_by_key: Dict[int, SystemSpansh] = {}
+    system_by_key: dict[int, SystemSpansh] = {}
 
     for system in input_systems:
         system_by_key[system.to_cache_key()] = system
@@ -135,7 +135,7 @@ def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: List
         partitioner.cache_spansh_entity_id(spansh_system, system_obj.id)
 
 
-def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: list[SystemSpansh]) -> None:
     logger.info(f"Layer 3: FactionPresences and Bodies ({partitioner.total_running_str_fn()})")
 
     # --- FactionPresences ---
@@ -179,12 +179,12 @@ def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: List
         partitioner.cache_spansh_entity_id(spansh_body, body_obj.id)
 
 
-def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list[SystemSpansh]) -> None:
     logger.info(f"Layer 4: Stations, Signals, Rings ({partitioner.total_running_str_fn()})")
 
     # --- Stations ---
-    rows_by_key: Dict[int, Dict[str, Any]] = {}
-    stations_by_key: Dict[int, StationSpansh] = {}
+    rows_by_key: dict[int, dict[str, Any]] = {}
+    stations_by_key: dict[int, StationSpansh] = {}
 
     for system in input_systems:
         system_id = partitioner.get_spansh_entity_id(system)
@@ -225,7 +225,7 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
     # --- Rings ---
     ring_rows = []
-    rings_by_key: Dict[int, AsteroidsSpansh] = {}
+    rings_by_key: dict[int, AsteroidsSpansh] = {}
     for system in input_systems:
         for body in system.bodies or []:
             body_id = partitioner.get_spansh_entity_id(body)
@@ -244,12 +244,12 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: List
         partitioner.cache_spansh_entity_id_by_key(spansh_ring_key, ring_obj.id)
 
 
-def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List[SystemSpansh]) -> None:
+def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list[SystemSpansh]) -> None:
     logger.info(f"Layer 4: Market, Outfitting, Shipyard, Hotspots ({partitioner.total_running_str_fn()})")
 
     # --- Market ---
 
-    commodities: List[Dict[str, Any]] = []
+    commodities: list[dict[str, Any]] = []
 
     now = datetime.now(timezone.utc)
     max_data_age = timedelta(days=partitioner.max_market_data_age_days)
@@ -287,7 +287,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
 
     # --- Outfitting ---
 
-    modules: List[Dict[str, Any]] = []
+    modules: list[dict[str, Any]] = []
 
     def extract_modules(owner_id: int, station: StationSpansh) -> None:
         if station.outfitting is None:
@@ -310,7 +310,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
     upsert_all(partitioner.session, OutfittingShipModulesDB, modules, ["station_id", "module_id"], ["id"])
 
     # --- Shipyard ---
-    ships: List[Dict[str, Any]] = []
+    ships: list[dict[str, Any]] = []
 
     def extract_ships(owner_id: int, station: StationSpansh) -> None:
         if station.outfitting is None:
@@ -348,7 +348,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: List
     upsert_all(partitioner.session, HotspotsDB, hotspots, ["ring_id", "commodity_sym"], ["id"])
 
 
-type MetadataDB = Union[CommoditiesDB, ShipsDB, ShipModulesDB]
+type MetadataDB = CommoditiesDB | ShipsDB | ShipModulesDB
 
 
 class SpanshDataLayerPartitioner:
@@ -387,7 +387,7 @@ class SpanshDataLayerPartitioner:
 
     def __init__(self, total_running_str_fn: Callable[[], str], max_market_data_age_days: int) -> None:
         self.session = SessionLocal()
-        self.id_cache: Dict[int, int] = {}
+        self.id_cache: dict[int, int] = {}
         self.total_running_str_fn = total_running_str_fn
         self.max_market_data_age_days = max_market_data_age_days
 
@@ -412,7 +412,7 @@ class SpanshDataLayerPartitioner:
             raise KeyError(f"Key not cached: {key}")
         return self.id_cache[key]
 
-    metadata_cache: Dict[str, MetadataDB] = {}
+    metadata_cache: dict[str, MetadataDB] = {}
 
     def cache_metadata_by_name(self, data: MetadataDB, name: str) -> None:
         if not name:
@@ -424,7 +424,7 @@ class SpanshDataLayerPartitioner:
             raise KeyError(f"Metadata not cached: {name}")
         return self.metadata_cache[name]
 
-    commodity_names_by_category: Dict[str, set[str]] = {}
+    commodity_names_by_category: dict[str, set[str]] = {}
 
     def store_commodity_name_by_category(self, commodity_name: str, category: str) -> None:
         if category not in self.commodity_names_by_category:
@@ -489,7 +489,7 @@ class SpanshDataLayerPartitioner:
 
         logger.info(f"Imported {path.name} successfully")
 
-    def insert_systems(self, input_systems: List[SystemSpansh]) -> None:
+    def insert_systems(self, input_systems: list[SystemSpansh]) -> None:
         insert_layer1(self, input_systems)
         insert_layer2(self, input_systems)
         insert_layer3(self, input_systems)
@@ -526,7 +526,7 @@ class SpanshDataPipeline:
         download_file(GALAXY_POPULATED_JSON_URL, GALAXY_POPULATED_JSON_GZ)
         ungzip(GALAXY_POPULATED_JSON_GZ, GALAXY_POPULATED_JSON)
 
-    async def load_and_process_data(self, batch_process_fn: Callable[[List[SystemSpansh]], None]) -> None:
+    async def load_and_process_data(self, batch_process_fn: Callable[[list[SystemSpansh]], None]) -> None:
         processed_count = 0
         process_batch_lock = asyncio.Lock()
         idx_lock = asyncio.Lock()
@@ -538,7 +538,7 @@ class SpanshDataPipeline:
 
             # parser = ijson.items(f, "item")
             # for idx, system_dict in enumerate(parser, start=1):
-            batch: List[SystemSpansh] = []
+            batch: list[SystemSpansh] = []
 
             idx = 0
             async for system_dict in ijson.items(f, "item"):
@@ -592,7 +592,7 @@ class SpanshDataPipeline:
 
         return None
 
-    def process_data_batch(self, system_batch: List[SystemSpansh]) -> None:
+    def process_data_batch(self, system_batch: list[SystemSpansh]) -> None:
         process_timer = Timer(f"Spansh datadump batch process {len(system_batch)}")
 
         self.partitioner.insert_systems(system_batch)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Tuple
 
 from src.ingestion.spansh.models import BaseSpanshModel
 from src.ingestion.spansh.models.common_spansh import TimestampsSpansh
@@ -7,11 +7,11 @@ from src.ingestion.spansh.models.station_spansh import StationSpansh
 
 
 class SignalsSpansh(BaseSpanshModel):
-    signals: Dict[str, int]
-    updated_at: Optional[datetime] = None
+    signals: dict[str, int]
+    updated_at: datetime | None = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
-    def to_sqlalchemy_dicts(self, body_id: int) -> List[Dict[str, Any]]:
+    def to_sqlalchemy_dicts(self, body_id: int) -> list[dict[str, Any]]:
         return [
             {
                 "body_id": body_id,
@@ -22,7 +22,7 @@ class SignalsSpansh(BaseSpanshModel):
             for signal_type, count in self.signals.items()
         ]
 
-    def to_sqlalchemy_hotspot_dicts(self, ring_id: int) -> List[Dict[str, Any]]:
+    def to_sqlalchemy_hotspot_dicts(self, ring_id: int) -> list[dict[str, Any]]:
         return [
             {
                 "ring_id": ring_id,
@@ -41,13 +41,13 @@ class AsteroidsSpansh(BaseSpanshModel):
     inner_radius: float
     outer_radius: float
 
-    id64: Optional[int] = None
-    signals: Optional[SignalsSpansh] = None
+    id64: int | None = None
+    signals: SignalsSpansh | None = None
 
     def to_cache_key_tuple(self, spansh_body_id: int) -> Tuple[Any, ...]:
         return ("RingsDB", spansh_body_id, self.name)
 
-    def to_sqlalchemy_dict(self, body_id: int) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, body_id: int) -> dict[str, Any]:
         """Returns a RingsDB dict"""
         return {
             "body_id": body_id,
@@ -73,52 +73,52 @@ class BodySpansh(BaseSpanshModel):
     id64: int
     body_id: int
     name: str
-    stations: List[StationSpansh]
-    update_time: Optional[datetime] = None
+    stations: list[StationSpansh]
+    update_time: datetime | None = None
     _validate_updated_time = BaseSpanshModel.flexible_datetime_validator("update_time")
 
-    absolute_magnitude: Optional[float] = None
-    age: Optional[int] = None
-    arg_of_periapsis: Optional[float] = None
-    ascending_node: Optional[float] = None
-    atmosphere_composition: Optional[Dict[str, float]] = None
-    atmosphere_type: Optional[str] = None
-    axial_tilt: Optional[float] = None
-    belts: Optional[List[AsteroidsSpansh]] = None
-    distance_to_arrival: Optional[float] = None
-    earth_masses: Optional[float] = None
-    gravity: Optional[float] = None
-    is_landable: Optional[bool] = None
-    luminosity: Optional[str] = None
-    main_star: Optional[bool] = None
-    materials: Optional[Dict[str, float]] = None
-    mean_anomaly: Optional[float] = None
-    orbital_eccentricity: Optional[float] = None
-    orbital_inclination: Optional[float] = None
-    orbital_period: Optional[float] = None
-    parents: Optional[List[Dict[str, int]]] = None
-    radius: Optional[float] = None
-    reserve_level: Optional[str] = None
-    rings: Optional[List[AsteroidsSpansh]] = None
-    rotational_period: Optional[float] = None
-    rotational_period_tidally_locked: Optional[bool] = None
-    semi_major_axis: Optional[float] = None
-    signals: Optional[SignalsSpansh] = None
-    solar_masses: Optional[float] = None
-    solar_radius: Optional[float] = None
-    solid_composition: Optional[Dict[str, float]] = None
-    spectral_class: Optional[str] = None
-    sub_type: Optional[str] = None
-    surface_pressure: Optional[float] = None
-    surface_temperature: Optional[float] = None
-    terraforming_state: Optional[str] = None
-    timestamps: Optional[TimestampsSpansh] = None
-    type: Optional[str] = None
-    volcanism_type: Optional[str] = None
+    absolute_magnitude: float | None = None
+    age: int | None = None
+    arg_of_periapsis: float | None = None
+    ascending_node: float | None = None
+    atmosphere_composition: dict[str, float] | None = None
+    atmosphere_type: str | None = None
+    axial_tilt: float | None = None
+    belts: list[AsteroidsSpansh] | None = None
+    distance_to_arrival: float | None = None
+    earth_masses: float | None = None
+    gravity: float | None = None
+    is_landable: bool | None = None
+    luminosity: str | None = None
+    main_star: bool | None = None
+    materials: dict[str, float] | None = None
+    mean_anomaly: float | None = None
+    orbital_eccentricity: float | None = None
+    orbital_inclination: float | None = None
+    orbital_period: float | None = None
+    parents: list[dict[str, int]] | None = None
+    radius: float | None = None
+    reserve_level: str | None = None
+    rings: list[AsteroidsSpansh] | None = None
+    rotational_period: float | None = None
+    rotational_period_tidally_locked: bool | None = None
+    semi_major_axis: float | None = None
+    signals: SignalsSpansh | None = None
+    solar_masses: float | None = None
+    solar_radius: float | None = None
+    solid_composition: dict[str, float] | None = None
+    spectral_class: str | None = None
+    sub_type: str | None = None
+    surface_pressure: float | None = None
+    surface_temperature: float | None = None
+    terraforming_state: str | None = None
+    timestamps: TimestampsSpansh | None = None
+    type: str | None = None
+    volcanism_type: str | None = None
 
     _validate_update_time = BaseSpanshModel.flexible_datetime_validator("update_time")
 
-    def to_sqlalchemy_dict(self, system_id: int) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, system_id: int) -> dict[str, Any]:
         return {
             "system_id": system_id,
             "id64": self.id64,

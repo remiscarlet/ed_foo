@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Tuple
 
 from pydantic import Field
 
@@ -33,7 +33,7 @@ class ThargoidWarSpansh(BaseSpanshModel):
             self.success_state,
         )
 
-    def to_sqlalchemy_dict(self) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self) -> dict[str, Any]:
         return {
             "current_state": self.current_state,
             "days_remaining": self.days_remaining,
@@ -47,16 +47,16 @@ class ThargoidWarSpansh(BaseSpanshModel):
 
 class FactionSpansh(BaseSpanshModel):
     name: str
-    influence: Optional[float]
+    influence: float | None
 
-    government: Optional[str] = None
-    allegiance: Optional[str] = None
-    state: Optional[str] = None
+    government: str | None = None
+    allegiance: str | None = None
+    state: str | None = None
 
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (self.__class__, self.name)
 
-    def to_sqlalchemy_dict(self) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "allegiance": self.allegiance,
@@ -68,13 +68,13 @@ class FactionSpansh(BaseSpanshModel):
 
 class ControllingFactionSpansh(BaseSpanshModel):
     name: str
-    allegiance: Optional[str] = None
-    government: Optional[str] = None
+    allegiance: str | None = None
+    government: str | None = None
 
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (FactionSpansh, self.name)
 
-    def to_sqlalchemy_dict(self) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "allegiance": self.allegiance,
@@ -86,7 +86,7 @@ class PowerConflictProgressSpansh(BaseSpanshModel):
     power: str
     progress: float
 
-    def to_sqlalchemy_dict(self) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self) -> dict[str, Any]:
         return {
             "power": self.power,
             "progress": self.progress,
@@ -111,32 +111,32 @@ class SystemSpansh(BaseSpanshModel):
     date: datetime
     _validate_date = BaseSpanshModel.flexible_datetime_validator("date")
 
-    controlling_faction: Optional[ControllingFactionSpansh]
-    government: Optional[str] = None
-    population: Optional[int] = None
-    primary_economy: Optional[str] = None
-    secondary_economy: Optional[str] = None
-    security: Optional[str] = None
+    controlling_faction: ControllingFactionSpansh | None
+    government: str | None = None
+    population: int | None = None
+    primary_economy: str | None = None
+    secondary_economy: str | None = None
+    security: str | None = None
 
-    bodies: Optional[List[BodySpansh]] = None
-    factions: Optional[List[FactionSpansh]] = None
-    all_stations: Optional[List[StationSpansh]] = Field(alias="stations")
+    bodies: list[BodySpansh] | None = None
+    factions: list[FactionSpansh] | None = None
+    all_stations: list[StationSpansh] | None = Field(alias="stations")
 
-    body_count: Optional[int] = None
+    body_count: int | None = None
 
-    controlling_power: Optional[str] = None
-    power_conflict_progress: Optional[List[PowerConflictProgressSpansh]] = None
-    power_state: Optional[str] = None
-    power_state_control_progress: Optional[float] = None
-    power_state_reinforcement: Optional[float] = None
-    power_state_undermining: Optional[float] = None
-    powers: Optional[List[str]] = None
+    controlling_power: str | None = None
+    power_conflict_progress: list[PowerConflictProgressSpansh] | None = None
+    power_state: str | None = None
+    power_state_control_progress: float | None = None
+    power_state_reinforcement: float | None = None
+    power_state_undermining: float | None = None
+    powers: list[str] | None = None
 
-    thargoid_war: Optional[ThargoidWarSpansh] = None
-    timestamps: Optional[TimestampsSpansh] = None
+    thargoid_war: ThargoidWarSpansh | None = None
+    timestamps: TimestampsSpansh | None = None
 
     @property
-    def stations(self) -> Optional[List[StationSpansh]]:
+    def stations(self) -> list[StationSpansh] | None:
         """Systems can only have one active System Colonisation Ship at a time.
         SCS's can also be decommissioned if not "fulfilled in time".
         Each newly commissioned SCS after previous iterations fail are considered new stations/entities
@@ -169,7 +169,7 @@ class SystemSpansh(BaseSpanshModel):
 
         return stations
 
-    def to_sqlalchemy_dict(self, controlling_faction_id: Optional[int]) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, controlling_faction_id: int | None) -> dict[str, Any]:
         return {
             "allegiance": self.allegiance,
             "controlling_faction_id": controlling_faction_id,

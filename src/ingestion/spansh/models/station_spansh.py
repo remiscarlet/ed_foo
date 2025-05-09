@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Tuple
 
 from pydantic import Field
 
@@ -14,7 +14,7 @@ class CommodityPriceSpansh(BaseSpanshModel):
     demand: int
     sell_price: int
     supply: int
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
 
@@ -24,7 +24,7 @@ class CommoditySpansh(CommodityPriceSpansh):
     name: str
     symbol: str
 
-    def to_sqlalchemy_dict(self, station_id: int, commodity_sym: str) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, station_id: int, commodity_sym: str) -> dict[str, Any]:
         return {
             "station_id": station_id,
             "commodity_sym": commodity_sym,
@@ -36,7 +36,7 @@ class CommoditySpansh(CommodityPriceSpansh):
         }
 
     @staticmethod
-    def to_blacklisted_sqlalchemy_dict(station_id: int, commodity_sym: str) -> Dict[str, Any]:
+    def to_blacklisted_sqlalchemy_dict(station_id: int, commodity_sym: str) -> dict[str, Any]:
         return {
             "station_id": station_id,
             "commodity_sym": commodity_sym,
@@ -50,9 +50,9 @@ class CommoditySpansh(CommodityPriceSpansh):
 
 
 class MarketSpansh(BaseSpanshModel):
-    commodities: Optional[List[CommoditySpansh]] = None
-    prohibited_commodities: Optional[List[str]] = None
-    update_time: Optional[datetime] = None
+    commodities: list[CommoditySpansh] | None = None
+    prohibited_commodities: list[str] | None = None
+    update_time: datetime | None = None
     _validate_update_time = BaseSpanshModel.flexible_datetime_validator("update_time")
 
 
@@ -64,9 +64,9 @@ class ShipModuleSpansh(BaseSpanshModel):
     rating: str
     symbol: str
 
-    ship: Optional[str] = None
+    ship: str | None = None
 
-    def to_sqlalchemy_dict(self, station_id: int, module_id: int) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, station_id: int, module_id: int) -> dict[str, Any]:
         return {
             "station_id": station_id,
             "module_id": module_id,
@@ -74,8 +74,8 @@ class ShipModuleSpansh(BaseSpanshModel):
 
 
 class OutfittingSpansh(BaseSpanshModel):
-    modules: List[ShipModuleSpansh]
-    updated_at: Optional[datetime] = None
+    modules: list[ShipModuleSpansh]
+    updated_at: datetime | None = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
 
@@ -84,7 +84,7 @@ class ShipSpansh(BaseSpanshModel):
     ship_id: int
     symbol: str
 
-    def to_sqlalchemy_dict(self, station_id: int, ship_id: int) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, station_id: int, ship_id: int) -> dict[str, Any]:
         return {
             "station_id": station_id,
             "ship_id": ship_id,
@@ -92,8 +92,8 @@ class ShipSpansh(BaseSpanshModel):
 
 
 class ShipyardSpansh(BaseSpanshModel):
-    ships: List[ShipSpansh]
-    updated_at: Optional[datetime] = None
+    ships: list[ShipSpansh]
+    updated_at: datetime | None = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
 
@@ -109,28 +109,28 @@ class StationSpansh(BaseSpanshModel):
 
     id: int
     name: str
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
-    allegiance: Optional[str] = None
-    controlling_faction: Optional[str] = None
-    controlling_faction_state: Optional[str] = None
-    distance_to_arrival: Optional[float] = None
-    economies: Optional[Dict[str, float]] = None
-    government: Optional[str] = None
-    landing_pads: Optional[Dict[str, int]] = None
-    market: Optional[MarketSpansh] = None
-    outfitting: Optional[OutfittingSpansh] = None
-    primary_economy: Optional[str] = None
-    services: Optional[List[str]] = None
-    shipyard: Optional[ShipyardSpansh] = None
-    type: Optional[str] = None
+    allegiance: str | None = None
+    controlling_faction: str | None = None
+    controlling_faction_state: str | None = None
+    distance_to_arrival: float | None = None
+    economies: dict[str, float] | None = None
+    government: str | None = None
+    landing_pads: dict[str, int] | None = None
+    market: MarketSpansh | None = None
+    outfitting: OutfittingSpansh | None = None
+    primary_economy: str | None = None
+    services: list[str] | None = None
+    shipyard: ShipyardSpansh | None = None
+    type: str | None = None
 
-    carrier_name: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    carrier_name: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
-    def to_sqlalchemy_dict(self, owner_id: int, owner_type: str) -> Dict[str, Any]:
+    def to_sqlalchemy_dict(self, owner_id: int, owner_type: str) -> dict[str, Any]:
         if self.landing_pads is not None:
             large_pads = self.landing_pads.get("large", 0)
             medium_pads = self.landing_pads.get("medium", 0)

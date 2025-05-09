@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.core.models.system_model import System
 
 
 class SystemPort(ABC):
     @abstractmethod
-    def upsert_systems(self, system: List[System]) -> None:
+    def upsert_systems(self, system: list[System]) -> None:
         pass
 
     @abstractmethod

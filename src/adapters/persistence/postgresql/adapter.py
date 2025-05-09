@@ -1,4 +1,4 @@
-from typing import List, Optional, Sequence
+from typing import Sequence
 
 from sqlalchemy import RowMapping, select, text
 
@@ -19,7 +19,7 @@ class ApiCommandAdapter(ApiCommandPort):
     def __init__(self) -> None:
         self.session = SessionLocal()
 
-    def get_acquirable_systems_from_origin(self, system_name: str) -> List[SystemResult]:
+    def get_acquirable_systems_from_origin(self, system_name: str) -> list[SystemResult]:
         stmt = text("SELECT * FROM api.get_acquirable_systems_from_origin(:system_name)")
 
         result = self.session.execute(stmt, {"system_name": system_name})
@@ -27,7 +27,7 @@ class ApiCommandAdapter(ApiCommandPort):
         rows: Sequence[RowMapping] = result.mappings().all()
         return [SystemResult(**row) for row in rows]
 
-    def get_expandable_systems_in_range(self, system_name: str) -> List[SystemResult]:
+    def get_expandable_systems_in_range(self, system_name: str) -> list[SystemResult]:
         stmt = text("SELECT * FROM api.get_expandable_systems_in_range(:system_name)")
 
         result = self.session.execute(stmt, {"system_name": system_name})
@@ -35,7 +35,7 @@ class ApiCommandAdapter(ApiCommandPort):
         rows: Sequence[RowMapping] = result.mappings().all()
         return [SystemResult(**row) for row in rows]
 
-    def get_hotspots_in_system(self, system_name: str) -> List[HotspotResult]:
+    def get_hotspots_in_system(self, system_name: str) -> list[HotspotResult]:
         stmt = text("SELECT * FROM api.get_hotspots_in_system(:system_name)")
 
         result = self.session.execute(stmt, {"system_name": system_name})
@@ -44,8 +44,8 @@ class ApiCommandAdapter(ApiCommandPort):
         return [HotspotResult(**row) for row in rows]
 
     def get_hotspots_in_system_by_commodities(
-        self, system_name: str, commodities_filter: List[str]
-    ) -> List[HotspotResult]:
+        self, system_name: str, commodities_filter: list[str]
+    ) -> list[HotspotResult]:
         stmt = text(
             """SELECT * FROM api.get_hotspots_in_system_by_commodities(
                 :system_name, :commodities_filter)"""
@@ -66,7 +66,7 @@ class ApiCommandAdapter(ApiCommandPort):
         timer.end()
         return rtn
 
-    def get_systems_with_power(self, power_name: str, power_states: Optional[list[str]] = None) -> List[SystemResult]:
+    def get_systems_with_power(self, power_name: str, power_states: list[str] | None = None) -> list[SystemResult]:
         params: dict[str, str | list[str]] = {"power_name": power_name}
         if power_states:
             params["power_states"] = power_states
@@ -81,7 +81,7 @@ class ApiCommandAdapter(ApiCommandPort):
 
     def get_top_commodities_in_system(
         self, system_name: str, comms_per_station: int, min_supplydemand: int, is_selling: bool
-    ) -> List[TopCommodityResult]:
+    ) -> list[TopCommodityResult]:
         stmt = text(
             """SELECT * FROM api.get_top_commodities_in_system(
                 :system_name, :comms_per_station, :min_supplydemand, :is_selling)"""
@@ -105,7 +105,7 @@ class SystemsAdapter(SystemPort):
     def __init__(self) -> None:
         self.session = SessionLocal()
 
-    def upsert_systems(self, systems: List[System]) -> None:
+    def upsert_systems(self, systems: list[System]) -> None:
         pass
 
     def get_system(self, system_name: str) -> System:

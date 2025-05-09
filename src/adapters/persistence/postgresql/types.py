@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -26,7 +26,7 @@ class TopCommodityResult(BaseModel):
     demand: int
     buy_price: int
     supply: int
-    updated_at: Optional[datetime]
+    updated_at: datetime | None
     rank: int
 
 
@@ -49,4 +49,4 @@ class SystemResult(BaseModel):
     power_state_reinforcement: float
     power_state_undermining: float
     powers: list[str]
-    thargoid_war: Optional[dict[str, Any]]
+    thargoid_war: dict[str, Any] | None

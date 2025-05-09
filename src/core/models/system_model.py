@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -10,56 +10,56 @@ from src.core.models.station_model import Station
 
 class Faction(BaseModel):
     name: str
-    influence: Optional[float] = None
-    government: Optional[str] = None
-    allegiance: Optional[str] = None
-    state: Optional[str] = None
+    influence: float | None = None
+    government: str | None = None
+    allegiance: str | None = None
+    state: str | None = None
 
-    edsm_id: Optional[int] = None
-    happiness: Optional[str] = None
-    is_player: Optional[bool] = None
-    active_states: Optional[List[str]] = None
-    pending_states: Optional[List[str]] = None
-    recovering_states: Optional[List[str]] = None
+    edsm_id: int | None = None
+    happiness: str | None = None
+    is_player: bool | None = None
+    active_states: list[str] | None = None
+    pending_states: list[str] | None = None
+    recovering_states: list[str] | None = None
 
-    spansh_updated_at: Optional[datetime] = None
-    edsm_updated_at: Optional[datetime] = None
-    eddn_updated_at: Optional[datetime] = None
+    spansh_updated_at: datetime | None = None
+    edsm_updated_at: datetime | None = None
+    eddn_updated_at: datetime | None = None
 
 
 class System(BaseModel):
 
     name: str
     coords: Coordinates
-    date: Optional[datetime]
+    date: datetime | None
 
-    id64: Optional[int]
-    bodies: List[Body]
-    allegiance: Optional[str]
-    factions: List[Faction]
-    government: Optional[str]
-    population: Optional[int]
-    primary_economy: Optional[str]
-    secondary_economy: Optional[str]
-    security: Optional[str]
-    stations: List[Station]
-    controlling_faction: Optional[Faction] = None
-    body_count: Optional[int] = None
-    controlling_power: Optional[str] = None
-    power_conflict_progress: Optional[List[Any]] = None
-    power_state: Optional[str] = None
-    power_state_control_progress: Optional[float] = None
-    power_state_reinforcement: Optional[float] = None
-    power_state_undermining: Optional[float] = None
-    powers: Optional[List[str]] = None
+    id64: int | None
+    bodies: list[Body]
+    allegiance: str | None
+    factions: list[Faction]
+    government: str | None
+    population: int | None
+    primary_economy: str | None
+    secondary_economy: str | None
+    security: str | None
+    stations: list[Station]
+    controlling_faction: Faction | None = None
+    body_count: int | None = None
+    controlling_power: str | None = None
+    power_conflict_progress: list[Any] | None = None
+    power_state: str | None = None
+    power_state_control_progress: float | None = None
+    power_state_reinforcement: float | None = None
+    power_state_undermining: float | None = None
+    powers: list[str] | None = None
 
-    thargoid_war: Optional[Dict[str, Any]] = None
-    timestamps: Optional[Timestamps] = None
+    thargoid_war: dict[str, Any] | None = None
+    timestamps: Timestamps | None = None
 
-    controlling_power_updated_at: Optional[datetime] = None
-    power_state_updated_at: Optional[datetime] = None
-    powers_updated_at: Optional[datetime] = None
+    controlling_power_updated_at: datetime | None = None
+    power_state_updated_at: datetime | None = None
+    powers_updated_at: datetime | None = None
 
-    spansh_updated_at: Optional[datetime] = None
-    edsm_updated_at: Optional[datetime] = None
-    eddn_updated_at: Optional[datetime] = None
+    spansh_updated_at: datetime | None = None
+    edsm_updated_at: datetime | None = None
+    eddn_updated_at: datetime | None = None

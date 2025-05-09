@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 from geoalchemy2 import Geometry, WKBElement
 from sqlalchemy import (
@@ -48,15 +48,15 @@ class BodiesDB(BaseModelWithId):
     system_id: Mapped[int] = mapped_column(ForeignKey("core.systems.id"), nullable=False, index=True)
     system: Mapped["SystemsDB"] = relationship(back_populates="bodies")
 
-    stations: Mapped[List["StationsDB"]] = relationship(
+    stations: Mapped[list["StationsDB"]] = relationship(
         "StationsDB",
         primaryjoin=lambda: and_(foreign(StationsDB.owner_id) == BodiesDB.id, StationsDB.owner_type == literal("body")),
         overlaps="stations",
     )
 
-    atmosphere_composition: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
-    materials: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
-    parents: Mapped[Optional[Dict[str, int]]] = mapped_column(JSONB)
+    atmosphere_composition: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
+    materials: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
+    parents: Mapped[Optional[dict[str, int]]] = mapped_column(JSONB)
 
     absolute_magnitude: Mapped[Optional[float]] = mapped_column(Float)
     age: Mapped[Optional[int]] = mapped_column(Integer)
@@ -81,7 +81,7 @@ class BodiesDB(BaseModelWithId):
     semi_major_axis: Mapped[Optional[float]] = mapped_column(Float)
     solar_masses: Mapped[Optional[float]] = mapped_column(Float)
     solar_radius: Mapped[Optional[float]] = mapped_column(Float)
-    solid_composition: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
+    solid_composition: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
     spectral_class: Mapped[Optional[str]] = mapped_column(Text)
     sub_type: Mapped[Optional[str]] = mapped_column(Text)
     surface_pressure: Mapped[Optional[float]] = mapped_column(Float)
@@ -93,8 +93,8 @@ class BodiesDB(BaseModelWithId):
     mean_anomaly_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     distance_to_arrival_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    rings: Mapped[List["RingsDB"]] = relationship(back_populates="body")
-    signals: Mapped[List["SignalsDB"]] = relationship(back_populates="body")
+    rings: Mapped[list["RingsDB"]] = relationship(back_populates="body")
+    signals: Mapped[list["SignalsDB"]] = relationship(back_populates="body")
 
     def to_core_model(self) -> Body:
         return Body(
@@ -174,7 +174,7 @@ class RingsDB(BaseModelWithId):
     inner_radius: Mapped[Optional[float]] = mapped_column(Float)
     outer_radius: Mapped[Optional[float]] = mapped_column(Float)
 
-    hotspots: Mapped[List["HotspotsDB"]] = relationship(back_populates="ring")
+    hotspots: Mapped[list["HotspotsDB"]] = relationship(back_populates="ring")
 
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         # String classname to work around circular imports from body_spansh.py
@@ -216,7 +216,7 @@ class StationsDB(BaseModelWithId):
     controlling_faction: Mapped[Optional[str]] = mapped_column(Text)
     controlling_faction_state: Mapped[Optional[str]] = mapped_column(Text)
     distance_to_arrival: Mapped[Optional[float]] = mapped_column(Float)
-    economies: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
+    economies: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
     government: Mapped[Optional[str]] = mapped_column(Text)
 
     large_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
@@ -224,11 +224,11 @@ class StationsDB(BaseModelWithId):
     small_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
 
     primary_economy: Mapped[Optional[str]] = mapped_column(Text)
-    services: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
+    services: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
     type: Mapped[Optional[str]] = mapped_column(Text)
 
     # It kind of is a station-level detail...
-    prohibited_commodities: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
+    prohibited_commodities: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
 
     carrier_name: Mapped[Optional[str]] = mapped_column(Text)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
@@ -280,7 +280,7 @@ class StationsDB(BaseModelWithId):
         if session is None:
             raise Exception("Could not find a valid Session attached to StationsDB object!")
 
-        parent: Optional[Union[SystemsDB, BodiesDB]] = None
+        parent: Optional[SystemsDB | BodiesDB] = None
         if self.owner_type == "system":
             parent = session.execute(select(SystemsDB).where(SystemsDB.id == self.owner_id)).scalar_one_or_none()
         elif self.owner_type == "body":
@@ -309,7 +309,7 @@ class CommoditiesDB(BaseModel):
 
     category: Mapped[Optional[str]] = mapped_column(Text)
     is_mineable: Mapped[Optional[bool]] = mapped_column(Boolean)
-    ring_types: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
+    ring_types: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
     mining_method: Mapped[Optional[str]] = mapped_column(Text)
     has_hotspots: Mapped[Optional[bool]] = mapped_column(Boolean)
 
@@ -421,7 +421,7 @@ class FactionsDB(BaseModelWithId):
     government: Mapped[Optional[str]] = mapped_column(Text)
     is_player: Mapped[Optional[bool]] = mapped_column(Boolean)
 
-    faction_presences: Mapped[List["FactionPresencesDB"]] = relationship(back_populates="faction")
+    faction_presences: Mapped[list["FactionPresencesDB"]] = relationship(back_populates="faction")
 
     def to_core_model(self) -> Faction:
         return Faction(
@@ -451,9 +451,9 @@ class FactionPresencesDB(BaseModelWithId):
     state: Mapped[Optional[str]] = mapped_column(Text)
     happiness: Mapped[Optional[str]] = mapped_column(Text)
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    active_states: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
-    pending_states: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
-    recovering_states: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
+    active_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    pending_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    recovering_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
 
     def __repr__(self) -> str:
         return f"<FactionPresencesDB(id={self.id}, system_id={self.system_id}, faction_id={self.faction_id})>"
@@ -484,13 +484,13 @@ class SystemsDB(BaseModelWithId):
     government: Mapped[Optional[str]] = mapped_column(Text)
     body_count: Mapped[Optional[int]] = mapped_column(Integer)
     controlling_power: Mapped[Optional[str]] = mapped_column(Text)
-    power_conflict_progress: Mapped[Optional[List[Dict[str, float]]]] = mapped_column(JSONB)
+    power_conflict_progress: Mapped[Optional[list[dict[str, float]]]] = mapped_column(JSONB)
     power_state: Mapped[Optional[str]] = mapped_column(Text)
     power_state_control_progress: Mapped[Optional[float]] = mapped_column(Float)
     power_state_reinforcement: Mapped[Optional[float]] = mapped_column(Float)
     power_state_undermining: Mapped[Optional[float]] = mapped_column(Float)
-    powers: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
-    thargoid_war: Mapped[Optional[Dict[str, float]]] = mapped_column(JSONB)
+    powers: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    thargoid_war: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
 
     controlling_power_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     power_state_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -499,9 +499,9 @@ class SystemsDB(BaseModelWithId):
     controlling_faction_id: Mapped[Optional[int]] = mapped_column(ForeignKey("core.factions.id"), index=True)
     controlling_faction: Mapped[Optional["FactionsDB"]] = relationship()
 
-    bodies: Mapped[List["BodiesDB"]] = relationship(back_populates="system")
-    faction_presences: Mapped[List["FactionPresencesDB"]] = relationship(back_populates="system")
-    stations: Mapped[List["StationsDB"]] = relationship(
+    bodies: Mapped[list["BodiesDB"]] = relationship(back_populates="system")
+    faction_presences: Mapped[list["FactionPresencesDB"]] = relationship(back_populates="system")
+    stations: Mapped[list["StationsDB"]] = relationship(
         "StationsDB",
         primaryjoin=lambda: and_(
             foreign(StationsDB.owner_id) == SystemsDB.id, StationsDB.owner_type == literal("system")
@@ -513,7 +513,7 @@ class SystemsDB(BaseModelWithId):
         return ("SystemsDB", self.name)
 
     @classmethod
-    def from_core_model_to_dict(cls, system: System) -> Dict[str, Any]:
+    def from_core_model_to_dict(cls, system: System) -> dict[str, Any]:
         return {
             "allegiance": system.allegiance,
             "bodies": [],  # [BodiesDB.from_core_model(body) for body in system.bodies],

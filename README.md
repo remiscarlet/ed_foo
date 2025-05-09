@@ -89,6 +89,14 @@ Ware Research Laboratory  471.05 LY   ConductiveFabrics          1234 CR        
 Ware Research Laboratory  471.05 LY   Lithium                    2467 CR          27762  0 CR                0  Unknown
 ```
 
+## Dev Stuff
+- Linters and type checkers run on commit via `pre-commit`
+
+To run the linter, fix lint issues, and type check:
+```
+make lint-fix-check
+```
+
 ---
 
 # Design Overview

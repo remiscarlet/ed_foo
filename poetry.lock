@@ -2794,6 +2794,21 @@ files = [
 urllib3 = ">=2"
 
 [[package]]
+name = "types-shapely"
+version = "2.1.0.20250418"
+description = "Typing stubs for shapely"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "types_shapely-2.1.0.20250418-py3-none-any.whl", hash = "sha256:8b78842a726a5be4cc116945266f661d9ef2b6e22af34b4b949081cdad6634fa"},
+    {file = "types_shapely-2.1.0.20250418.tar.gz", hash = "sha256:7637df81e75f7c66afc3c67f38314f746ede28cfa45217f0622127e5476b0f0c"},
+]
+
+[package.dependencies]
+numpy = ">=1.20"
+
+[[package]]
 name = "types-tabulate"
 version = "0.9.0.20241207"
 description = "Typing stubs for tabulate"
@@ -3019,4 +3034,4 @@ pyzmq = "*"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "c1d4cf6ba15d61546e0d9b57a36efe07bd5cf607bd3fe13138a3c5c744b4a698"
+content-hash = "e098165ecf02e61edc7c143d50dbec64a17b99926881d51af4d63362eb3d48e1"
