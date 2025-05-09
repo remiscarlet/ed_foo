@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -28,3 +28,25 @@ class TopCommodityResult(BaseModel):
     supply: int
     updated_at: Optional[datetime]
     rank: int
+
+
+class SystemResult(BaseModel):
+    name: str
+    x: float
+    y: float
+    z: float
+    allegiance: str
+    population: int
+    primary_economy: str
+    secondary_economy: str
+    security: str
+    government: str
+    body_count: int
+    controlling_power: str
+    power_conflict_progress: list[dict[str, float]]
+    power_state: str
+    power_state_control_progress: float
+    power_state_reinforcement: float
+    power_state_undermining: float
+    powers: list[str]
+    thargoid_war: Optional[dict[str, Any]]

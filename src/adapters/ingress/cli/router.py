@@ -74,10 +74,26 @@ def run_get_world(args: Namespace) -> None:
 # API CLI
 
 
-def run_get_hotspots(args: Namespace) -> None:
-    timer = Timer("Get Hotspots In System")
-    hotspots = ApiCommandAdapter().get_hotspots_in_system(args.system_name)
-    print_hotspot_results(args.system_name, hotspots)
+def run_get_expandable_systems_in_range(args: Namespace) -> None:
+    timer = Timer("Get Expandable Systems In Range")
+    systems = ApiCommandAdapter().get_expandable_systems_in_range(args.system_name)
+
+    logger.info("")
+    logger.info("====== CURRENT UNOCCUPIED SYSTEM ======")
+    logger.info(f"Name: {args.system_name}\n")
+
+    logger.info("====== SYSTEMS THAT CAN EXPAND INTO CURRENT ======")
+    headers = ["System Name", "Power State"]
+    table = [
+        [
+            s.name,
+            s.power_state,
+        ]
+        for s in systems
+    ]
+    logger.info(tabulate(table, headers))
+    logger.info("")
+
     timer.end()
 
 
@@ -85,6 +101,38 @@ def run_get_hotspots_by_commodities(args: Namespace) -> None:
     timer = Timer("Get Hotspots In System By Commodities")
     hotspots = ApiCommandAdapter().get_hotspots_in_system_by_commodities(args.system_name, args.commodities_filter)
     print_hotspot_results(args.system_name, hotspots)
+    timer.end()
+
+
+def run_get_hotspots(args: Namespace) -> None:
+    timer = Timer("Get Hotspots In System")
+    hotspots = ApiCommandAdapter().get_hotspots_in_system(args.system_name)
+    print_hotspot_results(args.system_name, hotspots)
+    timer.end()
+
+
+def run_get_systems_with_power(args: Namespace) -> None:
+    timer = Timer("Get Expandable Systems In Range")
+    systems = ApiCommandAdapter().get_systems_with_power(args.power_name, args.power_states)
+
+    logger.info("")
+    logger.info("====== DETAILS ======")
+    logger.info(f"Power: {args.power_name}\n")
+    if args.power_states:
+        logger.info(f"Systems States: {pformat(args.power_states)}\n")
+
+    logger.info(f"====== SYSTEMS INFLUENCED BY {args.power_name} ======")
+    headers = ["System Name", "Power State"]
+    table = [
+        [
+            s.name,
+            s.power_state,
+        ]
+        for s in systems
+    ]
+    logger.info(tabulate(table, headers))
+    logger.info("")
+
     timer.end()
 
 
@@ -145,6 +193,11 @@ def configure_api_parser(subparsers: Any) -> None:
     api = subparsers.add_parser("api")
     api_sub = api.add_subparsers(dest="subcommand")
 
+    api_expandable_sys = api_sub.add_parser("get-expandable-systems")
+    api_expandable_sys.add_argument("system_name")
+    api_expandable_sys.add_argument("-v", "--verbose", action="count", default=0)
+    api_expandable_sys.set_defaults(func=run_get_expandable_systems_in_range)
+
     api_hotspots = api_sub.add_parser("get-hotspots")
     api_hotspots.add_argument("system_name")
     api_hotspots.add_argument("-v", "--verbose", action="count", default=0)
@@ -155,6 +208,12 @@ def configure_api_parser(subparsers: Any) -> None:
     api_hotspots_by_comm.add_argument("commodities_filter", nargs="+")
     api_hotspots_by_comm.add_argument("-v", "--verbose", action="count", default=0)
     api_hotspots_by_comm.set_defaults(func=run_get_hotspots_by_commodities)
+
+    api_hotspots = api_sub.add_parser("get-systems-with-power")
+    api_hotspots.add_argument("power_name")
+    api_hotspots.add_argument("power_states", nargs="*")
+    api_hotspots.add_argument("-v", "--verbose", action="count", default=0)
+    api_hotspots.set_defaults(func=run_get_systems_with_power)
 
     api_top_commodities = api_sub.add_parser("get-top-commodities")
     api_top_commodities.add_argument("system_name")

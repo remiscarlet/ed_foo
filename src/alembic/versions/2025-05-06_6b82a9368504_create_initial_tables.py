@@ -9,6 +9,7 @@ Create Date: 2025-05-06 23:21:18.360145
 from typing import Sequence, Union
 
 import sqlalchemy as sa
+from geoalchemy2 import Geometry
 from sqlalchemy.dialects import postgresql
 
 from alembic import op
@@ -22,6 +23,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
+    op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
     op.execute("CREATE SCHEMA IF NOT EXISTS core")
     op.execute("CREATE SCHEMA IF NOT EXISTS derived")
     op.execute("CREATE SCHEMA IF NOT EXISTS api")
@@ -188,6 +190,7 @@ def upgrade() -> None:
         sa.Column("x", sa.Float(), nullable=False),
         sa.Column("y", sa.Float(), nullable=False),
         sa.Column("z", sa.Float(), nullable=False),
+        sa.Column("coords", Geometry(geometry_type="POINT", srid=0), nullable=False),
         sa.Column("date", sa.DateTime(), nullable=True),
         sa.Column("allegiance", sa.Text(), nullable=True),
         sa.Column("population", sa.BigInteger(), nullable=True),
@@ -392,3 +395,4 @@ def downgrade() -> None:
     op.execute("DROP SCHEMA IF EXISTS core CASCADE")
     op.execute("DROP SCHEMA IF EXISTS derived CASCADE")
     op.execute("DROP SCHEMA IF EXISTS api CASCADE")
+    op.execute("DROP EXTENSION IF EXISTS postgis")

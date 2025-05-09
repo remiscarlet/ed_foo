@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from geoalchemy2 import Geometry, WKBElement
 from sqlalchemy import (
     ARRAY,
     BigInteger,
@@ -471,6 +472,8 @@ class SystemsDB(BaseModelWithId):
     x: Mapped[float] = mapped_column(Float)
     y: Mapped[float] = mapped_column(Float)
     z: Mapped[float] = mapped_column(Float)
+    coords: Mapped[WKBElement] = mapped_column(Geometry(geometry_type="POINT", srid=0), nullable=True)
+
     date: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     allegiance: Mapped[Optional[str]] = mapped_column(Text)

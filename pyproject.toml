@@ -47,6 +47,7 @@ dependencies = [
     "sqlfluff (>=3.4.0,<4.0.0)",
     "types-tqdm (>=4.67.0.20250417,<5.0.0.0)",
     "types-tabulate (>=0.9.0.20241207,<0.10.0.0)",
+    "geoalchemy2 (>=0.17.1,<0.18.0)",
 ]
 
 [build-system]
@@ -131,7 +132,7 @@ indent_unit = "space"
 tab_space_size = 4
 
 [tool.sqlfluff.rules.layout.long_lines]
-max_line_length = 88
+max_line_length = 100
 
 [tool.sqlfluff.rules.aliasing.table]
 aliasing = "explicit"

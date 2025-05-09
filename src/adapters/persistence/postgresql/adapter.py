@@ -1,10 +1,14 @@
-from typing import List, Sequence
+from typing import List, Optional, Sequence
 
 from sqlalchemy import RowMapping, select, text
 
 from src.adapters.persistence.postgresql import SessionLocal
 from src.adapters.persistence.postgresql.db import SystemsDB
-from src.adapters.persistence.postgresql.types import HotspotResult, TopCommodityResult
+from src.adapters.persistence.postgresql.types import (
+    HotspotResult,
+    SystemResult,
+    TopCommodityResult,
+)
 from src.common.timer import Timer
 from src.core.models.system_model import System
 from src.core.ports.api_command_port import ApiCommandPort
@@ -15,21 +19,18 @@ class ApiCommandAdapter(ApiCommandPort):
     def __init__(self) -> None:
         self.session = SessionLocal()
 
-    def get_hotspots_in_system(self, system_name: str) -> List[HotspotResult]:
-        stmt = text(
-            """
-            SELECT * FROM api.get_hotspots_in_system(
-                :system_name
-            )
-        """
-        )
+    def get_expandable_systems_in_range(self, system_name: str) -> List[SystemResult]:
+        stmt = text("SELECT * FROM api.get_expandable_systems_in_range(:system_name)")
 
-        result = self.session.execute(
-            stmt,
-            {
-                "system_name": system_name,
-            },
-        )
+        result = self.session.execute(stmt, {"system_name": system_name})
+
+        rows: Sequence[RowMapping] = result.mappings().all()
+        return [SystemResult(**row) for row in rows]
+
+    def get_hotspots_in_system(self, system_name: str) -> List[HotspotResult]:
+        stmt = text("SELECT * FROM api.get_hotspots_in_system(:system_name)")
+
+        result = self.session.execute(stmt, {"system_name": system_name})
 
         rows: Sequence[RowMapping] = result.mappings().all()
         return [HotspotResult(**row) for row in rows]
@@ -38,12 +39,8 @@ class ApiCommandAdapter(ApiCommandPort):
         self, system_name: str, commodities_filter: List[str]
     ) -> List[HotspotResult]:
         stmt = text(
-            """
-            SELECT * FROM api.get_hotspots_in_system_by_commodities(
-                :system_name,
-                :commodities_filter
-            )
-        """
+            """SELECT * FROM api.get_hotspots_in_system_by_commodities(
+                :system_name, :commodities_filter)"""
         )
 
         timer = Timer("get_hotspots_in_system_by_commodities")
@@ -61,18 +58,25 @@ class ApiCommandAdapter(ApiCommandPort):
         timer.end()
         return rtn
 
+    def get_systems_with_power(self, power_name: str, power_states: Optional[list[str]] = None) -> List[SystemResult]:
+        params: dict[str, str | list[str]] = {"power_name": power_name}
+        if power_states:
+            params["power_states"] = power_states
+            stmt = text("SELECT * FROM api.get_systems_with_power(:power_name, :power_states)")
+        else:
+            stmt = text("SELECT * FROM api.get_systems_with_power(:power_name)")
+
+        result = self.session.execute(stmt, params)
+
+        rows: Sequence[RowMapping] = result.mappings().all()
+        return [SystemResult(**row) for row in rows]
+
     def get_top_commodities_in_system(
         self, system_name: str, comms_per_station: int, min_supplydemand: int, is_selling: bool
     ) -> List[TopCommodityResult]:
         stmt = text(
-            """
-            SELECT * FROM api.get_top_commodities_in_system(
-                :system_name,
-                :comms_per_station,
-                :min_supplydemand,
-                :is_selling
-            )
-        """
+            """SELECT * FROM api.get_top_commodities_in_system(
+                :system_name, :comms_per_station, :min_supplydemand, :is_selling)"""
         )
 
         result = self.session.execute(

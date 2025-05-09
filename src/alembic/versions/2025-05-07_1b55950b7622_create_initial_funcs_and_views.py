@@ -24,17 +24,25 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    with open(views_sql_dir / "resolved_stations_view_v1.sql") as f:
+    with open(views_sql_dir / "derived_resolved_stations_view_v1.sql") as f:
         op.execute(f.read())
-    with open(views_sql_dir / "station_commodities_v1.sql") as f:
+    with open(views_sql_dir / "derived_station_commodities_v1.sql") as f:
         op.execute(f.read())
-    with open(views_sql_dir / "hotspot_ring_view_v1.sql") as f:
+    with open(views_sql_dir / "derived_hotspot_ring_view_v1.sql") as f:
         op.execute(f.read())
-    with open(functions_sql_dir / "get_hotspots_in_system_by_commodities_v1.sql") as f:
+    with open(functions_sql_dir / "derived_get_systems_with_power_and_state_v1.sql") as f:
         op.execute(f.read())
-    with open(functions_sql_dir / "get_hotspots_in_system_v1.sql") as f:
+    with open(functions_sql_dir / "derived_get_systems_with_power_v1.sql") as f:
         op.execute(f.read())
-    with open(functions_sql_dir / "get_top_commodities_in_system_v1.sql") as f:
+    with open(functions_sql_dir / "api_get_hotspots_in_system_by_commodities_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "api_get_hotspots_in_system_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "api_get_systems_with_power_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "api_get_top_commodities_in_system_v1.sql") as f:
+        op.execute(f.read())
+    with open(functions_sql_dir / "api_get_expandable_systems_in_range_v1.sql") as f:
         op.execute(f.read())
 
 
@@ -43,6 +51,10 @@ def downgrade() -> None:
     op.execute("drop function if exists api.get_hotspots_in_system")
     op.execute("drop function if exists api.get_hotspots_in_system_by_commodities")
     op.execute("drop function if exists api.get_top_commodities_in_system")
+    op.execute("drop function if exists api.get_systems_with_power")
+    op.execute("drop function if exists api.get_expandable_systems_in_range")
+    op.execute("drop function if exists derived.get_systems_with_power_and_state")
+    op.execute("drop function if exists derived.get_systems_with_power")
     op.execute("drop view if exists derived.hotspot_ring_view")
     op.execute("drop view if exists derived.station_commodities_view")
     op.execute("drop view if exists derived.resolved_stations")
