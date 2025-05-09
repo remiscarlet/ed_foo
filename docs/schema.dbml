@@ -1,0 +1,306 @@
+Table "core"."commodities" {
+  "id64" int8
+  "symbol" text [pk, not null]
+  "name" text [not null]
+  "avg_price" int4
+  "rare_goods" bool
+  "corrosive" bool
+  "category" text
+  "is_mineable" bool
+  "ring_types" "text[]"
+  "mining_method" text
+  "has_hotspots" bool
+}
+
+Table "core"."factions" {
+  "name" text [unique, not null]
+  "allegiance" text
+  "government" text
+  "is_player" bool
+  "id" int4 [pk, not null, increment]
+}
+
+Table "core"."ship_modules" {
+  "module_id" int4
+  "name" text [not null]
+  "symbol" text [not null]
+  "category" text
+  "rating" text
+  "ship" text
+  "updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+}
+
+Table "core"."ships" {
+  "symbol" text [not null]
+  "name" text
+  "ship_id" int4
+  "updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+}
+
+Table "core"."stations" {
+  "id64" int8
+  "id_spansh" int8
+  "id_edsm" int8
+  "name" text [not null]
+  "owner_id" int4 [not null]
+  "owner_type" text [not null]
+  "allegiance" text
+  "controlling_faction" text
+  "controlling_faction_state" text
+  "distance_to_arrival" float8
+  "economies" jsonb
+  "government" text
+  "large_landing_pads" int4
+  "medium_landing_pads" int4
+  "small_landing_pads" int4
+  "primary_economy" text
+  "services" "text[]"
+  "type" text
+  "prohibited_commodities" "text[]"
+  "carrier_name" text
+  "latitude" float8
+  "longitude" float8
+  "spansh_updated_at" timestamp
+  "edsm_updated_at" timestamp
+  "eddn_updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (name, owner_id) [type: btree, name: "_station_name_owner_distanace_uc"]
+    name [type: btree, name: "ix_core_stations_name"]
+    owner_id [type: btree, name: "ix_core_stations_owner_id"]
+    owner_type [type: btree, name: "ix_core_stations_owner_type"]
+  }
+}
+
+Table "core"."market_commodities" {
+  "station_id" int8 [not null]
+  "commodity_sym" text [not null]
+  "buy_price" int4
+  "sell_price" int4
+  "supply" int4
+  "demand" int4
+  "updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (station_id, commodity_sym) [type: btree, name: "_station_market_commodity_uc"]
+    station_id [type: btree, name: "ix_core_market_commodities_station_id"]
+  }
+}
+
+Table "core"."outfitting_ship_modules" {
+  "station_id" int8 [not null]
+  "module_id" int8 [not null]
+  "updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    station_id [type: btree, name: "ix_core_outfitting_ship_modules_station_id"]
+  }
+}
+
+Table "core"."shipyard_ships" {
+  "station_id" int8 [not null]
+  "ship_id" int8 [not null]
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    station_id [type: btree, name: "ix_core_shipyard_ships_station_id"]
+  }
+}
+
+Table "core"."systems" {
+  "name" text [unique, not null]
+  "id64" int8
+  "id_spansh" int8
+  "id_edsm" int8
+  "x" float8 [not null]
+  "y" float8 [not null]
+  "z" float8 [not null]
+  "date" timestamp
+  "allegiance" text
+  "population" int8
+  "primary_economy" text
+  "secondary_economy" text
+  "security" text
+  "government" text
+  "body_count" int4
+  "controlling_power" text
+  "power_conflict_progress" jsonb
+  "power_state" text
+  "power_state_control_progress" float8
+  "power_state_reinforcement" float8
+  "power_state_undermining" float8
+  "powers" "text[]"
+  "thargoid_war" jsonb
+  "controlling_power_updated_at" timestamp
+  "power_state_updated_at" timestamp
+  "powers_updated_at" timestamp
+  "controlling_faction_id" int4
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    controlling_faction_id [type: btree, name: "ix_core_systems_controlling_faction_id"]
+  }
+}
+
+Table "core"."bodies" {
+  "name" text [not null]
+  "id64" int8
+  "id_spansh" int8
+  "id_edsm" int8
+  "body_id" int8
+  "system_id" int4 [not null]
+  "atmosphere_composition" jsonb
+  "materials" jsonb
+  "parents" jsonb
+  "absolute_magnitude" float8
+  "age" int4
+  "arg_of_periapsis" float8
+  "ascending_node" float8
+  "atmosphere_type" text
+  "axial_tilt" float8
+  "distance_to_arrival" float8
+  "earth_masses" float8
+  "gravity" float8
+  "is_landable" bool
+  "luminosity" text
+  "main_star" bool
+  "mean_anomaly" float8
+  "orbital_eccentricity" float8
+  "orbital_inclination" float8
+  "orbital_period" float8
+  "radius" float8
+  "reserve_level" text
+  "rotational_period" float8
+  "rotational_period_tidally_locked" bool
+  "semi_major_axis" float8
+  "solar_masses" float8
+  "solar_radius" float8
+  "solid_composition" jsonb
+  "spectral_class" text
+  "sub_type" text
+  "surface_pressure" float8
+  "surface_temperature" float8
+  "terraforming_state" text
+  "type" text
+  "volcanism_type" text
+  "mean_anomaly_updated_at" timestamp
+  "distance_to_arrival_updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (system_id, name, type, sub_type, body_id, main_star) [type: btree, name: "_bodies_uc"]
+    system_id [type: btree, name: "ix_core_bodies_system_id"]
+  }
+}
+
+Table "core"."faction_presences" {
+  "system_id" int4 [not null]
+  "faction_id" int4 [not null]
+  "influence" float8
+  "state" text
+  "happiness" text
+  "updated_at" timestamp
+  "active_states" "text[]"
+  "pending_states" "text[]"
+  "recovering_states" "text[]"
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (system_id, faction_id) [type: btree, name: "_system_faction_presence_uc"]
+    faction_id [type: btree, name: "ix_core_faction_presences_faction_id"]
+    system_id [type: btree, name: "ix_core_faction_presences_system_id"]
+  }
+}
+
+Table "core"."thargoid_wars" {
+  "system_id" int8 [not null]
+  "current_state" text [not null]
+  "days_remaining" float8 [not null]
+  "failure_state" text [not null]
+  "ports_remaining" float8 [not null]
+  "progress" float8 [not null]
+  "success_reached" bool [not null]
+  "success_state" text [not null]
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    system_id [type: btree, name: "ix_core_thargoid_wars_system_id"]
+  }
+}
+
+Table "core"."rings" {
+  "id64" int8
+  "name" text [not null]
+  "body_id" int4 [not null]
+  "type" text
+  "mass" float8
+  "inner_radius" float8
+  "outer_radius" float8
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (body_id, name) [type: btree, name: "_ring_on_body_uc"]
+    body_id [type: btree, name: "ix_core_rings_body_id"]
+  }
+}
+
+Table "core"."signals" {
+  "body_id" int4 [not null]
+  "signal_type" text
+  "count" int4
+  "updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (body_id, signal_type) [type: btree, name: "_signal_on_body_uc"]
+    body_id [type: btree, name: "ix_core_signals_body_id"]
+  }
+}
+
+Table "core"."hotspots" {
+  "ring_id" int4 [not null]
+  "commodity_sym" text [not null]
+  "count" int4
+  "updated_at" timestamp
+  "id" int4 [pk, not null, increment]
+
+  Indexes {
+    (ring_id, commodity_sym) [type: btree, name: "_ring_and_commodity_uc"]
+    ring_id [type: btree, name: "ix_core_hotspots_ring_id"]
+  }
+}
+
+Ref "bodies_system_id_fkey":"core"."systems"."id" < "core"."bodies"."system_id"
+
+Ref "faction_presences_faction_id_fkey":"core"."factions"."id" < "core"."faction_presences"."faction_id"
+
+Ref "faction_presences_system_id_fkey":"core"."systems"."id" < "core"."faction_presences"."system_id"
+
+Ref "hotspots_commodity_sym_fkey":"core"."commodities"."symbol" < "core"."hotspots"."commodity_sym"
+
+Ref "hotspots_ring_id_fkey":"core"."rings"."id" < "core"."hotspots"."ring_id"
+
+Ref "market_commodities_commodity_sym_fkey":"core"."commodities"."symbol" < "core"."market_commodities"."commodity_sym"
+
+Ref "market_commodities_station_id_fkey":"core"."stations"."id" < "core"."market_commodities"."station_id"
+
+Ref "outfitting_ship_modules_module_id_fkey":"core"."ship_modules"."id" < "core"."outfitting_ship_modules"."module_id"
+
+Ref "outfitting_ship_modules_station_id_fkey":"core"."stations"."id" < "core"."outfitting_ship_modules"."station_id"
+
+Ref "rings_body_id_fkey":"core"."bodies"."id" < "core"."rings"."body_id"
+
+Ref "shipyard_ships_ship_id_fkey":"core"."ships"."id" < "core"."shipyard_ships"."ship_id"
+
+Ref "shipyard_ships_station_id_fkey":"core"."stations"."id" < "core"."shipyard_ships"."station_id"
+
+Ref "signals_body_id_fkey":"core"."bodies"."id" < "core"."signals"."body_id"
+
+Ref "systems_controlling_faction_id_fkey":"core"."factions"."id" < "core"."systems"."controlling_faction_id"
+
+Ref "thargoid_wars_system_id_fkey":"core"."systems"."id" < "core"."thargoid_wars"."system_id"

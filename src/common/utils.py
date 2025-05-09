@@ -1,4 +1,5 @@
 import gzip
+import math
 import os
 import shutil
 from datetime import datetime, timezone
@@ -96,6 +97,8 @@ def seconds_to_str(sec: float) -> str:
     if not sec:
         return "0s"
 
+    ms_str = f"{sec - math.trunc(sec):.3f}"
+    ms_str_zero_truncated = ms_str[2:]  # Truncate the `0.` prefix on `0.56` etc
     s = int(sec % 60)
     m = int(sec // 60) % 60
     h = int(sec // (60 * 60)) % (60 * 60)
@@ -104,10 +107,12 @@ def seconds_to_str(sec: float) -> str:
         "h": h,
         "m": m,
         "s": s,
+        "ms": ms_str_zero_truncated,
     }
 
     parts = []
     for sym, val in config.items():
-        if val > 0:
+        if val:
             parts.append(f"{val}{sym}")
+
     return "".join(parts)

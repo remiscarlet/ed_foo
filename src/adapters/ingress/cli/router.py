@@ -1,10 +1,9 @@
 import asyncio
 import logging
-from functools import wraps
+from argparse import ArgumentParser, Namespace
 from pprint import pformat
-from typing import Annotated, Any, Callable, Coroutine, List
+from typing import Any
 
-import typer
 from tabulate import tabulate
 
 from src.adapters.persistence.postgresql.adapter import (
@@ -12,17 +11,12 @@ from src.adapters.persistence.postgresql.adapter import (
     SystemsAdapter,
 )
 from src.adapters.persistence.postgresql.types import HotspotResult
-from src.common.logging import configure_logger
+from src.common.logging import configure_logger, get_logger
+from src.common.timer import Timer
 from src.common.utils import get_time_since
 from src.ingestion.spansh.pipeline import SpanshDataPipeline
 
-
-def typer_async[T, **P](f: Callable[P, Coroutine[Any, Any, T]]) -> Callable[P, T]:
-    @wraps(f)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-        return asyncio.run(f(*args, **kwargs))
-
-    return wrapper
+logger = get_logger(__name__)
 
 
 def verbose_count_to_log_level(count: int) -> int:
@@ -35,155 +29,152 @@ def verbose_count_to_log_level(count: int) -> int:
             return logging.TRACE  # type: ignore # dynamically added
 
 
-# Debug CLI
-debug_cli = typer.Typer()
+def print_hotspot_results(system_name: str, hotspots: list[HotspotResult]) -> None:
+    logger.info("")
+    logger.info("====== SYSTEM ======")
+    logger.info(f"Name: {system_name}\n")
+    if not hotspots:
+        print("!! Found NO hotspots in this system!")
+        return
 
-
-@debug_cli.command()
-def hello_world(name: str) -> None:
-    typer.echo(f"Hello World, {name}")
+    headers = ["Ring", "Ring Type", "Commodity", "Count"]
+    table = [[h.ring_name, h.ring_type, h.commodity, h.count] for h in hotspots]
+    logger.info(tabulate(table, headers))
 
 
 # Data Ingestion CLI
-ingestion_cli = typer.Typer()
 
 
-@ingestion_cli.command()
-@typer_async
-async def import_spansh(
-    verbose: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
-    start_at_system_idx: Annotated[
-        int, typer.Option("--system-start-idx", "-s", help="System index in the dump to start at.")
-    ] = 0,
-    skipping_past_every: Annotated[
-        int,
-        typer.Option(
-            "--skipping-past-every", "-S", help="If starting at a non-zero index, print progress every S systems"
-        ),
-    ] = 1000,
-    validated_every: Annotated[
-        int, typer.Option("--validated-every", "-V", help="Print json validation progress every V systems")
-    ] = 500,
-    process_every: Annotated[
-        int, typer.Option("--process-every", "-P", help="Batch process and upsert into Postgres every P systems")
-    ] = 1500,
-    max_market_data_age_days: Annotated[
-        int, typer.Option("--max-market-data-age-days", "-M", help="Maximum age of market data to import")
-    ] = 30,
-) -> None:
-    configure_logger(verbose_count_to_log_level(verbose))
+def run_import_spansh(args: Namespace) -> None:
+    async def run() -> None:
+        pipeline = SpanshDataPipeline(
+            start_at_system_idx=args.system_start_idx,
+            skipping_past_every=args.skipping_past_every,
+            validated_every=args.validated_every,
+            process_every=args.process_every,
+            max_market_data_age_days=args.max_market_data_age_days,
+        )
+        await pipeline.run()
 
-    pipeline = SpanshDataPipeline(
-        start_at_system_idx=start_at_system_idx,
-        skipping_past_every=skipping_past_every,
-        validated_every=validated_every,
-        process_every=process_every,
-        max_market_data_age_days=max_market_data_age_days,
-    )
-    await pipeline.run()
+    asyncio.run(run())
 
 
-@ingestion_cli.command()
-def download_spansh(
-    verbose: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
-) -> None:
-    configure_logger(verbose_count_to_log_level(verbose))
-
+def run_download_spansh(args: Namespace) -> None:
     SpanshDataPipeline.download_data()
 
 
 # System CLI
-system_cli = typer.Typer()
-
-systems_adapter = SystemsAdapter()
 
 
-@system_cli.command()
-def get_world(world_name: str) -> None:
-    system = systems_adapter.get_system(world_name)
-    typer.echo(pformat(system))
+def run_get_world(args: Namespace) -> None:
+    system = SystemsAdapter().get_system(args.name)
+    print(pformat(system))
 
 
 # API CLI
-api_cli = typer.Typer()
-
-api_adapter = ApiCommandAdapter()
 
 
-def print_hotspot_results(system_name: str, hotspots: List[HotspotResult]) -> None:
-    typer.echo("")
-    typer.echo("====== SYSTEM ======")
-    typer.echo(f"Name: {system_name}")
-    typer.echo("")
-    if not hotspots:
-        typer.echo("!! Found NO hotspots in this system!")
-
-    headers = ["Ring", "Ring Type", "Commodity", "Count"]
-    table = []
-    for hotspot in hotspots:
-        table.append(
-            [
-                hotspot.ring_name,
-                hotspot.ring_type,
-                hotspot.commodity,
-                hotspot.count,
-            ]
-        )
-    typer.echo(tabulate(table, headers))
-    typer.echo("")
+def run_get_hotspots(args: Namespace) -> None:
+    timer = Timer("Get Hotspots In System")
+    hotspots = ApiCommandAdapter().get_hotspots_in_system(args.system_name)
+    print_hotspot_results(args.system_name, hotspots)
+    timer.end()
 
 
-@api_cli.command()
-def get_hotspots_in_system(system_name: str) -> None:
-    hotspots = api_adapter.get_hotspots_in_system(system_name)
-    print_hotspot_results(system_name, hotspots)
+def run_get_hotspots_by_commodities(args: Namespace) -> None:
+    timer = Timer("Get Hotspots In System By Commodities")
+    hotspots = ApiCommandAdapter().get_hotspots_in_system_by_commodities(args.system_name, args.commodities_filter)
+    print_hotspot_results(args.system_name, hotspots)
+    timer.end()
 
 
-@api_cli.command()
-def get_hotspots_in_system_by_commodities(system_name: str, commodities_filter: List[str]) -> None:
-    hotspots = api_adapter.get_hotspots_in_system_by_commodities(system_name, commodities_filter)
-    print_hotspot_results(system_name, hotspots)
-
-
-@api_cli.command()
-def get_top_commodities_in_system(
-    system_name: str, comms_per_station: int = 5, min_supplydemand: int = 1, is_selling: bool = True
-) -> None:
-    commodities = api_adapter.get_top_commodities_in_system(
-        system_name, comms_per_station, min_supplydemand, is_selling
+def run_get_top_commodities(args: Namespace) -> None:
+    adapter = ApiCommandAdapter()
+    timer = Timer("Get Top Commodities In System")
+    commodities = adapter.get_top_commodities_in_system(
+        args.system_name, args.comms_per_station, args.min_supplydemand, args.is_selling
     )
 
-    typer.echo("")
-    typer.echo("====== SYSTEM ======")
-    typer.echo(f"Name: {system_name}")
-    typer.echo("")
+    logger.info("")
+    logger.info("====== SYSTEM ======")
+    logger.info(f"Name: {args.system_name}\n")
     if not commodities:
-        typer.echo("!! Found NO stations with known markets!")
+        logger.info("!! Found NO stations with known markets!")
 
     headers = ["Station Name", "Distance", "Commodity", "Sell Price", "Demand", "Buy Price", "Supply", "Updated Last"]
-    table = []
-    for commodity in commodities:
-        time_since_update = get_time_since(commodity.updated_at) if commodity.updated_at is not None else "Unknown"
-        table.append(
-            [
-                commodity.station_name,
-                f"{commodity.distance_to_arrival:.2f} LY",
-                commodity.commodity,
-                f"{commodity.sell_price} CR",
-                commodity.demand,
-                f"{commodity.buy_price} CR",
-                commodity.supply,
-                time_since_update,
-            ]
-        )
-    typer.echo(tabulate(table, headers))
-    typer.echo("")
+    table = [
+        [
+            c.station_name,
+            f"{c.distance_to_arrival:.2f} LY",
+            c.commodity,
+            f"{c.sell_price} CR",
+            c.demand,
+            f"{c.buy_price} CR",
+            c.supply,
+            get_time_since(c.updated_at) if c.updated_at else "Unknown",
+        ]
+        for c in commodities
+    ]
+    logger.info(tabulate(table, headers))
+    logger.info("")
+    timer.end()
 
 
-# Main CLI
-cli = typer.Typer()
+# Argparse
 
-cli.add_typer(ingestion_cli, name="ingestion")
-cli.add_typer(debug_cli, name="debug")
-cli.add_typer(system_cli, name="system")
-cli.add_typer(api_cli, name="api")
+
+def configure_ingestion_parser(subparsers: Any) -> None:
+    ingestion = subparsers.add_parser("ingestion")
+    ingestion_sub = ingestion.add_subparsers(dest="subcommand")
+
+    spansh_dl = ingestion_sub.add_parser("download")
+    spansh_dl.add_argument("-v", "--verbose", action="count", default=0)
+    spansh_dl.set_defaults(func=run_download_spansh)
+
+    spansh_import = ingestion_sub.add_parser("import")
+    spansh_import.add_argument("-v", "--verbose", action="count", default=0)
+    spansh_import.add_argument("-s", "--system-start-idx", type=int, default=0)
+    spansh_import.add_argument("-S", "--skipping-past-every", type=int, default=1000)
+    spansh_import.add_argument("-V", "--validated-every", type=int, default=500)
+    spansh_import.add_argument("-P", "--process-every", type=int, default=1500)
+    spansh_import.add_argument("-M", "--max-market-data-age-days", type=int, default=30)
+    spansh_import.set_defaults(func=run_import_spansh)
+
+
+def configure_api_parser(subparsers: Any) -> None:
+    api = subparsers.add_parser("api")
+    api_sub = api.add_subparsers(dest="subcommand")
+
+    api_hotspots = api_sub.add_parser("get-hotspots")
+    api_hotspots.add_argument("system_name")
+    api_hotspots.add_argument("-v", "--verbose", action="count", default=0)
+    api_hotspots.set_defaults(func=run_get_hotspots)
+
+    api_hotspots_by_comm = api_sub.add_parser("get-hotspots-by")
+    api_hotspots_by_comm.add_argument("system_name")
+    api_hotspots_by_comm.add_argument("commodities_filter", nargs="+")
+    api_hotspots_by_comm.add_argument("-v", "--verbose", action="count", default=0)
+    api_hotspots_by_comm.set_defaults(func=run_get_hotspots_by_commodities)
+
+    api_top_commodities = api_sub.add_parser("get-top-commodities")
+    api_top_commodities.add_argument("system_name")
+    api_top_commodities.add_argument("--comms-per-station", type=int, default=5)
+    api_top_commodities.add_argument("--min-supplydemand", type=int, default=1)
+    api_top_commodities.add_argument("--is-selling", action="store_true")
+    api_top_commodities.add_argument("-v", "--verbose", action="count", default=0)
+    api_top_commodities.set_defaults(func=run_get_top_commodities)
+
+
+def cli() -> None:
+    parser = ArgumentParser(description="Elite Dangerous CLI Tool")
+    subparsers = parser.add_subparsers(dest="command")
+
+    configure_ingestion_parser(subparsers)
+    configure_api_parser(subparsers)
+
+    args = parser.parse_args()
+    if hasattr(args, "func"):
+        configure_logger(verbose_count_to_log_level(args.verbose))
+        args.func(args)
+    else:
+        parser.print_help()

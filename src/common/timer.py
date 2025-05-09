@@ -50,10 +50,11 @@ class Timer:
 
     def log(self, dur: float, lap: bool = False) -> None:
         if lap:
-            msg = f"[{self.__name}] Lapped in {seconds_to_str(dur)} seconds"
+            msg = f"[{self.__name}] Lapped in {seconds_to_str(dur)}"
         else:
-            msg = f"[{self.__name}] Took {seconds_to_str(dur)} seconds total"
-        logger.info(msg)
+            msg = f"[{self.__name}] Took {seconds_to_str(dur)} total"
+
+        logger.debug(msg)
 
     def __enter__(self) -> "Timer":
         return self

@@ -11,7 +11,7 @@ app = None
 async def run() -> None:
     app_mode = os.getenv("APP_MODE", "cli")
     if app_mode == "cli":
-        await cli()
+        cli()
     else:
         global app
         app = FastAPI()

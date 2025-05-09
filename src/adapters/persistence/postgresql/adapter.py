@@ -5,6 +5,7 @@ from sqlalchemy import RowMapping, select, text
 from src.adapters.persistence.postgresql import SessionLocal
 from src.adapters.persistence.postgresql.db import SystemsDB
 from src.adapters.persistence.postgresql.types import HotspotResult, TopCommodityResult
+from src.common.timer import Timer
 from src.core.models.system_model import System
 from src.core.ports.api_command_port import ApiCommandPort
 from src.core.ports.system_port import SystemPort
@@ -45,6 +46,7 @@ class ApiCommandAdapter(ApiCommandPort):
         """
         )
 
+        timer = Timer("get_hotspots_in_system_by_commodities")
         result = self.session.execute(
             stmt,
             {
@@ -54,7 +56,10 @@ class ApiCommandAdapter(ApiCommandPort):
         )
 
         rows: Sequence[RowMapping] = result.mappings().all()
-        return [HotspotResult(**row) for row in rows]
+        rtn = [HotspotResult(**row) for row in rows]
+
+        timer.end()
+        return rtn
 
     def get_top_commodities_in_system(
         self, system_name: str, comms_per_station: int, min_supplydemand: int, is_selling: bool

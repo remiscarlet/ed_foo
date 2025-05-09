@@ -26,19 +26,19 @@ run-pipeline: download-spansh import-spansh-v
 ## Code Quality
 
 lint:
+	poetry run sqlfluff lint --dialect postgres .
 	poetry run yamllint **/*.yaml
 	poetry run lint_metadata
 	poetry run black --check src/
 	poetry run isort --check-only src/
 	poetry run flake8 src/ -v
-	poetry run sqlfluff lint --dialect postgres .
 
 lint-fix:
+	poetry run sqlfluff fix --dialect postgres .
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black src/
 	poetry run isort src/
-	poetry run sqlfluff fix --dialect postgres .
 
 type:
 	poetry run mypy src/
@@ -46,13 +46,13 @@ type:
 check: lint type
 
 lint-fix-check:
+	poetry run sqlfluff fix --dialect postgres .
 	poetry run yamlfix **/*.yaml
 	poetry run lint_metadata
 	poetry run black src/
 	poetry run isort src/
 	poetry run flake8 src/ -v
 	poetry run mypy src/
-	poetry run sqlfluff fix --dialect postgres .
 
 ## Docker (Dev Only)
 
