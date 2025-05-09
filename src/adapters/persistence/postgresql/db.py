@@ -43,7 +43,7 @@ class BodiesDB(BaseModelWithId):
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_edsm: Mapped[Optional[int]] = mapped_column(BigInteger)
 
-    body_id: Mapped[Optional[int]] = mapped_column(BigInteger)  # The "idx" of the body _within the system_
+    body_id: Mapped[Optional[int]] = mapped_column(Integer)  # The "idx" of the body _within the system_
 
     system_id: Mapped[int] = mapped_column(ForeignKey("core.systems.id"), nullable=False, index=True)
     system: Mapped["SystemsDB"] = relationship(back_populates="bodies")
@@ -209,7 +209,7 @@ class StationsDB(BaseModelWithId):
     id_edsm: Mapped[Optional[int]] = mapped_column(BigInteger)
     name: Mapped[str] = mapped_column(Text, nullable=False, index=True)  # Station name is NOT unique
 
-    owner_id: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
+    owner_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     owner_type: Mapped[str] = mapped_column(Text, nullable=False, index=True)
 
     allegiance: Mapped[Optional[str]] = mapped_column(Text)
@@ -324,7 +324,7 @@ class MarketCommoditiesDB(BaseModelWithId):
         {"schema": "core"},
     )
 
-    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False, index=True)
+    station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("core.commodities.symbol"), nullable=False)
 
     buy_price: Mapped[Optional[int]] = mapped_column(Integer)
@@ -354,9 +354,9 @@ class ShipyardShipsDB(BaseModelWithId):
     __tablename__ = "shipyard_ships"
     __table_args__ = {"schema": "core"}
 
-    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False, index=True)
+    station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     ship_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("core.ships.id"), nullable=False
+        Integer, ForeignKey("core.ships.id"), nullable=False
     )  # Small lookup table; no index
 
     def __repr__(self) -> str:
@@ -383,9 +383,9 @@ class OutfittingShipModulesDB(BaseModelWithId):
     __tablename__ = "outfitting_ship_modules"
     __table_args__ = {"schema": "core"}
 
-    station_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.stations.id"), nullable=False, index=True)
+    station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     module_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("core.ship_modules.id"), nullable=False
+        Integer, ForeignKey("core.ship_modules.id"), nullable=False
     )  # Small lookup table; no index
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -397,7 +397,7 @@ class ThargoidWarDB(BaseModelWithId):
     __tablename__ = "thargoid_wars"
     __table_args__ = {"schema": "core"}
 
-    system_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("core.systems.id"), nullable=False, index=True)
+    system_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.systems.id"), nullable=False, index=True)
 
     current_state: Mapped[str] = mapped_column(Text)
     days_remaining: Mapped[float] = mapped_column(Float)

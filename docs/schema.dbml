@@ -21,6 +21,7 @@ Table "core"."factions" {
 }
 
 Table "core"."ship_modules" {
+  "id" int4 [pk, not null, increment]
   "module_id" int4
   "name" text [not null]
   "symbol" text [not null]
@@ -28,7 +29,6 @@ Table "core"."ship_modules" {
   "rating" text
   "ship" text
   "updated_at" timestamp
-  "id" int4 [pk, not null, increment]
 }
 
 Table "core"."ships" {
@@ -76,7 +76,7 @@ Table "core"."stations" {
 }
 
 Table "core"."market_commodities" {
-  "station_id" int8 [not null]
+  "station_id" int4 [not null]
   "commodity_sym" text [not null]
   "buy_price" int4
   "sell_price" int4
@@ -92,8 +92,8 @@ Table "core"."market_commodities" {
 }
 
 Table "core"."outfitting_ship_modules" {
-  "station_id" int8 [not null]
-  "module_id" int8 [not null]
+  "station_id" int4 [not null]
+  "module_id" int4 [not null]
   "updated_at" timestamp
   "id" int4 [pk, not null, increment]
 
@@ -103,8 +103,8 @@ Table "core"."outfitting_ship_modules" {
 }
 
 Table "core"."shipyard_ships" {
-  "station_id" int8 [not null]
-  "ship_id" int8 [not null]
+  "station_id" int4 [not null]
+  "ship_id" int4 [not null]
   "id" int4 [pk, not null, increment]
 
   Indexes {
@@ -113,6 +113,8 @@ Table "core"."shipyard_ships" {
 }
 
 Table "core"."systems" {
+  "id" int4 [pk, not null, increment]
+  "controlling_faction_id" int4
   "name" text [unique, not null]
   "id64" int8
   "id_spansh" int8
@@ -120,6 +122,7 @@ Table "core"."systems" {
   "x" float8 [not null]
   "y" float8 [not null]
   "z" float8 [not null]
+  "coords" geometry("POINTZ", 0) [not null]
   "date" timestamp
   "allegiance" text
   "population" int8
@@ -139,8 +142,6 @@ Table "core"."systems" {
   "controlling_power_updated_at" timestamp
   "power_state_updated_at" timestamp
   "powers_updated_at" timestamp
-  "controlling_faction_id" int4
-  "id" int4 [pk, not null, increment]
 
   Indexes {
     controlling_faction_id [type: btree, name: "ix_core_systems_controlling_faction_id"]
@@ -148,11 +149,12 @@ Table "core"."systems" {
 }
 
 Table "core"."bodies" {
+  "id" int4 [pk, not null, increment]
   "name" text [not null]
   "id64" int8
   "id_spansh" int8
   "id_edsm" int8
-  "body_id" int8
+  "body_id" int4
   "system_id" int4 [not null]
   "atmosphere_composition" jsonb
   "materials" jsonb
@@ -190,7 +192,6 @@ Table "core"."bodies" {
   "volcanism_type" text
   "mean_anomaly_updated_at" timestamp
   "distance_to_arrival_updated_at" timestamp
-  "id" int4 [pk, not null, increment]
 
   Indexes {
     (system_id, name, type, sub_type, body_id, main_star) [type: btree, name: "_bodies_uc"]
@@ -199,8 +200,8 @@ Table "core"."bodies" {
 }
 
 Table "core"."faction_presences" {
-  "system_id" int4 [not null]
   "faction_id" int4 [not null]
+  "system_id" int4 [not null]
   "influence" float8
   "state" text
   "happiness" text
@@ -218,7 +219,7 @@ Table "core"."faction_presences" {
 }
 
 Table "core"."thargoid_wars" {
-  "system_id" int8 [not null]
+  "system_id" int4 [not null]
   "current_state" text [not null]
   "days_remaining" float8 [not null]
   "failure_state" text [not null]
@@ -263,11 +264,11 @@ Table "core"."signals" {
 }
 
 Table "core"."hotspots" {
-  "ring_id" int4 [not null]
   "commodity_sym" text [not null]
   "count" int4
   "updated_at" timestamp
   "id" int4 [pk, not null, increment]
+  "ring_id" int4 [not null]
 
   Indexes {
     (ring_id, commodity_sym) [type: btree, name: "_ring_and_commodity_uc"]

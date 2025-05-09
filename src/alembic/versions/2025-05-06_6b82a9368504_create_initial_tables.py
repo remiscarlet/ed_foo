@@ -84,7 +84,7 @@ def upgrade() -> None:
         sa.Column("id_spansh", sa.BigInteger(), nullable=True),
         sa.Column("id_edsm", sa.BigInteger(), nullable=True),
         sa.Column("name", sa.Text(), nullable=False),
-        sa.Column("owner_id", sa.BigInteger(), nullable=False),
+        sa.Column("owner_id", sa.Integer(), nullable=False),
         sa.Column("owner_type", sa.Text(), nullable=False),
         sa.Column("allegiance", sa.Text(), nullable=True),
         sa.Column("controlling_faction", sa.Text(), nullable=True),
@@ -115,7 +115,7 @@ def upgrade() -> None:
     op.create_index(op.f("ix_core_stations_owner_type"), "stations", ["owner_type"], unique=False, schema="core")
     op.create_table(
         "market_commodities",
-        sa.Column("station_id", sa.BigInteger(), nullable=False),
+        sa.Column("station_id", sa.Integer(), nullable=False),
         sa.Column("commodity_sym", sa.Text(), nullable=False),
         sa.Column("buy_price", sa.Integer(), nullable=True),
         sa.Column("sell_price", sa.Integer(), nullable=True),
@@ -140,8 +140,8 @@ def upgrade() -> None:
     )
     op.create_table(
         "outfitting_ship_modules",
-        sa.Column("station_id", sa.BigInteger(), nullable=False),
-        sa.Column("module_id", sa.BigInteger(), nullable=False),
+        sa.Column("station_id", sa.Integer(), nullable=False),
+        sa.Column("module_id", sa.Integer(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
@@ -164,8 +164,8 @@ def upgrade() -> None:
     )
     op.create_table(
         "shipyard_ships",
-        sa.Column("station_id", sa.BigInteger(), nullable=False),
-        sa.Column("ship_id", sa.BigInteger(), nullable=False),
+        sa.Column("station_id", sa.Integer(), nullable=False),
+        sa.Column("ship_id", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["ship_id"],
@@ -237,7 +237,7 @@ def upgrade() -> None:
         sa.Column("id64", sa.BigInteger(), nullable=True),
         sa.Column("id_spansh", sa.BigInteger(), nullable=True),
         sa.Column("id_edsm", sa.BigInteger(), nullable=True),
-        sa.Column("body_id", sa.BigInteger(), nullable=True),
+        sa.Column("body_id", sa.Integer(), nullable=True),
         sa.Column("system_id", sa.Integer(), nullable=False),
         sa.Column("atmosphere_composition", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("materials", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
@@ -317,7 +317,7 @@ def upgrade() -> None:
     )
     op.create_table(
         "thargoid_wars",
-        sa.Column("system_id", sa.BigInteger(), nullable=False),
+        sa.Column("system_id", sa.Integer(), nullable=False),
         sa.Column("current_state", sa.Text(), nullable=False),
         sa.Column("days_remaining", sa.Float(), nullable=False),
         sa.Column("failure_state", sa.Text(), nullable=False),
