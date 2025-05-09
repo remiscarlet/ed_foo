@@ -35,18 +35,31 @@ class SystemResult(BaseModel):
     x: float
     y: float
     z: float
-    allegiance: str
+    allegiance: str | None
     population: int
-    primary_economy: str
-    secondary_economy: str
-    security: str
-    government: str
+    primary_economy: str | None
+    secondary_economy: str | None
+    security: str | None
+    government: str | None
     body_count: int
-    controlling_power: str
-    power_conflict_progress: list[dict[str, float]]
-    power_state: str
-    power_state_control_progress: float
-    power_state_reinforcement: float
-    power_state_undermining: float
-    powers: list[str]
+    controlling_power: str | None
+    power_conflict_progress: list[dict[str, Any]] | None
+    power_state: str | None
+    power_state_control_progress: float | None
+    power_state_reinforcement: float | None
+    power_state_undermining: float | None
+    powers: list[str] | None
     thargoid_war: dict[str, Any] | None
+
+    @property
+    def power_conflict_progress_str(self) -> str:
+        if self.power_conflict_progress is None:
+            return "No Conflict"
+
+        self.power_conflict_progress.sort(key=lambda d: d.get("power", ""))
+
+        power_strs = []
+        for power in self.power_conflict_progress:
+            power_strs.append(f"{power.get('power')}: {power.get('progress')}")
+
+        return ", ".join(power_strs)

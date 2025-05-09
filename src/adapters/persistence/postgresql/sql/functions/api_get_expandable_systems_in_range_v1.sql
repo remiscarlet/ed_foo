@@ -47,7 +47,7 @@ BEGIN
         s.power_state_reinforcement, s.power_state_undermining,
         s.powers, s.thargoid_war, s.controlling_power_updated_at,
         s.power_state_updated_at, s.powers_updated_at
-    from derived.get_systems_with_power(
+    from derived.get_systems_with_power_and_state(
         'Nakato Kaine',
         array['Stronghold', 'Fortified']
     ) s

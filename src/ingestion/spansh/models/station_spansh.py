@@ -24,6 +24,9 @@ class CommoditySpansh(CommodityPriceSpansh):
     name: str
     symbol: str
 
+    def to_cache_key_tuple(self, station_id: int, commodity_symbol: str) -> Tuple[Any, ...]:
+        return (self.__class__, station_id, commodity_symbol)
+
     def to_sqlalchemy_dict(self, station_id: int, commodity_sym: str) -> dict[str, Any]:
         return {
             "station_id": station_id,

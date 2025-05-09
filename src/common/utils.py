@@ -1,5 +1,4 @@
 import gzip
-import math
 import os
 import shutil
 from datetime import datetime, timezone
@@ -108,10 +107,9 @@ def seconds_to_str(sec: float) -> str:
     }
 
     if not (h or m):
-        # Only print ms if it's under 1 minute
-        ms_str = f"{sec - math.trunc(sec):.3f}"
-        ms_str_zero_truncated = ms_str[2:]  # Truncate the `0.` prefix on `0.56` etc
-        config["ms"] = ms_str_zero_truncated
+        # Only print fractional seconds if it's under 1 minute
+        ms_str = f"{sec % 60:.2f}"
+        config["s"] = ms_str
 
     parts = []
     for sym, val in config.items():

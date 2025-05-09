@@ -249,7 +249,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
 
     # --- Market ---
 
-    commodities: list[dict[str, Any]] = []
+    commodities: dict[int, dict[str, Any]] = {}
 
     now = datetime.now(timezone.utc)
     max_data_age = timedelta(days=partitioner.max_market_data_age_days)
@@ -266,7 +266,9 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         station_id = partitioner.get_spansh_entity_id_by_key(station.to_cache_key(owner_id))
 
         for commodity in station.market.commodities or []:
-            commodities.append(commodity.to_sqlalchemy_dict(station_id, commodity.symbol))
+            commodities[commodity.to_cache_key(station_id, commodity.symbol)] = commodity.to_sqlalchemy_dict(
+                station_id, commodity.symbol
+            )
 
     for system in input_systems:
         for station in system.stations or []:
@@ -280,7 +282,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
     upsert_all(
         partitioner.session,
         MarketCommoditiesDB,
-        commodities,
+        list(commodities.values()),
         ["station_id", "commodity_sym"],
         ["id"],
     )

@@ -10,7 +10,7 @@ from src.adapters.persistence.postgresql.adapter import (
     ApiCommandAdapter,
     SystemsAdapter,
 )
-from src.adapters.persistence.postgresql.types import HotspotResult, SystemResult
+from src.adapters.persistence.postgresql.types import HotspotResult
 from src.common.logging import configure_logger, get_logger
 from src.common.timer import Timer
 from src.common.utils import get_time_since
@@ -40,19 +40,6 @@ def print_hotspot_results(system_name: str, hotspots: list[HotspotResult]) -> No
     headers = ["Ring", "Ring Type", "Commodity", "Count"]
     table = [[h.ring_name, h.ring_type, h.commodity, h.count] for h in hotspots]
     logger.info(tabulate(table, headers))
-
-
-def print_system_and_power_states(systems: list[SystemResult]) -> None:
-    headers = ["System Name", "Power State"]
-    table = [
-        [
-            s.name,
-            s.power_state,
-        ]
-        for s in systems
-    ]
-    logger.info(tabulate(table, headers))
-    logger.info("")
 
 
 # Data Ingestion CLI
@@ -96,7 +83,18 @@ def run_get_acquirable_systems_in_range(args: Namespace) -> None:
     logger.info(f"Name: {args.system_name}\n")
 
     logger.info("====== ACQUIRABLE SYSTEMS (UNOCCUPIED) ======")
-    print_system_and_power_states(systems)
+    headers = ["System Name", "Population", "Primary Economy", "Power Conflict Progress"]
+    table = [
+        [
+            s.name,
+            f"{s.population:3,}",
+            s.primary_economy,
+            s.power_conflict_progress_str,
+        ]
+        for s in systems
+    ]
+    logger.info(tabulate(table, headers))
+    logger.info("")
 
     timer.end()
 
@@ -110,7 +108,18 @@ def run_get_expandable_systems_in_range(args: Namespace) -> None:
     logger.info(f"Name: {args.system_name}\n")
 
     logger.info("====== SYSTEMS THAT CAN EXPAND INTO CURRENT ======")
-    print_system_and_power_states(systems)
+    headers = ["System Name", "Power State", "Population", "Primary Economy"]
+    table = [
+        [
+            s.name,
+            s.power_state,
+            f"{s.population:3,}",
+            s.primary_economy,
+        ]
+        for s in systems
+    ]
+    logger.info(tabulate(table, headers))
+    logger.info("")
 
     timer.end()
 
@@ -140,7 +149,17 @@ def run_get_systems_with_power(args: Namespace) -> None:
         logger.info(f"Systems States: {pformat(args.power_states)}\n")
 
     logger.info(f"====== SYSTEMS INFLUENCED BY {args.power_name} ======")
-    print_system_and_power_states(systems)
+    headers = ["System Name", "Power State", "Population", "Primary Economy"]
+    table = [
+        [
+            s.name,
+            s.power_state,
+            f"{s.population:3,}",
+            s.primary_economy,
+        ]
+        for s in systems
+    ]
+    logger.info(tabulate(table, headers))
 
     timer.end()
 
