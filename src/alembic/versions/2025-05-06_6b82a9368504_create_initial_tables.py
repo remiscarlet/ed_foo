@@ -281,7 +281,7 @@ def upgrade() -> None:
             ["core.systems.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("system_id", "name", "type", "sub_type", "body_id", "main_star", name="_bodies_uc"),
+        sa.UniqueConstraint("system_id", "name", "body_id", name="_bodies_uc"),
         schema="core",
     )
     op.create_index(op.f("ix_core_bodies_system_id"), "bodies", ["system_id"], unique=False, schema="core")

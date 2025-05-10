@@ -161,14 +161,14 @@ def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: list
     for system in input_systems:
         system_id = partitioner.get_spansh_entity_id(system)
         for body in system.bodies or []:
-            spansh_body_by_key[body.to_cache_key()] = body
+            spansh_body_by_key[body.to_cache_key(system_id)] = body
             body_rows.append(body.to_sqlalchemy_dict(system_id))
 
     body_objects = upsert_all(
         partitioner.session,
         BodiesDB,
         body_rows,
-        ["system_id", "name", "type", "sub_type", "body_id", "main_star"],
+        ["system_id", "name", "body_id"],
         ["id"],
     )
 
@@ -176,7 +176,7 @@ def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         spansh_body = spansh_body_by_key.get(body_obj.to_cache_key())
         if spansh_body is None:
             raise Exception(f"Body not found in spansh cache for: {pformat(body_obj.to_cache_key_tuple())}")
-        partitioner.cache_spansh_entity_id(spansh_body, body_obj.id)
+        partitioner.cache_spansh_entity_id_by_key(spansh_body.to_cache_key(body_obj.system_id), body_obj.id)
 
 
 def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list[SystemSpansh]) -> None:
@@ -197,7 +197,7 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list
             stations_by_key[cache_key] = station
 
         for body in system.bodies or []:
-            body_id = partitioner.get_spansh_entity_id(body)
+            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
 
             for station in body.stations or []:
                 cache_key = station.to_cache_key(body_id)
@@ -216,9 +216,10 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list
     # --- Signals ---
     signal_rows = []
     for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
         for body in system.bodies or []:
             if body.signals:
-                body_id = partitioner.get_spansh_entity_id(body)
+                body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
                 signal_rows.extend(body.signals.to_sqlalchemy_dicts(body_id))
 
     upsert_all(partitioner.session, SignalsDB, signal_rows, ["body_id", "signal_type"], ["id"])
@@ -227,8 +228,9 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list
     ring_rows = []
     rings_by_key: dict[int, AsteroidsSpansh] = {}
     for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
         for body in system.bodies or []:
-            body_id = partitioner.get_spansh_entity_id(body)
+            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
             for ring in body.rings or []:
                 ring_rows.append(ring.to_sqlalchemy_dict(body_id))
                 rings_by_key[ring.to_cache_key(body_id)] = ring
@@ -271,11 +273,11 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
             )
 
     for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
         for station in system.stations or []:
-            system_id = partitioner.get_spansh_entity_id(system)
             extract_commodities(system_id, station)
         for body in system.bodies or []:
-            body_id = partitioner.get_spansh_entity_id(body)
+            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
             for station in body.stations:
                 extract_commodities(body_id, station)
 
@@ -305,7 +307,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         for station in system.stations or []:
             extract_modules(system_id, station)
         for body in system.bodies or []:
-            body_id = partitioner.get_spansh_entity_id(body)
+            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
             for station in body.stations:
                 extract_modules(body_id, station)
 
@@ -327,7 +329,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         for station in system.stations or []:
             extract_ships(system_id, station)
         for body in system.bodies or []:
-            body_id = partitioner.get_spansh_entity_id(body)
+            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
             for station in body.stations:
                 extract_ships(body_id, station)
 
@@ -336,11 +338,12 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
     # --- Hotspots ---
     hotspots = []
     for system in input_systems:
+        system_id = partitioner.get_spansh_entity_id(system)
         for body in system.bodies or []:
             if body.rings is None:
                 continue
 
-            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key())
+            body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
 
             for ring in body.rings:
                 if ring.signals is None:

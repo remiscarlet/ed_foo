@@ -61,8 +61,8 @@ class AsteroidsSpansh(BaseSpanshModel):
 
 
 class BodySpansh(BaseSpanshModel):
-    def to_cache_key_tuple(self) -> Tuple[Any, ...]:
-        return (self.__class__, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star)
+    def to_cache_key_tuple(self, system_id: int) -> Tuple[Any, ...]:
+        return ("BodiesDB", system_id, self.name, self.body_id)
 
     def __repr__(self) -> str:
         return (

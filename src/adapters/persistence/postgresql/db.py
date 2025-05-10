@@ -25,7 +25,6 @@ from src.core.models.body_model import Body
 from src.core.models.common_model import Coordinates
 from src.core.models.station_model import Station
 from src.core.models.system_model import Faction, System
-from src.ingestion.spansh.models.body_spansh import BodySpansh
 
 logger = get_logger(__name__)
 
@@ -33,7 +32,7 @@ logger = get_logger(__name__)
 class BodiesDB(BaseModelWithId):
     __tablename__ = "bodies"
     __table_args__ = (
-        UniqueConstraint("system_id", "name", "type", "sub_type", "body_id", "main_star", name="_bodies_uc"),
+        UniqueConstraint("system_id", "name", "body_id", name="_bodies_uc"),
         {"schema": "core"},
     )
 
@@ -138,7 +137,7 @@ class BodiesDB(BaseModelWithId):
         )
 
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
-        return (BodySpansh, self.id64, self.name, self.body_id, self.type, self.sub_type, self.main_star)
+        return ("BodiesDB", self.system_id, self.name, self.body_id)
 
     def __repr__(self) -> str:
         return f"<BodiesDB(id={self.id}, name={self.name!r})>"
