@@ -49,6 +49,7 @@ dependencies = [
     "geoalchemy2 (>=0.17.1,<0.18.0)",
     "shapely (>=2.1.0,<3.0.0)",
     "types-shapely (>=2.1.0.20250418,<3.0.0.0)",
+    "interactions-py (>=5.14.0,<6.0.0)",
 ]
 
 [build-system]

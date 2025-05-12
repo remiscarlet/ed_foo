@@ -1,4 +1,3 @@
-import asyncio
 import logging  # noqa: F401
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -532,24 +531,15 @@ class SpanshDataPipeline:
         ungzip(GALAXY_POPULATED_JSON_GZ, GALAXY_POPULATED_JSON)
 
     async def load_and_process_data(self, batch_process_fn: Callable[[list[SystemSpansh]], None]) -> None:
-        processed_count = 0
-        process_batch_lock = asyncio.Lock()
-        idx_lock = asyncio.Lock()
+        skip_timer = Timer("Skipping rows to known min index")
+        validate_timer = Timer("Pydantic validation timer")
 
+        batch: list[SystemSpansh] = []
+
+        idx = 0
         async with aiofiles.open(GALAXY_POPULATED_JSON, mode="r") as f:
-            # with GALAXY_POPULATED_JSON.open("r") as f:
-            skip_timer = Timer("Skipping rows to known min index")
-            validate_timer = Timer("Pydantic validation timer")
-
-            # parser = ijson.items(f, "item")
-            # for idx, system_dict in enumerate(parser, start=1):
-            batch: list[SystemSpansh] = []
-
-            idx = 0
             async for system_dict in ijson.items(f, "item"):
-                # for idx, system_dict in enumerate(ijson.items(f, "item"), start=1):
-                async with idx_lock:
-                    idx += 1
+                idx += 1
 
                 if idx < self.start_at_system_idx:
                     if idx % self.skipping_past_every == 0:
@@ -557,11 +547,9 @@ class SpanshDataPipeline:
                         logger.info(f"Skipping past {idx} (Took {time_elapsed})({self.total_running_str()})")
                     continue
 
-                processed_count += 1
                 try:
                     model = SystemSpansh.model_validate(system_dict)
-                    async with process_batch_lock:
-                        batch.append(model)
+                    batch.append(model)
                 except Exception as e:
                     logger.warning(f"Validation failed at item {idx}: {e}")
                     continue
@@ -574,25 +562,17 @@ class SpanshDataPipeline:
                     )
 
                 if idx % self.process_every == 0:
-                    async with process_batch_lock:
-                        old_batch = []
-                        old_batch, batch = batch, old_batch
+                    old_batch = batch
+                    batch = []
 
                     batch_process_fn(old_batch)
-
-                    old_batch.clear()
-                    import gc
-
-                    gc.collect()
 
                     validate_timer.reset()
 
             if batch:
                 batch_process_fn(batch)
-                batch.clear()
-                gc.collect()
 
-        logger.info(f">> {processed_count} Systems")
+        logger.info(f">> {idx} Systems")
         self.pipeline_timer.end()
 
         return None

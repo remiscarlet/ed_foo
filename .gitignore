@@ -4,3 +4,4 @@ logs/
 gen/
 __pycache__/
 .DS_STORE
+config.yaml

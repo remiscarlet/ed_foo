@@ -111,3 +111,4 @@ models: gen-eddn-models
 install-eddn-models: download-eddn-models gen-eddn-models
 
 # make nuke-db; make up-db; sleep 1; make alembic-upgrade; make alembic-revision; make alembic-upgrade;
+
