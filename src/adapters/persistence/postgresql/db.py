@@ -547,7 +547,7 @@ class SystemsDB(BaseModelWithId):
         controlling_faction = None
         if self.controlling_faction_id is not None:
             controlling_faction = session.scalars(
-                select(FactionsDB).where(FactionsDB.id.is_(self.controlling_faction_id))
+                select(FactionsDB).where(FactionsDB.id == self.controlling_faction_id)
             ).first()
             if controlling_faction is None:
                 raise Exception("Associated controlling faction id could not be found in the FactionsDB!")

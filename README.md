@@ -22,7 +22,7 @@ make pg-shell
 ```
 
 ### Discord Integration
-- Coming Soon
+![Example](docs/discord_get-mining-expandable.png)
 
 ### CLI Usage
 - We'll eventually expose more like an HTTP API and crons/webhooks

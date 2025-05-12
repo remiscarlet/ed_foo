@@ -10,10 +10,13 @@ from src.adapters.persistence.postgresql.types import (
     SystemResult,
     TopCommodityResult,
 )
+from src.common.logging import get_logger
 from src.common.timer import Timer
 from src.core.models.system_model import System
 from src.core.ports.api_command_port import ApiCommandPort
 from src.core.ports.system_port import SystemPort
+
+logger = get_logger(__name__)
 
 
 class ApiCommandAdapter(ApiCommandPort):
@@ -118,10 +121,11 @@ class SystemsAdapter(SystemPort):
         pass
 
     def get_system(self, system_name: str) -> System:
-        query = select(SystemsDB).where(SystemsDB.name.is_(system_name))
+        query = select(SystemsDB).where(SystemsDB.name == system_name)
         db_system = self.session.scalars(query).first()
+        logger.info(db_system)
         if not db_system:
-            raise Exception("System not found")
+            raise ValueError("System not found")
         return db_system.to_core_model()
 
     def delete_system(self, system_name: str) -> None:
