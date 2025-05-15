@@ -360,18 +360,18 @@ class ShipsDB(BaseModel):
 class ShipyardShipsDB(BaseModelWithId):
     unique_columns = (
         "station_id",
-        "ship_id",
+        "ship_sym",
     )
     __tablename__ = "shipyard_ships"
     __table_args__ = (UniqueConstraint(*unique_columns, name="_station_shipyard_ship_uc"), {"schema": "core"})
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
-    ship_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("core.ships.symbol"), nullable=False
+    ship_sym: Mapped[str] = mapped_column(
+        Text, ForeignKey("core.ships.symbol"), nullable=False
     )  # Small lookup table; no index
 
     def __repr__(self) -> str:
-        return f"<ShipyardShipsDB(id={self.id}, station_id={self.station_id}, ship_id={self.ship_id})>"
+        return f"<ShipyardShipsDB(id={self.id}, station_id={self.station_id}, ship_sym={self.ship_sym})>"
 
 
 class ShipModulesDB(BaseModel):
@@ -394,19 +394,19 @@ class ShipModulesDB(BaseModel):
 class OutfittingShipModulesDB(BaseModelWithId):
     unique_columns = (
         "station_id",
-        "module_id",
+        "module_name",
     )
     __tablename__ = "outfitting_ship_modules"
     __table_args__ = (UniqueConstraint(*unique_columns, name="_station_outfitting_module_uc"), {"schema": "core"})
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
-    module_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("core.ship_modules.name"), nullable=False
+    module_name: Mapped[str] = mapped_column(
+        Text, ForeignKey("core.ship_modules.name"), nullable=False
     )  # Small lookup table; no index
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     def __repr__(self) -> str:
-        return f"<OutfittingShipModulesDB(id={self.id}, station_id={self.station_id}, module_id={self.module_id})>"
+        return f"<OutfittingShipModulesDB(id={self.id}, station_id={self.station_id}, module_name={self.module_name})>"
 
 
 class ThargoidWarDB(BaseModelWithId):

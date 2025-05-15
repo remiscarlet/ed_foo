@@ -158,8 +158,8 @@ class SystemSpansh(BaseSpanshModel):
         if self.all_stations is None:
             return None
 
-        stations = []
-        colonisation_ships = []
+        stations: list[StationSpansh] = []
+        colonisation_ships: list[StationSpansh] = []
         for station in self.all_stations:
             if station.name == "System Colonisation Ship":
                 colonisation_ships.append(station)
@@ -169,7 +169,7 @@ class SystemSpansh(BaseSpanshModel):
         if colonisation_ships:
             newest_scs = max(
                 colonisation_ships,
-                key=lambda scs: (scs.updated_at if scs.updated_at is not None else datetime(year=1, month=1, day=1)),
+                key=lambda scs: (scs.update_time if scs.update_time is not None else datetime(year=1, month=1, day=1)),
             )
             stations.append(newest_scs)
 
@@ -202,5 +202,7 @@ class SystemSpansh(BaseSpanshModel):
             "power_state_undermining": self.power_state_undermining,
             "powers": self.powers,
             "thargoid_war": self.thargoid_war.to_sqlalchemy_dict() if self.thargoid_war is not None else None,
-            # "timestamps": (self.timestamps.to_core_model() if self.timestamps is not None else None),
+            "controlling_power_updated_at": getattr(self.timestamps, "controlling_power", None),
+            "power_state_updated_at": getattr(self.timestamps, "power_state", None),
+            "powers_updated_at": getattr(self.timestamps, "powers", None),
         }

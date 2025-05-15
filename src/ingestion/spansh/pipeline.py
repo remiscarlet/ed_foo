@@ -101,7 +101,7 @@ def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         controlling = system.controlling_faction
         if controlling:
             all_factions[controlling.name] = controlling
-            faction_dicts[faction.name] = controlling.to_sqlalchemy_dict()
+            faction_dicts[controlling.name] = controlling.to_sqlalchemy_dict()
 
     faction_objects = upsert_all(partitioner.session, FactionsDB, list(faction_dicts.values()), ["id"])
     for faction_obj in faction_objects:
@@ -257,7 +257,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
 
         for commodity in station.market.commodities or []:
             commodities[commodity.to_cache_key(station_id, commodity.symbol)] = commodity.to_sqlalchemy_dict(
-                station_id, commodity.symbol
+                station_id, commodity.symbol, station.market.update_time
             )
 
     for system in input_systems:

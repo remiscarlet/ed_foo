@@ -116,8 +116,6 @@ class BodySpansh(BaseSpanshModel):
     type: str | None = None
     volcanism_type: str | None = None
 
-    _validate_update_time = BaseSpanshModel.flexible_datetime_validator("update_time")
-
     def to_sqlalchemy_dict(self, system_id: int) -> dict[str, Any]:
         return {
             "system_id": system_id,
@@ -158,5 +156,6 @@ class BodySpansh(BaseSpanshModel):
             "terraforming_state": self.terraforming_state,
             "type": self.type,
             "volcanism_type": self.volcanism_type,
-            # "timestamps": self.timestamps.to_core_model() if self.timestamps is not None else None,
+            "mean_anomaly_updated_at": getattr(self.timestamps, "mean_anomaly", None),
+            "distance_to_arrival_updated_at": getattr(self.timestamps, "distance_to_arrival", None),
         }

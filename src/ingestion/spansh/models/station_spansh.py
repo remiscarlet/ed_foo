@@ -27,7 +27,9 @@ class CommoditySpansh(CommodityPriceSpansh):
     def to_cache_key_tuple(self, station_id: int, commodity_symbol: str) -> Tuple[Any, ...]:
         return (self.__class__, station_id, commodity_symbol)
 
-    def to_sqlalchemy_dict(self, station_id: int, commodity_sym: str) -> dict[str, Any]:
+    def to_sqlalchemy_dict(
+        self, station_id: int, commodity_sym: str, market_updated_at: datetime | None
+    ) -> dict[str, Any]:
         return {
             "station_id": station_id,
             "commodity_sym": commodity_sym,
@@ -35,20 +37,7 @@ class CommoditySpansh(CommodityPriceSpansh):
             "sell_price": self.sell_price,
             "supply": self.supply,
             "demand": self.demand,
-            "updated_at": self.updated_at,
-        }
-
-    @staticmethod
-    def to_blacklisted_sqlalchemy_dict(station_id: int, commodity_sym: str) -> dict[str, Any]:
-        return {
-            "station_id": station_id,
-            "commodity_sym": commodity_sym,
-            "is_blacklisted": True,
-            "buy_price": None,
-            "sell_price": None,
-            "supply": None,
-            "demand": None,
-            "updated_at": None,
+            "updated_at": self.updated_at or market_updated_at,
         }
 
 
@@ -112,8 +101,8 @@ class StationSpansh(BaseSpanshModel):
 
     id: int
     name: str
-    updated_at: datetime | None = None
-    _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
+    update_time: datetime | None = None
+    _validate_update_time = BaseSpanshModel.flexible_datetime_validator("update_time")
 
     allegiance: str | None = None
     controlling_faction: str | None = None
@@ -163,5 +152,5 @@ class StationSpansh(BaseSpanshModel):
             "carrier_name": self.carrier_name,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "spansh_updated_at": self.updated_at,
+            "spansh_updated_at": self.update_time,
         }

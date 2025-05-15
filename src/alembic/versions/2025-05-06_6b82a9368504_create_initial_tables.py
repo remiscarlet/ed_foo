@@ -139,11 +139,11 @@ def upgrade() -> None:
     op.create_table(
         "outfitting_ship_modules",
         sa.Column("station_id", sa.Integer(), nullable=False),
-        sa.Column("module_id", sa.Integer(), nullable=False),
+        sa.Column("module_name", sa.Text(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["module_id"],
+            ["module_name"],
             ["core.ship_modules.name"],
         ),
         sa.ForeignKeyConstraint(
@@ -151,7 +151,7 @@ def upgrade() -> None:
             ["core.stations.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("station_id", "module_id", name="_station_outfitting_module_uc"),
+        sa.UniqueConstraint("station_id", "module_name", name="_station_outfitting_module_uc"),
         schema="core",
     )
     op.create_index(
@@ -164,10 +164,10 @@ def upgrade() -> None:
     op.create_table(
         "shipyard_ships",
         sa.Column("station_id", sa.Integer(), nullable=False),
-        sa.Column("ship_id", sa.Integer(), nullable=False),
+        sa.Column("ship_sym", sa.Text(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["ship_id"],
+            ["ship_sym"],
             ["core.ships.symbol"],
         ),
         sa.ForeignKeyConstraint(
@@ -175,7 +175,7 @@ def upgrade() -> None:
             ["core.stations.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("station_id", "ship_id", name="_station_shipyard_ship_uc"),
+        sa.UniqueConstraint("station_id", "ship_sym", name="_station_shipyard_ship_uc"),
         schema="core",
     )
     op.create_index(
@@ -224,7 +224,6 @@ def upgrade() -> None:
         sa.UniqueConstraint("name"),
         schema="core",
     )
-    op.create_index("idx_systems_coords", "systems", ["coords"], unique=False, schema="core", postgresql_using="gist")
     op.create_index(
         op.f("ix_core_systems_controlling_faction_id"),
         "systems",
