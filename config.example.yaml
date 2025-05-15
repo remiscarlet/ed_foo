@@ -1,0 +1,4 @@
+# Create a discord application and get its bot token
+# https://discordpy.readthedocs.io/en/stable/discord.html
+discord_bot:
+  token: replaceme

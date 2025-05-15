@@ -23,6 +23,8 @@ make pg-shell
 
 ### Discord Integration
 ![Example](docs/discord_get-mining-expandable.png)
+![Example](docs/discord_get-top-commodities.png)
+![Example](docs/discord_get-hotspots.png)
 
 ### CLI Usage
 - We'll eventually expose more like an HTTP API and crons/webhooks
@@ -177,10 +179,9 @@ We collect, process, and expose structured data from external sources like **Spa
 | Purpose                         | Technology                   | Why |
 |:---------------------------------|:------------------------------|:----|
 | Project Management              | Poetry                        | Modern Python packaging and dependency management |
-| Build Automation                | Makefiles                     | Human-readable, cross-platform dev commands |
-| Core Data Modeling              | Pydantic                      | Type-safe schemas, OpenAPI generation, easy codegen |
-| CLI Development                 | Typer                         | Pydantic-integrated CLI with minimal boilerplate |
-| Bot                             | Discord.py                    | Discord bot integration |
+| Build Automation                | Makefiles, Github Actions Soon| Human-readable, cross-platform dev commands |
+| Data Modeling                   | Pydantic                      | Type-safe schemas, OpenAPI generation, easy codegen |
+| Bot                             | interactions.py               | Discord bot integration |
 | Database                        | Postgres + SQLAlchemy         | Relational storage, robust ORM mapping |
 | Migrations                      | Alembic                       | Database schema evolution |
 | Code Generation (planned)       | OpenAPI, JSON Schema export   | External data contracts and client generation |
