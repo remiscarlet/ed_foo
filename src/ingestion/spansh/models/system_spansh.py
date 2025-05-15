@@ -56,11 +56,17 @@ class FactionSpansh(BaseSpanshModel):
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (self.__class__, self.name)
 
-    def to_sqlalchemy_dict(self) -> dict[str, Any]:
+    def to_faction_sqlalchemy_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "allegiance": self.allegiance,
             "government": self.government,
+        }
+
+    def to_faction_presence_sqlalchemy_dict(self, system_id: int, faction_id: int) -> dict[str, Any]:
+        return {
+            "system_id": system_id,
+            "faction_id": faction_id,
             "influence": self.influence,
             "state": self.state,
         }

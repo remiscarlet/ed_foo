@@ -12,6 +12,7 @@ from sqlalchemy.orm import (
 
 
 class BaseModel(DeclarativeBase):
+    unique_columns: Tuple[str, ...] = ()
     __abstract__ = True
 
     def to_cache_key(self, *args: Any, **kwargs: Any) -> int:

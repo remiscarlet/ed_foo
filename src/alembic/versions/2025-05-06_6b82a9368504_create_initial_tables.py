@@ -57,15 +57,14 @@ def upgrade() -> None:
     )
     op.create_table(
         "ship_modules",
-        sa.Column("module_id", sa.Integer(), nullable=True),
         sa.Column("name", sa.Text(), nullable=False),
+        sa.Column("module_id", sa.Integer(), nullable=True),
         sa.Column("symbol", sa.Text(), nullable=False),
         sa.Column("category", sa.Text(), nullable=True),
         sa.Column("rating", sa.Text(), nullable=True),
         sa.Column("ship", sa.Text(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("name"),
         schema="core",
     )
     op.create_table(
@@ -74,8 +73,7 @@ def upgrade() -> None:
         sa.Column("name", sa.Text(), nullable=True),
         sa.Column("ship_id", sa.Integer(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("symbol"),
         schema="core",
     )
     op.create_table(
@@ -146,13 +144,14 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["module_id"],
-            ["core.ship_modules.id"],
+            ["core.ship_modules.name"],
         ),
         sa.ForeignKeyConstraint(
             ["station_id"],
             ["core.stations.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("station_id", "module_id", name="_station_outfitting_module_uc"),
         schema="core",
     )
     op.create_index(
@@ -169,13 +168,14 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["ship_id"],
-            ["core.ships.id"],
+            ["core.ships.symbol"],
         ),
         sa.ForeignKeyConstraint(
             ["station_id"],
             ["core.stations.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("station_id", "ship_id", name="_station_shipyard_ship_uc"),
         schema="core",
     )
     op.create_index(
@@ -224,6 +224,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("name"),
         schema="core",
     )
+    op.create_index("idx_systems_coords", "systems", ["coords"], unique=False, schema="core", postgresql_using="gist")
     op.create_index(
         op.f("ix_core_systems_controlling_faction_id"),
         "systems",

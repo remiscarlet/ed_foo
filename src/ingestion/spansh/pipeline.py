@@ -2,7 +2,7 @@ import logging  # noqa: F401
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Callable, Iterable, Type
+from typing import Any, Callable, Type
 
 import aiofiles  # noqa: F401
 import ijson
@@ -10,7 +10,7 @@ import yaml
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.postgresql import BaseModel, BaseModelWithId, SessionLocal
+from src.adapters.persistence.postgresql import BaseModel, SessionLocal
 from src.adapters.persistence.postgresql.db import (
     BodiesDB,
     CommoditiesDB,
@@ -53,13 +53,16 @@ def upsert_all[T: BaseModel](
     session: Session,
     model: Type[T],
     rows: list[dict[str, Any]],
-    conflict_cols: list[str],
-    exclude_update_cols: list[str] = [],
-    debug_print_extra_cols: list[str] = [],
+    exclude_update_cols: list[str] | None = None,
+    debug_print_extra_cols: list[str] | None = None,
 ) -> list[T]:
     if not rows:
         return []
+    debug_print_extra_cols = debug_print_extra_cols or []
+    exclude_update_cols = exclude_update_cols or []
+    exclude_update_cols.append("id")  # Never update id column
 
+    conflict_cols = list(model.unique_columns)
     cols_to_print = conflict_cols + debug_print_extra_cols
     logger.debug(f"{len(rows)} {model.__name__} items being upserted...")
     logger.trace(repr([{k: v for k, v in item.items() if k in cols_to_print} for item in rows]))
@@ -93,18 +96,14 @@ def insert_layer1(partitioner: "SpanshDataLayerPartitioner", input_systems: list
     for system in input_systems:
         for faction in system.factions or []:
             all_factions[faction.name] = faction
-            faction_dicts[faction.name] = {
-                k: v for k, v in faction.to_sqlalchemy_dict().items() if k in ["allegiance", "government", "name"]
-            }
+            faction_dicts[faction.name] = faction.to_faction_sqlalchemy_dict()
 
         controlling = system.controlling_faction
         if controlling:
             all_factions[controlling.name] = controlling
-            faction_dicts[controlling.name] = {
-                k: v for k, v in controlling.to_sqlalchemy_dict().items() if k in ["allegiance", "government", "name"]
-            }
+            faction_dicts[faction.name] = controlling.to_sqlalchemy_dict()
 
-    faction_objects = upsert_all(partitioner.session, FactionsDB, list(faction_dicts.values()), ["name"], ["id"])
+    faction_objects = upsert_all(partitioner.session, FactionsDB, list(faction_dicts.values()), ["id"])
     for faction_obj in faction_objects:
         spansh_faction = all_factions.get(faction_obj.name)
         if spansh_faction is None:
@@ -125,7 +124,7 @@ def insert_layer2(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         )
         systems.append(system.to_sqlalchemy_dict(controlling_faction_id=controlling_id))
 
-    system_objects = upsert_all(partitioner.session, SystemsDB, systems, ["name"], ["id"])
+    system_objects = upsert_all(partitioner.session, SystemsDB, systems, ["id"])
 
     for system_obj in system_objects:
         spansh_system = system_by_key.get(system_obj.to_cache_key())
@@ -143,16 +142,9 @@ def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         system_id = partitioner.get_spansh_entity_id(system)
         for faction in system.factions or []:
             faction_id = partitioner.get_spansh_entity_id(faction)
-            presence_rows.append(
-                {
-                    "system_id": system_id,
-                    "faction_id": faction_id,
-                    "state": faction.state,
-                    "influence": faction.influence,
-                }
-            )
+            presence_rows.append(faction.to_faction_presence_sqlalchemy_dict(system_id, faction_id))
 
-    upsert_all(partitioner.session, FactionPresencesDB, presence_rows, ["faction_id", "system_id"], ["id"])
+    upsert_all(partitioner.session, FactionPresencesDB, presence_rows, ["id"])
 
     # --- Bodies ---
     body_rows = []
@@ -167,7 +159,6 @@ def insert_layer3(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         partitioner.session,
         BodiesDB,
         body_rows,
-        ["system_id", "name", "body_id"],
         ["id"],
     )
 
@@ -205,9 +196,7 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list
                 rows_by_key[cache_key] = row
                 stations_by_key[cache_key] = station
 
-    station_objects = upsert_all(
-        partitioner.session, StationsDB, list(rows_by_key.values()), ["name", "owner_id"], ["id"]
-    )
+    station_objects = upsert_all(partitioner.session, StationsDB, list(rows_by_key.values()), ["id"])
 
     for station_obj in station_objects:
         partitioner.cache_spansh_entity_id_by_key(station_obj.to_cache_key(), station_obj.id)
@@ -221,7 +210,7 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list
                 body_id = partitioner.get_spansh_entity_id_by_key(body.to_cache_key(system_id))
                 signal_rows.extend(body.signals.to_sqlalchemy_dicts(body_id))
 
-    upsert_all(partitioner.session, SignalsDB, signal_rows, ["body_id", "signal_type"], ["id"])
+    upsert_all(partitioner.session, SignalsDB, signal_rows, ["id"])
 
     # --- Rings ---
     ring_rows = []
@@ -234,7 +223,7 @@ def insert_layer4(partitioner: "SpanshDataLayerPartitioner", input_systems: list
                 ring_rows.append(ring.to_sqlalchemy_dict(body_id))
                 rings_by_key[ring.to_cache_key(body_id)] = ring
 
-    ring_objects = upsert_all(partitioner.session, RingsDB, ring_rows, ["body_id", "name"], ["id"])
+    ring_objects = upsert_all(partitioner.session, RingsDB, ring_rows, ["id"])
 
     for ring_obj in ring_objects:
         spansh_ring = rings_by_key[ring_obj.to_cache_key()]
@@ -284,7 +273,6 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
         partitioner.session,
         MarketCommoditiesDB,
         list(commodities.values()),
-        ["station_id", "commodity_sym"],
         ["id"],
     )
 
@@ -310,7 +298,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
             for station in body.stations:
                 extract_modules(body_id, station)
 
-    upsert_all(partitioner.session, OutfittingShipModulesDB, modules, ["station_id", "module_id"], ["id"])
+    upsert_all(partitioner.session, OutfittingShipModulesDB, modules, ["id"])
 
     # --- Shipyard ---
     ships: list[dict[str, Any]] = []
@@ -332,7 +320,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
             for station in body.stations:
                 extract_ships(body_id, station)
 
-    upsert_all(partitioner.session, ShipyardShipsDB, ships, ["station_id", "ship_id"], ["id"])
+    upsert_all(partitioner.session, ShipyardShipsDB, ships, ["id"])
 
     # --- Hotspots ---
     hotspots = []
@@ -349,7 +337,7 @@ def insert_layer5(partitioner: "SpanshDataLayerPartitioner", input_systems: list
                     continue
                 ring_id = partitioner.get_spansh_entity_id_by_key(ring.to_cache_key(body_id))
                 hotspots.extend(ring.signals.to_sqlalchemy_hotspot_dicts(ring_id))
-    upsert_all(partitioner.session, HotspotsDB, hotspots, ["ring_id", "commodity_sym"], ["id"])
+    upsert_all(partitioner.session, HotspotsDB, hotspots, ["id"])
 
 
 type MetadataDB = CommoditiesDB | ShipsDB | ShipModulesDB
@@ -438,23 +426,6 @@ class SpanshDataLayerPartitioner:
     def get_commodity_names_by_category(self, category: str) -> set[str]:
         return self.commodity_names_by_category[category]
 
-    def _upsert_and_cache[T: BaseModelWithId](
-        self,
-        model_cls: Type[T],
-        spansh_entities: Iterable[BaseSpanshModel],
-        to_dict_fn: Callable[[BaseSpanshModel], dict[str, Any]],
-        pk_keys: list[str],
-    ) -> None:
-        rows = [to_dict_fn(entity) for entity in spansh_entities]
-        db_objs = upsert_all(self.session, model_cls, rows, pk_keys, ["id"])
-
-        by_key = {e.to_cache_key(): e for e in spansh_entities}
-        for db_obj in db_objs:
-            spansh_entity = by_key.get(db_obj.to_cache_key())
-            if spansh_entity is None:
-                raise Exception(f"Missing Spansh entity for DB object: {pformat(db_obj)}")
-            self.cache_spansh_entity_id(spansh_entity, db_obj.id)
-
     def load_metadata_yaml_into_pg(self, path: Path) -> None:
         logger.debug(f"Inserting '{path}'")
 
@@ -486,7 +457,7 @@ class SpanshDataLayerPartitioner:
                     }
                 )
 
-            commodity_objects = upsert_all(self.session, CommoditiesDB, commodities, ["symbol"], [])
+            commodity_objects = upsert_all(self.session, CommoditiesDB, commodities)
             logger.debug(pformat(commodity_objects))
             for commodity in commodity_objects:
                 self.cache_metadata_by_name(commodity, commodity.name)

@@ -30,9 +30,10 @@ logger = get_logger(__name__)
 
 
 class BodiesDB(BaseModelWithId):
+    unique_columns = ("system_id", "name", "body_id")
     __tablename__ = "bodies"
     __table_args__ = (
-        UniqueConstraint("system_id", "name", "body_id", name="_bodies_uc"),
+        UniqueConstraint(*unique_columns, name="_bodies_uc"),
         {"schema": "core"},
     )
 
@@ -144,8 +145,9 @@ class BodiesDB(BaseModelWithId):
 
 
 class SignalsDB(BaseModelWithId):
+    unique_columns = ("body_id", "signal_type")
     __tablename__ = "signals"
-    __table_args__ = (UniqueConstraint("body_id", "signal_type", name="_signal_on_body_uc"), {"schema": "core"})
+    __table_args__ = (UniqueConstraint(*unique_columns, name="_signal_on_body_uc"), {"schema": "core"})
 
     body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="signals")
@@ -159,8 +161,9 @@ class SignalsDB(BaseModelWithId):
 
 
 class RingsDB(BaseModelWithId):
+    unique_columns = ("body_id", "name")
     __tablename__ = "rings"
-    __table_args__ = (UniqueConstraint("body_id", "name", name="_ring_on_body_uc"), {"schema": "core"})
+    __table_args__ = (UniqueConstraint(*unique_columns, name="_ring_on_body_uc"), {"schema": "core"})
 
     id64: Mapped[int] = mapped_column(BigInteger, nullable=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
@@ -184,8 +187,9 @@ class RingsDB(BaseModelWithId):
 
 
 class HotspotsDB(BaseModelWithId):
+    unique_columns = ("ring_id", "commodity_sym")
     __tablename__ = "hotspots"
-    __table_args__ = (UniqueConstraint("ring_id", "commodity_sym", name="_ring_and_commodity_uc"), {"schema": "core"})
+    __table_args__ = (UniqueConstraint(*unique_columns, name="_ring_and_commodity_uc"), {"schema": "core"})
 
     ring_id: Mapped[int] = mapped_column(ForeignKey("core.rings.id"), nullable=False, index=True)
     ring: Mapped["RingsDB"] = relationship(back_populates="hotspots")
@@ -200,8 +204,9 @@ class HotspotsDB(BaseModelWithId):
 
 
 class StationsDB(BaseModelWithId):
+    unique_columns = ("name", "owner_id")
     __tablename__ = "stations"
-    __table_args__ = (UniqueConstraint("name", "owner_id", name="_station_name_owner_distanace_uc"), {"schema": "core"})
+    __table_args__ = (UniqueConstraint(*unique_columns, name="_station_name_owner_distanace_uc"), {"schema": "core"})
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -294,6 +299,7 @@ class StationsDB(BaseModelWithId):
 
 
 class CommoditiesDB(BaseModel):
+    unique_columns = ("symbol",)
     __tablename__ = "commodities"
     __table_args__ = {"schema": "core"}
 
@@ -317,9 +323,10 @@ class CommoditiesDB(BaseModel):
 
 
 class MarketCommoditiesDB(BaseModelWithId):
+    unique_columns = ("station_id", "commodity_sym")
     __tablename__ = "market_commodities"
     __table_args__ = (
-        UniqueConstraint("station_id", "commodity_sym", name="_station_market_commodity_uc"),
+        UniqueConstraint(*unique_columns, name="_station_market_commodity_uc"),
         {"schema": "core"},
     )
 
@@ -336,38 +343,44 @@ class MarketCommoditiesDB(BaseModelWithId):
         return f"<MarketCommoditiesDB(id={self.id}, station_id={self.station_id}, commodity_sym={self.commodity_sym})>"
 
 
-class ShipsDB(BaseModelWithId):
+class ShipsDB(BaseModel):
     __tablename__ = "ships"
     __table_args__ = {"schema": "core"}
 
-    symbol: Mapped[str] = mapped_column(Text)
+    symbol: Mapped[str] = mapped_column(Text, primary_key=True)
+
     name: Mapped[Optional[str]] = mapped_column(Text)
     ship_id: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     def __repr__(self) -> str:
-        return f"<ShipsDB(id={self.id}, name={self.name})>"
+        return f"<ShipsDB(symbol={self.symbol}, name={self.name})>"
 
 
 class ShipyardShipsDB(BaseModelWithId):
+    unique_columns = (
+        "station_id",
+        "ship_id",
+    )
     __tablename__ = "shipyard_ships"
-    __table_args__ = {"schema": "core"}
+    __table_args__ = (UniqueConstraint(*unique_columns, name="_station_shipyard_ship_uc"), {"schema": "core"})
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     ship_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("core.ships.id"), nullable=False
+        Integer, ForeignKey("core.ships.symbol"), nullable=False
     )  # Small lookup table; no index
 
     def __repr__(self) -> str:
         return f"<ShipyardShipsDB(id={self.id}, station_id={self.station_id}, ship_id={self.ship_id})>"
 
 
-class ShipModulesDB(BaseModelWithId):
+class ShipModulesDB(BaseModel):
     __tablename__ = "ship_modules"
     __table_args__ = {"schema": "core"}
 
+    name: Mapped[str] = mapped_column(Text, primary_key=True)
+
     module_id: Mapped[Optional[int]] = mapped_column(Integer)
-    name: Mapped[str] = mapped_column(Text, nullable=False)
     symbol: Mapped[str] = mapped_column(Text)
     category: Mapped[Optional[str]] = mapped_column(Text)
     rating: Mapped[Optional[str]] = mapped_column(Text)
@@ -375,16 +388,20 @@ class ShipModulesDB(BaseModelWithId):
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     def __repr__(self) -> str:
-        return f"<ShipModulesDB(id={self.id}, name={self.name})>"
+        return f"<ShipModulesDB(name={self.name})>"
 
 
 class OutfittingShipModulesDB(BaseModelWithId):
+    unique_columns = (
+        "station_id",
+        "module_id",
+    )
     __tablename__ = "outfitting_ship_modules"
-    __table_args__ = {"schema": "core"}
+    __table_args__ = (UniqueConstraint(*unique_columns, name="_station_outfitting_module_uc"), {"schema": "core"})
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     module_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("core.ship_modules.id"), nullable=False
+        Integer, ForeignKey("core.ship_modules.name"), nullable=False
     )  # Small lookup table; no index
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -393,6 +410,7 @@ class OutfittingShipModulesDB(BaseModelWithId):
 
 
 class ThargoidWarDB(BaseModelWithId):
+    unique_columns = ("system_id",)
     __tablename__ = "thargoid_wars"
     __table_args__ = {"schema": "core"}
 
@@ -411,6 +429,7 @@ class ThargoidWarDB(BaseModelWithId):
 
 
 class FactionsDB(BaseModelWithId):
+    unique_columns = ("name",)
     __tablename__ = "factions"
     __table_args__ = {"schema": "core"}
 
@@ -435,9 +454,10 @@ class FactionsDB(BaseModelWithId):
 
 
 class FactionPresencesDB(BaseModelWithId):
+    unique_columns = ("system_id", "faction_id")
     __tablename__ = "faction_presences"
     __table_args__ = (
-        UniqueConstraint("system_id", "faction_id", name="_system_faction_presence_uc"),
+        UniqueConstraint(*unique_columns, name="_system_faction_presence_uc"),
         {"schema": "core"},
     )
 
@@ -459,6 +479,7 @@ class FactionPresencesDB(BaseModelWithId):
 
 
 class SystemsDB(BaseModelWithId):
+    unique_columns = ("name",)
     __tablename__ = "systems"
     __table_args__ = {"schema": "core"}
 
@@ -471,7 +492,7 @@ class SystemsDB(BaseModelWithId):
     x: Mapped[float] = mapped_column(Float)
     y: Mapped[float] = mapped_column(Float)
     z: Mapped[float] = mapped_column(Float)
-    coords: Mapped[WKBElement] = mapped_column(Geometry(geometry_type="POINT", srid=0), nullable=True)
+    coords: Mapped[WKBElement] = mapped_column(Geometry(geometry_type="POINTZ", srid=0))
 
     date: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
