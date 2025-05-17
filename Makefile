@@ -7,6 +7,14 @@ install:
 
 setup: install up alembic-upgrade install-eddn-models
 
+## Discord
+discord-bot:
+	python src/adapters/ingress/discord/bot.py
+
+## EDDN
+eddn-listener:
+	poetry run cli ingestion eddn-listener
+
 ## Data DL/Import
 
 download-spansh:
@@ -90,7 +98,7 @@ alembic-revision:
 
 download-eddn-models:
 	mkdir -p data
-	git clone https://github.com/EDCD/EDDN.git data/eddn/ 2>/dev/null || true
+	git clone https://github.com/EDCD/EDDN.git -b live data/eddn/ 2>/dev/null || true
 	git -C data/eddn pull
 
 gen-eddn-models: download-eddn-models
@@ -108,7 +116,10 @@ gen-eddn-models: download-eddn-models
 	touch gen/eddn_models/__init__.py
 models: gen-eddn-models
 
-install-eddn-models: download-eddn-models gen-eddn-models
+gen-eddn-model-mappings:
+	poetry run generate_eddn_schema_mapping
+
+install-eddn-models: download-eddn-models gen-eddn-models gen-eddn-model-mappings
 
 # make nuke-db; make up-db; sleep 1; make alembic-upgrade; make alembic-revision; make alembic-upgrade;
 

@@ -14,6 +14,7 @@ from src.adapters.persistence.postgresql.types import HotspotResult
 from src.common.logging import configure_logger, get_logger
 from src.common.timer import Timer
 from src.common.utils import get_time_since
+from src.ingestion.eddn.listener import eddn_listener
 from src.ingestion.spansh.pipeline import SpanshDataPipeline
 
 logger = get_logger(__name__)
@@ -43,6 +44,10 @@ def print_hotspot_results(system_name: str, hotspots: list[HotspotResult]) -> No
 
 
 # Data Ingestion CLI
+
+
+def run_eddn_listener(args: Namespace) -> None:
+    eddn_listener()
 
 
 def run_import_spansh(args: Namespace) -> None:
@@ -197,7 +202,7 @@ def run_get_top_commodities(args: Namespace) -> None:
     table = [
         [
             c.station_name,
-            f"{c.distance_to_arrival:.2f} LY",
+            f"{c.distance_to_arrival:.2f} LS",
             c.commodity,
             f"{c.sell_price} CR",
             c.demand,
@@ -218,6 +223,10 @@ def run_get_top_commodities(args: Namespace) -> None:
 def configure_ingestion_parser(subparsers: Any) -> None:
     ingestion = subparsers.add_parser("ingestion")
     ingestion_sub = ingestion.add_subparsers(dest="subcommand")
+
+    eddn_listener = ingestion_sub.add_parser("eddn-listener")
+    eddn_listener.add_argument("-v", "--verbose", action="count", default=0)
+    eddn_listener.set_defaults(func=run_eddn_listener)
 
     spansh_dl = ingestion_sub.add_parser("download-spansh")
     spansh_dl.add_argument("-v", "--verbose", action="count", default=0)

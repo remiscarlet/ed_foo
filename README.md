@@ -90,46 +90,46 @@ Name: San Xiang
 
 Station Name              Distance    Commodity                  Sell Price      Demand  Buy Price      Supply  Updated Last
 ------------------------  ----------  -------------------------  ------------  --------  -----------  --------  --------------
-Crown Landing             275.29 LY   MineralExtractors          1237 CR          11199  0 CR                0  Unknown
-Crown Landing             275.29 LY   BioReducingLichen          1613 CR           7164  0 CR                0  Unknown
-Crown Landing             275.29 LY   HazardousEnvironmentSuits  861 CR            6259  0 CR                0  Unknown
-Crown Landing             275.29 LY   MineralOil                 776 CR            2358  0 CR                0  Unknown
-Crown Landing             275.29 LY   HydrogenPeroxide           3209 CR           2294  0 CR                0  Unknown
-Garriott Point            338.27 LY   MineralExtractors          1237 CR           7537  0 CR                0  Unknown
-Garriott Point            338.27 LY   BioReducingLichen          1601 CR           4756  0 CR                0  Unknown
-Garriott Point            338.27 LY   HazardousEnvironmentSuits  869 CR            4585  0 CR                0  Unknown
-Garriott Point            338.27 LY   MineralOil                 776 CR            3164  0 CR                0  Unknown
-Garriott Point            338.27 LY   Goslarite                  7854 CR           2262  0 CR                0  Unknown
-K2Q-G4J                   284.67 LY   Tritium                    118366 CR           13  0 CR                0  Unknown
-KFH-1QJ                   199.14 LY   Tritium                    60510 CR          1271  0 CR                0  Unknown
-KLV-1QJ                   194.37 LY   Benitoite                  300321 CR          500  0 CR                0  Unknown
-KLV-1QJ                   194.37 LY   Alexandrite                230277 CR          500  0 CR                0  Unknown
-KLV-1QJ                   194.37 LY   Tritium                    50072 CR           437  0 CR                0  Unknown
-KLV-1QJ                   194.37 LY   Musgravite                 300521 CR          300  0 CR                0  Unknown
-KLV-1QJ                   194.37 LY   Monazite                   350922 CR          235  0 CR                0  Unknown
-KLV-1QJ                   194.37 LY   Osmium                     45198 CR           220  0 CR                0  Unknown
-Leinster Terminal         193.45 LY   SurfaceStabilisers         1106 CR           7550  0 CR                0  Unknown
-Leinster Terminal         193.45 LY   Grain                      739 CR            5183  0 CR                0  Unknown
-Leinster Terminal         193.45 LY   Clothing                   862 CR            3150  0 CR                0  Unknown
-Leinster Terminal         193.45 LY   Beer                       553 CR            2334  0 CR                0  Unknown
-Leinster Terminal         193.45 LY   WaterPurifiers             845 CR            1311  0 CR                0  Unknown
-Ortiz's Garden            188.41 LY   AnimalMonitors             900 CR            6424  0 CR                0  Unknown
-Ortiz's Garden            188.41 LY   AquaponicSystems           869 CR            5697  0 CR                0  Unknown
-Ortiz's Garden            188.41 LY   Biowaste                   721 CR            2829  0 CR                0  Unknown
-Ortiz's Garden            188.41 LY   CropHarvesters             2979 CR           1687  0 CR                0  Unknown
-Ortiz's Garden            188.41 LY   TerrainEnrichmentSystems   5757 CR           1215  0 CR                0  Unknown
-Stronghold Carrier        195.21 LY   Cobalt                     5206 CR           8749  0 CR                0  Unknown
-Stronghold Carrier        195.21 LY   Pyrophyllite               14301 CR          6522  0 CR                0  Unknown
-Stronghold Carrier        195.21 LY   Rutile                     2693 CR           5854  0 CR                0  Unknown
-Stronghold Carrier        195.21 LY   Lithium                    2442 CR           4326  0 CR                0  Unknown
-Stronghold Carrier        195.21 LY   Gallite                    13694 CR          3696  0 CR                0  Unknown
-V1Z-B2X                   0.00 LY     Steel                      6270 CR           6000  0 CR                0  Unknown
-V5H-L0N                   1974.66 LY  Gold                       47609 CR           155  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LY   Cobalt                     7852 CR          44046  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LY   Pyrophyllite               14301 CR         41853  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LY   Rutile                     5385 CR          36964  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LY   ConductiveFabrics          1234 CR          36107  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LY   Lithium                    2467 CR          27762  0 CR                0  Unknown
+Crown Landing             275.29 LS   MineralExtractors          1237 CR          11199  0 CR                0  Unknown
+Crown Landing             275.29 LS   BioReducingLichen          1613 CR           7164  0 CR                0  Unknown
+Crown Landing             275.29 LS   HazardousEnvironmentSuits  861 CR            6259  0 CR                0  Unknown
+Crown Landing             275.29 LS   MineralOil                 776 CR            2358  0 CR                0  Unknown
+Crown Landing             275.29 LS   HydrogenPeroxide           3209 CR           2294  0 CR                0  Unknown
+Garriott Point            338.27 LS   MineralExtractors          1237 CR           7537  0 CR                0  Unknown
+Garriott Point            338.27 LS   BioReducingLichen          1601 CR           4756  0 CR                0  Unknown
+Garriott Point            338.27 LS   HazardousEnvironmentSuits  869 CR            4585  0 CR                0  Unknown
+Garriott Point            338.27 LS   MineralOil                 776 CR            3164  0 CR                0  Unknown
+Garriott Point            338.27 LS   Goslarite                  7854 CR           2262  0 CR                0  Unknown
+K2Q-G4J                   284.67 LS   Tritium                    118366 CR           13  0 CR                0  Unknown
+KFH-1QJ                   199.14 LS   Tritium                    60510 CR          1271  0 CR                0  Unknown
+KLV-1QJ                   194.37 LS   Benitoite                  300321 CR          500  0 CR                0  Unknown
+KLV-1QJ                   194.37 LS   Alexandrite                230277 CR          500  0 CR                0  Unknown
+KLV-1QJ                   194.37 LS   Tritium                    50072 CR           437  0 CR                0  Unknown
+KLV-1QJ                   194.37 LS   Musgravite                 300521 CR          300  0 CR                0  Unknown
+KLV-1QJ                   194.37 LS   Monazite                   350922 CR          235  0 CR                0  Unknown
+KLV-1QJ                   194.37 LS   Osmium                     45198 CR           220  0 CR                0  Unknown
+Leinster Terminal         193.45 LS   SurfaceStabilisers         1106 CR           7550  0 CR                0  Unknown
+Leinster Terminal         193.45 LS   Grain                      739 CR            5183  0 CR                0  Unknown
+Leinster Terminal         193.45 LS   Clothing                   862 CR            3150  0 CR                0  Unknown
+Leinster Terminal         193.45 LS   Beer                       553 CR            2334  0 CR                0  Unknown
+Leinster Terminal         193.45 LS   WaterPurifiers             845 CR            1311  0 CR                0  Unknown
+Ortiz's Garden            188.41 LS   AnimalMonitors             900 CR            6424  0 CR                0  Unknown
+Ortiz's Garden            188.41 LS   AquaponicSystems           869 CR            5697  0 CR                0  Unknown
+Ortiz's Garden            188.41 LS   Biowaste                   721 CR            2829  0 CR                0  Unknown
+Ortiz's Garden            188.41 LS   CropHarvesters             2979 CR           1687  0 CR                0  Unknown
+Ortiz's Garden            188.41 LS   TerrainEnrichmentSystems   5757 CR           1215  0 CR                0  Unknown
+Stronghold Carrier        195.21 LS   Cobalt                     5206 CR           8749  0 CR                0  Unknown
+Stronghold Carrier        195.21 LS   Pyrophyllite               14301 CR          6522  0 CR                0  Unknown
+Stronghold Carrier        195.21 LS   Rutile                     2693 CR           5854  0 CR                0  Unknown
+Stronghold Carrier        195.21 LS   Lithium                    2442 CR           4326  0 CR                0  Unknown
+Stronghold Carrier        195.21 LS   Gallite                    13694 CR          3696  0 CR                0  Unknown
+V1Z-B2X                   0.00 LS     Steel                      6270 CR           6000  0 CR                0  Unknown
+V5H-L0N                   1974.66 LS  Gold                       47609 CR           155  0 CR                0  Unknown
+Ware Research Laboratory  471.05 LS   Cobalt                     7852 CR          44046  0 CR                0  Unknown
+Ware Research Laboratory  471.05 LS   Pyrophyllite               14301 CR         41853  0 CR                0  Unknown
+Ware Research Laboratory  471.05 LS   Rutile                     5385 CR          36964  0 CR                0  Unknown
+Ware Research Laboratory  471.05 LS   ConductiveFabrics          1234 CR          36107  0 CR                0  Unknown
+Ware Research Laboratory  471.05 LS   Lithium                    2467 CR          27762  0 CR                0  Unknown
 ```
 
 ## Dev Stuff

@@ -76,6 +76,7 @@ pgcli = "^4.3.0"
 [tool.poetry.scripts]
 main = "src.main:main"
 cli = "src.main:cli"
+generate_eddn_schema_mapping = "src.ingestion.eddn.schemas:generate_mapping"
 lint_metadata = "tools.scripts.validate_yaml_schema:main"
 
 [tool.isort]

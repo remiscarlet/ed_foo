@@ -1,7 +1,7 @@
 import gzip
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -66,7 +66,7 @@ def get_time_since(dt: datetime) -> str:
     Eg, timedelta(days=20, hours=5) => "2 Weeks, 6 Days, 5 Hours Ago"
         timedelta(days=1, hours=1) => "1 Week, 1 Hour Ago"
     """
-    delta = datetime.now(timezone.utc) - dt
+    delta = datetime.now() - dt
 
     days = delta.days
     seconds = delta.total_seconds() - (days * 24 * 60 * 60)
