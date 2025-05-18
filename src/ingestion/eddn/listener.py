@@ -10,6 +10,9 @@ from types import ModuleType
 from typing import Any
 
 import zmq
+from gen.eddn_models import (
+    commodity_v3_0,
+)
 
 from src.common.constants import EDDN_SCHEMA_MAPPING_FILE
 from src.common.logging import configure_logger, get_logger
@@ -65,7 +68,20 @@ def eddn_listener() -> None:
         module = get_module_from_schema(schema)
         try:
             obj = module.Model.model_validate(d)
-            pprint(obj)
-
         except Exception:
             traceback.print_exc()
+            logger.info(pformat(d))
+            continue
+
+        obj_type = type(obj)
+        if obj_type in processor_mapping:
+            processor_mapping[obj_type](obj)
+
+
+def process_commodity_v3_0(model: commodity_v3_0.Model) -> None:
+    pprint(model)
+
+
+processor_mapping = {
+    commodity_v3_0.Model: process_commodity_v3_0,
+}

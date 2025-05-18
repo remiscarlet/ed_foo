@@ -102,18 +102,8 @@ download-eddn-models:
 	git -C data/eddn pull
 
 gen-eddn-models: download-eddn-models
-	mkdir -p data/_tmp
-	cp data/eddn/schemas/*.json data/_tmp
-	mkdir -p gen
-	poetry run datamodel-codegen \
-		--reuse-model \
-		--strict-nullable \
-		--input-file-type jsonschema \
-		--input data/_tmp \
-		--output-model-type pydantic_v2.BaseModel \
-		--output gen/eddn_models/
-	touch gen/__init__.py
-	touch gen/eddn_models/__init__.py
+	./tools/scripts/generate_eddn_models.sh
+
 models: gen-eddn-models
 
 gen-eddn-model-mappings:
@@ -121,5 +111,11 @@ gen-eddn-model-mappings:
 
 install-eddn-models: download-eddn-models gen-eddn-models gen-eddn-model-mappings
 
+clean-models:
+	rm -f gen/eddn_schema_to_model_mapping.json
+	rm -rf gen/generate_eddn_models
+	rm -rf gen/eddn_models
+	rm -rf data/eddn
+	rm -rf data/eddn_schemas_patched
 # make nuke-db; make up-db; sleep 1; make alembic-upgrade; make alembic-revision; make alembic-upgrade;
 
