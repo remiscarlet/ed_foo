@@ -10,23 +10,6 @@ import yaml
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.postgresql import BaseModel, SessionLocal
-from src.adapters.persistence.postgresql.db import (
-    BodiesDB,
-    CommoditiesDB,
-    FactionPresencesDB,
-    FactionsDB,
-    HotspotsDB,
-    MarketCommoditiesDB,
-    OutfittingShipModulesDB,
-    RingsDB,
-    ShipModulesDB,
-    ShipsDB,
-    ShipyardShipsDB,
-    SignalsDB,
-    StationsDB,
-    SystemsDB,
-)
 from src.common.constants import (
     COMMODITIES_YAML_FMT,
     GALAXY_POPULATED_JSON,
@@ -44,6 +27,23 @@ from src.ingestion.spansh.models.system_spansh import (
     ControllingFactionSpansh,
     FactionSpansh,
     SystemSpansh,
+)
+from src.postgresql import BaseModel, SessionLocal
+from src.postgresql.db import (
+    BodiesDB,
+    CommoditiesDB,
+    FactionPresencesDB,
+    FactionsDB,
+    HotspotsDB,
+    MarketCommoditiesDB,
+    OutfittingShipModulesDB,
+    RingsDB,
+    ShipModulesDB,
+    ShipsDB,
+    ShipyardShipsDB,
+    SignalsDB,
+    StationsDB,
+    SystemsDB,
 )
 
 logger = get_logger(__name__)

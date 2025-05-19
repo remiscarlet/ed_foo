@@ -4,13 +4,13 @@ from pprint import pformat
 from interactions import Embed, OptionType, SlashContext, slash_command, slash_option
 from tabulate import tabulate
 
-from src.adapters.ingress.discord import send_error_embed
-from src.adapters.persistence.postgresql.adapter import (
+from src.common.logging import get_logger
+from src.interfaces.discord import send_error_embed
+from src.postgresql.adapter import (
     ApiCommandAdapter,
     SystemsAdapter,
 )
-from src.adapters.persistence.postgresql.types import TopCommodityResult
-from src.common.logging import get_logger
+from src.postgresql.types import TopCommodityResult
 
 logger = get_logger(__name__)
 
@@ -39,7 +39,8 @@ async def get_top_commodities(
     try:
         SystemsAdapter().get_system(system_name)
     except ValueError:
-        return await send_error_embed(ctx, f"Could not find system '{system_name}'!")
+        await send_error_embed(ctx, f"Could not find system '{system_name}'!")
+        return
 
     commodities = ApiCommandAdapter().get_top_commodities_in_system(
         system_name, number_commodities, minimum_demand, False

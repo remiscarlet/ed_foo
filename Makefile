@@ -5,11 +5,11 @@
 install:
 	poetry install
 
-setup: install up alembic-upgrade install-eddn-models
+setup: install up alembic-upgrade install-models
 
 ## Discord
 discord-bot:
-	python src/adapters/ingress/discord/bot.py
+	python src/interfaces/discord/bot.py
 
 ## EDDN
 eddn-listener:
@@ -101,15 +101,18 @@ download-eddn-models:
 	git clone https://github.com/EDCD/EDDN.git -b live data/eddn/ 2>/dev/null || true
 	git -C data/eddn pull
 
-gen-eddn-models: download-eddn-models
+gen-eddn-models:
 	./tools/scripts/generate_eddn_models.sh
 
-models: gen-eddn-models
+gen-metadata-models:
+	./tools/scripts/generate_metadata_models.sh
+
+models: download-eddn-models gen-eddn-models gen-metadata-models
 
 gen-eddn-model-mappings:
 	poetry run generate_eddn_schema_mapping
 
-install-eddn-models: download-eddn-models gen-eddn-models gen-eddn-model-mappings
+install-models: models gen-eddn-model-mappings
 
 clean-models:
 	rm -f gen/eddn_schema_to_model_mapping.json

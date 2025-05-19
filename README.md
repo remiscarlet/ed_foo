@@ -64,9 +64,9 @@ make lint-fix-check
 ```
 
 ### Interesting Locations (For Now)
-- `src/adapters/ingress/cli/router.py`
-  - CLI entrypoint
-- `src/adapters/persistence/postgres/`
+- `src/interfaces/discord/bot.py`
+  - Discord bot entrypoint
+- `src/postgresql/`
   - Any and all database-specific things like SQL files, sqlalchemy schemas, etc
   - Except DB migrations.
 - `src/alembic/`

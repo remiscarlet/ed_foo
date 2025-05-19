@@ -2,26 +2,23 @@ from typing import Sequence
 
 from sqlalchemy import RowMapping, select, text
 
-from src.adapters.persistence.postgresql import SessionLocal
-from src.adapters.persistence.postgresql.db import SystemsDB
-from src.adapters.persistence.postgresql.types import (
+from src.common.logging import get_logger
+from src.common.timer import Timer
+from src.common.utils import dur_to_interval_str
+from src.postgresql import SessionLocal
+from src.postgresql.db import StationsDB, SystemsDB
+from src.postgresql.types import (
     HotspotResult,
     MiningAcquisitionResult,
     MiningReinforcementResult,
     SystemResult,
     TopCommodityResult,
 )
-from src.common.logging import get_logger
-from src.common.timer import Timer
-from src.common.utils import dur_to_interval_str
-from src.core.models.system_model import System
-from src.core.ports.api_command_port import ApiCommandPort
-from src.core.ports.system_port import SystemPort
 
 logger = get_logger(__name__)
 
 
-class ApiCommandAdapter(ApiCommandPort):
+class ApiCommandAdapter:
     def __init__(self) -> None:
         self.session = SessionLocal()
 
@@ -159,20 +156,27 @@ class ApiCommandAdapter(ApiCommandPort):
         return [TopCommodityResult(**row) for row in rows]
 
 
-class SystemsAdapter(SystemPort):
+class SystemsAdapter:
     def __init__(self) -> None:
         self.session = SessionLocal()
 
-    def upsert_systems(self, systems: list[System]) -> None:
-        pass
-
-    def get_system(self, system_name: str) -> System:
+    def get_system(self, system_name: str) -> SystemsDB:
         query = select(SystemsDB).where(SystemsDB.name == system_name)
         db_system = self.session.scalars(query).first()
         logger.info(db_system)
         if not db_system:
             raise ValueError("System not found")
-        return db_system.to_core_model()
+        return db_system
 
-    def delete_system(self, system_name: str) -> None:
-        pass
+
+class StationsAdapter:
+    def __init__(self) -> None:
+        self.session = SessionLocal()
+
+    def get_station(self, station_name: str) -> StationsDB:
+        query = select(StationsDB).where(StationsDB.name == station_name)
+        db_station = self.session.scalars(query).first()
+        logger.info(db_station)
+        if not db_station:
+            raise ValueError("Station not found")
+        return db_station

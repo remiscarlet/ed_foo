@@ -4,13 +4,13 @@ from pprint import pformat
 
 from interactions import Embed, OptionType, SlashContext, slash_command, slash_option
 
-from src.adapters.ingress.discord import send_error_embed
-from src.adapters.persistence.postgresql.adapter import (
+from src.common.logging import get_logger
+from src.interfaces.discord import send_error_embed
+from src.postgresql.adapter import (
     ApiCommandAdapter,
     SystemsAdapter,
 )
-from src.adapters.persistence.postgresql.types import HotspotResult
-from src.common.logging import get_logger
+from src.postgresql.types import HotspotResult
 
 logger = get_logger(__name__)
 
@@ -25,7 +25,8 @@ async def get_hotspots(ctx: SlashContext, system_name: str) -> None:
     try:
         SystemsAdapter().get_system(system_name)
     except ValueError:
-        return await send_error_embed(ctx, f"Could not find system '{system_name}'!")
+        await send_error_embed(ctx, f"Could not find system '{system_name}'!")
+        return
 
     hotspots = ApiCommandAdapter().get_hotspots_in_system(system_name)
 

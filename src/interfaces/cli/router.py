@@ -6,16 +6,16 @@ from typing import Any
 
 from tabulate import tabulate
 
-from src.adapters.persistence.postgresql.adapter import (
-    ApiCommandAdapter,
-    SystemsAdapter,
-)
-from src.adapters.persistence.postgresql.types import HotspotResult
 from src.common.logging import configure_logger, get_logger
 from src.common.timer import Timer
 from src.common.utils import get_time_since
 from src.ingestion.eddn.listener import eddn_listener
 from src.ingestion.spansh.pipeline import SpanshDataPipeline
+from src.postgresql.adapter import (
+    ApiCommandAdapter,
+    SystemsAdapter,
+)
+from src.postgresql.types import HotspotResult
 
 logger = get_logger(__name__)
 

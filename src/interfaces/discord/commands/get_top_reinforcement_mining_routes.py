@@ -4,14 +4,14 @@ from pprint import pformat
 from interactions import Embed, OptionType, SlashContext, slash_command, slash_option
 from tabulate import tabulate
 
-from src.adapters.ingress.discord import send_error_embed
-from src.adapters.ingress.discord.utils import split_comma_delimited_string
-from src.adapters.persistence.postgresql.adapter import (
-    ApiCommandAdapter,
-)
-from src.adapters.persistence.postgresql.types import MiningReinforcementResult
 from src.common.logging import get_logger
 from src.common.utils import get_time_since
+from src.interfaces.discord import send_error_embed
+from src.interfaces.discord.utils import split_comma_delimited_string
+from src.postgresql.adapter import (
+    ApiCommandAdapter,
+)
+from src.postgresql.types import MiningReinforcementResult
 
 logger = get_logger(__name__)
 
@@ -85,7 +85,8 @@ async def get_top_reinforcement_mining_routes(
     )
 
     if not mining_routes:
-        return await send_error_embed(ctx, "Uh oh, the provided arguments didn't find any valid results!")
+        await send_error_embed(ctx, "Uh oh, the provided arguments didn't find any valid results!")
+        return
 
     routes_by_system: dict[str, list[MiningReinforcementResult]] = defaultdict(lambda: list())
     for route in mining_routes:

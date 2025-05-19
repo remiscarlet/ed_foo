@@ -1,8 +1,8 @@
 from dependency_injector import containers, providers
 
-from src.adapters.persistence.postgresql.body_db import BodiesDB
-from src.adapters.persistence.postgresql.station_db import StationsDB
-from src.adapters.persistence.postgresql.system_db import SystemsDB
+from src.postgresql.postgresql.body_db import BodiesDB
+from src.postgresql.postgresql.station_db import StationsDB
+from src.postgresql.postgresql.system_db import SystemsDB
 
 
 # --- Dependency Injection Container ---

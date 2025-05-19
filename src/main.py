@@ -3,7 +3,7 @@ import os
 
 from fastapi import FastAPI
 
-from src.adapters.ingress.cli.router import cli
+from src.interfaces.cli.router import cli
 
 app = None
 

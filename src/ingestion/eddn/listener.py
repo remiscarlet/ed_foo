@@ -16,6 +16,7 @@ from gen.eddn_models import (
 
 from src.common.constants import EDDN_SCHEMA_MAPPING_FILE
 from src.common.logging import configure_logger, get_logger
+from src.postgresql.adapter import StationsAdapter
 
 logger = get_logger(__name__)
 
@@ -79,9 +80,23 @@ def eddn_listener() -> None:
 
 
 def process_commodity_v3_0(model: commodity_v3_0.Model) -> None:
-    pprint(model)
+    # May want to filter any stations with "invalid characters" like '$' or ';'
+    # Some station names come through like '$EXT_PANEL_ColonisationShip; Skvortsov Territory'
+    pprint(f"{model.message.systemName} - {model.message.stationName} - {len(model.message.commodities)} Commodities")
+
+    try:
+        station = StationsAdapter().get_station(model.message.stationName)
+    except ValueError:
+        logger.warning(f"Encountered station name that we don't know about! '{model.message.stationName}'")
+        return
+
+    pprint(station)
 
 
+# TODO: Consider dependency ordering of inserts for new system/stations
+# Eg, if we're seeing market commodities for a system we don't have in the DB, there should be a pending
+# upsert for the station/system that needs to go through before we can upsert the market commodities themselves, which
+# have a FK on the stations table, ie station needs to be upserted first.
 processor_mapping = {
     commodity_v3_0.Model: process_commodity_v3_0,
 }

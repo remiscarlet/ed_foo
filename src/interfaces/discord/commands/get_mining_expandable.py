@@ -2,12 +2,12 @@ from pprint import pformat
 
 from interactions import Embed, OptionType, SlashContext, slash_command, slash_option
 
-from src.adapters.ingress.discord import MineableDataDisplay, send_error_embed
-from src.adapters.persistence.postgresql.adapter import (
+from src.common.logging import get_logger
+from src.interfaces.discord import MineableDataDisplay, send_error_embed
+from src.postgresql.adapter import (
     ApiCommandAdapter,
     SystemsAdapter,
 )
-from src.common.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -22,15 +22,18 @@ async def get_mining_expandable(ctx: SlashContext, system_name: str) -> None:
     try:
         system = SystemsAdapter().get_system(system_name)
     except ValueError:
-        return await send_error_embed(ctx, f"Could not find system '{system_name}'!")
+        await send_error_embed(ctx, f"Could not find system '{system_name}'!")
+        return
 
     if system.power_state != "Unoccupied":
-        return await send_error_embed(ctx, f"System '{system_name}' is not unoccupied!")
+        await send_error_embed(ctx, f"System '{system_name}' is not unoccupied!")
+        return
 
     if "Nakato Kaine" not in (system.powers or []):
-        return await send_error_embed(
+        await send_error_embed(
             ctx, f"Unoccupied system '{system_name}' is not within Councillor Kaine's sphere of influence!"
         )
+        return
 
     routes = ApiCommandAdapter().get_mining_expandable_systems_in_range(system_name)
 

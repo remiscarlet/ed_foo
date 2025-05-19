@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from interactions import Embed, SlashContext
 
-from src.adapters.persistence.postgresql.types import MiningAcquisitionResult
+from src.postgresql.postgresql.types import MiningAcquisitionResult
 
 
 async def send_error_embed(ctx: SlashContext, msg: str) -> None:
