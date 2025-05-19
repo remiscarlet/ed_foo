@@ -70,7 +70,7 @@ class SystemResult(BaseModel):
         return ", ".join(power_strs)
 
 
-# From: sql/functions/api_get_mining_expandable_systems_in_range.sql
+# From: sql/functions/api_get_mining_expandable_systems_in_range_v1.sql
 class MiningAcquisitionResult(BaseModel):
     expanding_system: str
     ring_name: str
@@ -79,3 +79,20 @@ class MiningAcquisitionResult(BaseModel):
     station_name: str
     sell_price: int
     demand: int
+
+
+# From: sql/functions/api_get_top_reinforcement_mining_routes_v1.sql
+# From: sql/functions/api_get_reinforcement_mining_routes_v1.sql
+class MiningReinforcementResult(BaseModel):
+    system_name: str
+    body_name: str
+    ring_name: str
+    ring_type: str
+    commodity: str
+    count: int
+    power_state: str
+    station_name: str
+    distance_to_arrival: float
+    sell_price: int
+    demand: int
+    updated_at: datetime

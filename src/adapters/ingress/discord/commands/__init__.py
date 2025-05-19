@@ -5,5 +5,8 @@ from src.adapters.ingress.discord.commands.get_mining_expandable import (
 from src.adapters.ingress.discord.commands.get_top_commodities import (
     get_top_commodities,
 )
+from src.adapters.ingress.discord.commands.get_top_reinforcement_mining_routes import (
+    get_top_reinforcement_mining_routes,
+)
 
-__all__ = ["get_mining_expandable", "get_top_commodities", "get_hotspots"]
+__all__ = ["get_mining_expandable", "get_top_commodities", "get_hotspots", "get_top_reinforcement_mining_routes"]

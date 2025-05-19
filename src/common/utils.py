@@ -1,6 +1,8 @@
 import gzip
 import os
+import re
 import shutil
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
@@ -117,3 +119,25 @@ def seconds_to_str(sec: float) -> str:
             parts.append(f"{val}{sym}")
 
     return "".join(parts)
+
+
+acronym_map = OrderedDict(
+    {
+        "w": "WEEKS",
+        "d": "DAYS",
+        "h": "HOURS",
+        "m": "MINUTES",
+    }
+)
+
+
+def dur_to_interval_str(dur_str: str) -> str:
+    """Converts a duration string like '3d10h30m' to a postgres interval string '3 DAYS 10 HOURS 30 MINUTES'"""
+    interval_strs: list[str] = []
+    for acro, interval in acronym_map.items():
+        r = re.compile(r"(\d+)%s" % re.escape(acro))
+        matches = r.search(dur_str)
+        if matches is not None:
+            interval_strs.append(f"{matches.group(1)} {interval}")
+
+    return " ".join(interval_strs)

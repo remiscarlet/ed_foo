@@ -17,17 +17,17 @@ logger = get_logger(__name__)
 
 @slash_command(name="get-hotspots", description="Get list of hotspots in a given system")
 @slash_option(
-    name="system_name_option", description="Target system name to acquire", required=True, opt_type=OptionType.STRING
+    name="system_name", description="Target system name to acquire", required=True, opt_type=OptionType.STRING
 )
-async def get_hotspots(ctx: SlashContext, system_name_option: str) -> None:
+async def get_hotspots(ctx: SlashContext, system_name: str) -> None:
     await ctx.defer(ephemeral=True)
 
     try:
-        SystemsAdapter().get_system(system_name_option)
+        SystemsAdapter().get_system(system_name)
     except ValueError:
-        return await send_error_embed(ctx, f"Could not find system '{system_name_option}'!")
+        return await send_error_embed(ctx, f"Could not find system '{system_name}'!")
 
-    hotspots = ApiCommandAdapter().get_hotspots_in_system(system_name_option)
+    hotspots = ApiCommandAdapter().get_hotspots_in_system(system_name)
 
     results_by_commodity: dict[str, list[HotspotResult]] = defaultdict(lambda: list())
     for hotspot in hotspots:
@@ -44,7 +44,7 @@ async def get_hotspots(ctx: SlashContext, system_name_option: str) -> None:
         hotspots_str = "**Mine In**:\n"
         hotspots_str += "\n".join(ring_names)
         embed = Embed(
-            title=f"{commodity_name} Hotspots ({system_name_option})",
+            title=f"{commodity_name} Hotspots ({system_name})",
             description=hotspots_str,
             color=0x3498DB,
         )

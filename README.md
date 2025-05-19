@@ -1,7 +1,31 @@
-# ED Foo (Enhanced Knowledge Analysis and Insights Notification Engine)
+# EKAINE (Enhanced Knowledge Analysis and Insights Notification Engine)
 
-<sub>Extremely WIP — initial refactor in progress.</sub>
----
+## What Is
+This project is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data.
+
+It collects, processes, and exposes structured data from external sources like **EDDN** (Live), **Spansh** (Dumps), and **EDSM** (Dumps), and allow interaction with insights via:
+- Discord bots
+- Webhooks
+- CLI tools
+- REST APIs (Maybe)
+
+### Features
+Major features are split into "queries" and "alerts"
+
+Queries (All queries have configurable arguments/filters):
+- Get Hotspots for System
+- Get Top N Commodity Prices at Stations for System
+- Get Top Mining Reinforcement Routes Globally
+- Get Mining Reinforcement Routes for System
+- Get Mining Acqusition Routes for System
+
+Alerts (Coming Soon - Relies on EDDN live updates):
+- Notify When System Enters Boom (Filterable)
+- Notify Systems Being Undermined
+- Notify System Control Point Thresholds ('50%', '75%', etc to 'Min Control Score', 'Fortified', etc)
+
+Queries and Alerts are made by querying a fully schematized timescale/PostgreSQL database. Timescale allows time-series queries and alerts while the standard PG allows stateful queries and alerts.
+
 
 ## Usage
 ### Pre-req
@@ -22,115 +46,10 @@ make pg-shell
 ```
 
 ### Discord Integration
+![Example](docs/discord_get-top-reinf-mining-routes.png)
 ![Example](docs/discord_get-mining-expandable.png)
 ![Example](docs/discord_get-top-commodities.png)
 ![Example](docs/discord_get-hotspots.png)
-
-### CLI Usage
-- We'll eventually expose more like an HTTP API and crons/webhooks
-
-```
-$ poetry run cli api get-mining-expandable 'Col 285 Sector OJ-M b22-6'
-
-====== DETAILS ======
-Target Unoccupied System: Col 285 Sector OJ-M b22-6
-
-====== MINING ACQUISITION ROUTES ======
-Mine                   In                                   Sell In                    At                For    Demand
----------------------  -----------------------------------  -------------------------  -------------  ------  --------
-LowTemperatureDiamond  Col 285 Sector UE-G c11-27 5 B Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  305239        60
-LowTemperatureDiamond  Col 285 Sector UE-G c11-27 7 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  305239        60
-Tritium                Col 285 Sector UE-G c11-27 7 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat   61865       497
-LowTemperatureDiamond  Col 285 Sector UE-G c11-27 8 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  305239        60
-Tritium                Col 285 Sector UE-G c11-27 8 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat   61865       497
-Platinum               Col 285 Sector UE-G c11-27 6 A Ring  Col 285 Sector OJ-M b22-6  Roy's Retreat  183325        90
-```
-
-```
-$ poetry run cli api get-acquirable-systems 'Col 285 Sector UE-G c11-27'
-
-====== CURRENT SYSTEM (ACQUIRING) ======
-Name: Col 285 Sector UE-G c11-27
-
-====== ACQUIRABLE SYSTEMS (UNOCCUPIED) ======
-System Name                 Population    Primary Economy    Power Conflict Progress
---------------------------  ------------  -----------------  ---------------------------------------------------------------------------
-Col 285 Sector MD-O b21-0   13,049,935    High Tech          Nakato Kaine: 0.0
-Col 285 Sector QJ-M b22-0   53,241        Military           Nakato Kaine: 0.000517
-Col 285 Sector UP-K b23-0   13,000        Colony             Nakato Kaine: 0.0
-HIP 71629                   1,244,291     Extraction         Nakato Kaine: 0.0
-HIP 67572                   15,000        Extraction         Nakato Kaine: 0.0
-HR 5252                     18,444,892    Extraction         Nakato Kaine: 0.000175
-Col 285 Sector VE-G c11-6   6,000         Industrial         Nakato Kaine: 0.0044
-HIP 67783                   4,500         Industrial         Nakato Kaine: 0.0
-Col 285 Sector QJ-M b22-1   10,000        Military           Nakato Kaine: 0.004825
-...etc
-```
-
-```
-$ poetry run cli api get-hotspots-in-system-by-commodities 'San Xiang' Monazite Platinum
-
-====== SYSTEM ======
-Name: San Xiang
-
-Ring                Ring Type    Commodity      Count
-------------------  -----------  -----------  -------
-San Xiang 1 A Ring  Metallic     Monazite           1
-San Xiang 1 A Ring  Metallic     Platinum           2
-San Xiang 1 B Ring  Metal Rich   Monazite           1
-San Xiang 4 A Ring  Rocky        Monazite           3
-San Xiang 5 A Ring  Rocky        Monazite           2
-```
-
-```
-$ poetry run cli api get-top-commodities-in-system 'San Xiang'
-
-====== SYSTEM ======
-Name: San Xiang
-
-Station Name              Distance    Commodity                  Sell Price      Demand  Buy Price      Supply  Updated Last
-------------------------  ----------  -------------------------  ------------  --------  -----------  --------  --------------
-Crown Landing             275.29 LS   MineralExtractors          1237 CR          11199  0 CR                0  Unknown
-Crown Landing             275.29 LS   BioReducingLichen          1613 CR           7164  0 CR                0  Unknown
-Crown Landing             275.29 LS   HazardousEnvironmentSuits  861 CR            6259  0 CR                0  Unknown
-Crown Landing             275.29 LS   MineralOil                 776 CR            2358  0 CR                0  Unknown
-Crown Landing             275.29 LS   HydrogenPeroxide           3209 CR           2294  0 CR                0  Unknown
-Garriott Point            338.27 LS   MineralExtractors          1237 CR           7537  0 CR                0  Unknown
-Garriott Point            338.27 LS   BioReducingLichen          1601 CR           4756  0 CR                0  Unknown
-Garriott Point            338.27 LS   HazardousEnvironmentSuits  869 CR            4585  0 CR                0  Unknown
-Garriott Point            338.27 LS   MineralOil                 776 CR            3164  0 CR                0  Unknown
-Garriott Point            338.27 LS   Goslarite                  7854 CR           2262  0 CR                0  Unknown
-K2Q-G4J                   284.67 LS   Tritium                    118366 CR           13  0 CR                0  Unknown
-KFH-1QJ                   199.14 LS   Tritium                    60510 CR          1271  0 CR                0  Unknown
-KLV-1QJ                   194.37 LS   Benitoite                  300321 CR          500  0 CR                0  Unknown
-KLV-1QJ                   194.37 LS   Alexandrite                230277 CR          500  0 CR                0  Unknown
-KLV-1QJ                   194.37 LS   Tritium                    50072 CR           437  0 CR                0  Unknown
-KLV-1QJ                   194.37 LS   Musgravite                 300521 CR          300  0 CR                0  Unknown
-KLV-1QJ                   194.37 LS   Monazite                   350922 CR          235  0 CR                0  Unknown
-KLV-1QJ                   194.37 LS   Osmium                     45198 CR           220  0 CR                0  Unknown
-Leinster Terminal         193.45 LS   SurfaceStabilisers         1106 CR           7550  0 CR                0  Unknown
-Leinster Terminal         193.45 LS   Grain                      739 CR            5183  0 CR                0  Unknown
-Leinster Terminal         193.45 LS   Clothing                   862 CR            3150  0 CR                0  Unknown
-Leinster Terminal         193.45 LS   Beer                       553 CR            2334  0 CR                0  Unknown
-Leinster Terminal         193.45 LS   WaterPurifiers             845 CR            1311  0 CR                0  Unknown
-Ortiz's Garden            188.41 LS   AnimalMonitors             900 CR            6424  0 CR                0  Unknown
-Ortiz's Garden            188.41 LS   AquaponicSystems           869 CR            5697  0 CR                0  Unknown
-Ortiz's Garden            188.41 LS   Biowaste                   721 CR            2829  0 CR                0  Unknown
-Ortiz's Garden            188.41 LS   CropHarvesters             2979 CR           1687  0 CR                0  Unknown
-Ortiz's Garden            188.41 LS   TerrainEnrichmentSystems   5757 CR           1215  0 CR                0  Unknown
-Stronghold Carrier        195.21 LS   Cobalt                     5206 CR           8749  0 CR                0  Unknown
-Stronghold Carrier        195.21 LS   Pyrophyllite               14301 CR          6522  0 CR                0  Unknown
-Stronghold Carrier        195.21 LS   Rutile                     2693 CR           5854  0 CR                0  Unknown
-Stronghold Carrier        195.21 LS   Lithium                    2442 CR           4326  0 CR                0  Unknown
-Stronghold Carrier        195.21 LS   Gallite                    13694 CR          3696  0 CR                0  Unknown
-V1Z-B2X                   0.00 LS     Steel                      6270 CR           6000  0 CR                0  Unknown
-V5H-L0N                   1974.66 LS  Gold                       47609 CR           155  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LS   Cobalt                     7852 CR          44046  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LS   Pyrophyllite               14301 CR         41853  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LS   Rutile                     5385 CR          36964  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LS   ConductiveFabrics          1234 CR          36107  0 CR                0  Unknown
-Ware Research Laboratory  471.05 LS   Lithium                    2467 CR          27762  0 CR                0  Unknown
-```
 
 ## Dev Stuff
 - Linters and type checkers run on commit via `pre-commit`
@@ -150,38 +69,9 @@ make lint-fix-check
   - Stores all DB migrations
 - `src/ingestion/`
   - Data ingestion logic
-  - Currently only contains Spansh dump import pipeline
-  - Will soon contain EDDN live update listener
+  - Spansh dump data DL/import pipeline
+  - WIP EDDN live update listener
 
 ### DB Schema
 - See https://dbdiagram.io/d/EKAINE-680e5f821ca52373f58ba72d
 ![DB Schema](docs/schema.png)
-
----
-
-# Design Overview
-
-## What Is
-
-This project is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data.
-
-We collect, process, and expose structured data from external sources like **Spansh**, **EDSM**, and **EDDN**, and allow interaction with insights via:
-- CLI tools
-- Discord bots
-- Webhooks
-- REST APIs
-
-
----
-
-## Technologies
-
-| Purpose                         | Technology                   | Why |
-|:---------------------------------|:------------------------------|:----|
-| Project Management              | Poetry                        | Modern Python packaging and dependency management |
-| Build Automation                | Makefiles, Github Actions Soon| Human-readable, cross-platform dev commands |
-| Data Modeling                   | Pydantic                      | Type-safe schemas, OpenAPI generation, easy codegen |
-| Bot                             | interactions.py               | Discord bot integration |
-| Database                        | Postgres + SQLAlchemy         | Relational storage, robust ORM mapping |
-| Migrations                      | Alembic                       | Database schema evolution |
-| Code Generation (planned)       | OpenAPI, JSON Schema export   | External data contracts and client generation |
