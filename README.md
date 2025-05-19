@@ -1,7 +1,10 @@
 # EKAINE (Enhanced Knowledge Analysis and Insights Notification Engine)
 
+EKAINE delivers a fully schematized and enriched database optimized for powerful, flexible querying—surpassing the capabilities of existing tools. Its most powerful feature is the seamless cross-querying of system, station, body, and market data through standard SQL.
+
 ## What Is
-This project is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data.
+
+EKAINE is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data.
 
 It collects, processes, and exposes structured data from external sources like **EDDN** (Live), **Spansh** (Dumps), and **EDSM** (Dumps), and allow interaction with insights via:
 - Discord bots
@@ -26,6 +29,7 @@ Alerts (Coming Soon - Relies on EDDN live updates):
 
 Queries and Alerts are made by querying a fully schematized timescale/PostgreSQL database. Timescale allows time-series queries and alerts while the standard PG allows stateful queries and alerts.
 
+Many more to come.
 
 ## Usage
 ### Pre-req
