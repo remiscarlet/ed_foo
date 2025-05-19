@@ -1,4 +1,5 @@
-# EKAINE (Enhanced Knowledge Analysis and Insights Notification Engine)
+# EKAINE
+###### (Enhanced Knowledge Analysis and Insights Notification Engine)
 
 EKAINE delivers a fully schematized and enriched database optimized for powerful, flexible querying—surpassing the capabilities of existing tools. Its most powerful feature is the seamless cross-querying of system, station, body, and market data through standard SQL.
 
