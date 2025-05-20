@@ -39,10 +39,15 @@ Many more to come.
 - If you already have a Spansh `galaxy_populated.json` data dump, add it to `data/` with default filename
   - If so, `make import-spansh` instead of `make run-pipeline`
 
-### Setup
+### Initial Setup/Database Hydration
 ```
 make setup
 make run-pipeline
+```
+
+### EDDN Listener
+```
+make eddn-listener
 ```
 
 ### Adhoc SQL Queries
@@ -51,6 +56,10 @@ make pg-shell
 ```
 
 ### Discord Integration
+```
+make discord-bot
+```
+
 ![Example](docs/discord_get-top-reinf-mining-routes.png)
 ![Example](docs/discord_get-mining-expandable.png)
 ![Example](docs/discord_get-top-commodities.png)
