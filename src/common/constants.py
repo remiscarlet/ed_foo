@@ -28,6 +28,8 @@ METADATA_SCHEMAS_DIR = METADATA_DIR / "schemas"
 ENUMS_SCHEMA = METADATA_SCHEMAS_DIR / "enums.schema.json"
 COMMODITIES_SCHEMA = METADATA_SCHEMAS_DIR / "commodities.schema.json"
 COMMODITIES_YAML_FMT = "commodities.*.yaml"
+STRINGS_SCHEMA = METADATA_SCHEMAS_DIR / "strings.schema.json"
+STRINGS_YAML_FMT = "strings.*.yaml"
 
 # EDDN
 GEN_DIR = REL_ROOT_PATH / "gen"  # Hehe...

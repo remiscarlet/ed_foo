@@ -1,0 +1,19 @@
+---
+# https://github.com/EDCD/EDDI/blob/0eb98497bbdb1a5e49cf06f6702dbf9f9322798d/DataDefinitions/Economy.cs
+None: $economy_None;
+Agriculture: $economy_Agri;
+Colony: $economy_Colony;
+Damaged: $economy_Damaged;
+Engineer: $economy_Engineer;
+Extraction: $economy_Extraction;
+Refinery: $economy_Refinery;
+Repair: $economy_Repair;
+Rescue: $economy_Rescue;
+Industrial: $economy_Industrial;
+Terraforming: $economy_Terraforming;
+High Tech: $economy_HighTech;
+Service: $economy_Service;
+Tourism: $economy_Tourism;
+Military: $economy_Military;
+Prison: $economy_Prison;
+Carrier: $economy_Carrier;

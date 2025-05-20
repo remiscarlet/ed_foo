@@ -2,7 +2,6 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from pprint import pprint
 from typing import Any, cast
 
 from src.common.constants import EDDN_SCHEMA_MAPPING_FILE, EDDN_SCHEMAS_DIR
@@ -42,7 +41,7 @@ def generate_mapping() -> None:
         module_path = f"gen.eddn_models.{model_file}"
         module = importlib.import_module(module_path)
 
-        pprint([file, module.Model])  # Ensure model is valid and importable
+        logger.info([file, module.Model])  # Ensure model is valid and importable
 
         mapping[schema] = model_file
 

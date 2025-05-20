@@ -1,6 +1,6 @@
 source tools/scripts/generate_models.sh
 
-TMP_DIR=$(mktemp -d)
+TMP_DIR=$(mktemp -d)/
 SCHEMA_DIR="data/eddn/schemas/"
 GEN_DIR_NAME="eddn_models"
 
@@ -47,5 +47,6 @@ jq '
     },
   }
 ' ${TMP_DIR}${TMP} > ${TMP_DIR}${ORIG}
+rm ${TMP_DIR}${TMP}
 
 generate_models $TMP_DIR $GEN_DIR_NAME

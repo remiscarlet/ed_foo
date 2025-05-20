@@ -1,0 +1,9 @@
+---
+# https://github.com/EDCD/EDDI/blob/0eb98497bbdb1a5e49cf06f6702dbf9f9322798d/DataDefinitions/SecurityLevel.cs
+None: None
+Low: $SYSTEM_SECURITY_low;
+Medium: $SYSTEM_SECURITY_medium;
+High: $SYSTEM_SECURITY_high;
+High Anarchy: $SYSTEM_SECURITY_high_anarchy;
+Anarchy: $GAlAXY_MAP_INFO_state_anarchy;
+Lawless: $GALAXY_MAP_INFO_state_lawless;

@@ -1,0 +1,14 @@
+---
+# https://github.com/EDCD/EDDI/blob/0eb98497bbdb1a5e49cf06f6702dbf9f9322798d/DataDefinitions/DataScan.cs
+Abandoned Data Log: $Datascan_AbandonedDataLog;
+Ancient Codex: $Datascan_ANCIENTCODEX;
+Data Link: $Datascan_DataLink;
+Data Point: $Datascan_DataPoint;
+Data Point HVT: $Datascan_DataPointHVT;
+Listening Post: $Datascan_ListeningPost;
+Settlement Unknown: $Datascan_SettlementUnknown;
+Ship Uplink: $Datascan_ShipUplink;
+TG Transmitter: $Datascan_TGTRANSMITTER;
+Tourist Beacon: $Datascan_TouristBeacon;
+Unknown Uplink: $Datascan_UnknownUplink;
+Wrecked Ship: $Datascan_WreckedShip;

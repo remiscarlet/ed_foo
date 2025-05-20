@@ -1,0 +1,20 @@
+---
+# https://github.com/EDCD/EDDI/blob/0eb98497bbdb1a5e49cf06f6702dbf9f9322798d/DataDefinitions/Government.cs
+None: $government_None;
+Anarchy: $government_Anarchy;
+Carrier: $government_Carrier;
+Colony: $government_Colony;
+Communism: $government_Communism;
+Confederacy: $government_Confederacy;
+Cooperative: $government_Cooperative;
+Corporate: $government_Corporate;
+Democracy: $government_Democracy;
+Dictatorship: $government_Dictatorship;
+Feudal: $government_Feudal;
+Imperial: $government_Imperial;
+Patronage: $government_Patronage;
+Prison: $government_Prison;
+Prison Colony: $government_PrisonColony;
+Theocracy: $government_Theocracy;
+Workshop: $government_Workshop;
+Engineer: $government_engineer;
