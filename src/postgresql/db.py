@@ -1,28 +1,27 @@
 from datetime import datetime
-from typing import Any, Optional, Tuple, Union
+from pprint import pformat
+from typing import Any, Optional, Tuple, Union, cast
 
-from gen.eddn_models import commodity_v3_0
+from gen.eddn_models import commodity_v3_0, journal_v1_0
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 from sqlalchemy import (
-    ARRAY,
     BigInteger,
     Boolean,
     DateTime,
     Float,
     ForeignKey,
     Integer,
-    Text,
     UniqueConstraint,
     and_,
     literal,
     select,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TEXT
 from sqlalchemy.orm import Mapped, Session, foreign, mapped_column, relationship
 
-from src.common.game_constants import get_symbol_by_capi_name
+from src.common.game_constants import get_symbol_by_eddn_name
 from src.common.logging import get_logger
 from src.ingestion.spansh.models.body_spansh import (
     AsteroidsSpansh,
@@ -51,7 +50,7 @@ class BodiesDB(BaseModelWithId):
         {"schema": "core"},
     )
 
-    name: Mapped[str] = mapped_column(Text, nullable=False)
+    name: Mapped[str] = mapped_column(TEXT, nullable=False)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -76,33 +75,33 @@ class BodiesDB(BaseModelWithId):
     age: Mapped[Optional[int]] = mapped_column(Integer)
     arg_of_periapsis: Mapped[Optional[float]] = mapped_column(Float)
     ascending_node: Mapped[Optional[float]] = mapped_column(Float)
-    atmosphere_type: Mapped[Optional[str]] = mapped_column(Text)
+    atmosphere_type: Mapped[Optional[str]] = mapped_column(TEXT)
     axial_tilt: Mapped[Optional[float]] = mapped_column(Float)
     distance_to_arrival: Mapped[Optional[float]] = mapped_column(Float)
     earth_masses: Mapped[Optional[float]] = mapped_column(Float)
     gravity: Mapped[Optional[float]] = mapped_column(Float)
     is_landable: Mapped[Optional[bool]] = mapped_column(Boolean)
-    luminosity: Mapped[Optional[str]] = mapped_column(Text)
+    luminosity: Mapped[Optional[str]] = mapped_column(TEXT)
     main_star: Mapped[Optional[bool]] = mapped_column(Boolean)
     mean_anomaly: Mapped[Optional[float]] = mapped_column(Float)
     orbital_eccentricity: Mapped[Optional[float]] = mapped_column(Float)
     orbital_inclination: Mapped[Optional[float]] = mapped_column(Float)
     orbital_period: Mapped[Optional[float]] = mapped_column(Float)
     radius: Mapped[Optional[float]] = mapped_column(Float)
-    reserve_level: Mapped[Optional[str]] = mapped_column(Text)
+    reserve_level: Mapped[Optional[str]] = mapped_column(TEXT)
     rotational_period: Mapped[Optional[float]] = mapped_column(Float)
     rotational_period_tidally_locked: Mapped[Optional[bool]] = mapped_column(Boolean)
     semi_major_axis: Mapped[Optional[float]] = mapped_column(Float)
     solar_masses: Mapped[Optional[float]] = mapped_column(Float)
     solar_radius: Mapped[Optional[float]] = mapped_column(Float)
     solid_composition: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
-    spectral_class: Mapped[Optional[str]] = mapped_column(Text)
-    sub_type: Mapped[Optional[str]] = mapped_column(Text)
+    spectral_class: Mapped[Optional[str]] = mapped_column(TEXT)
+    sub_type: Mapped[Optional[str]] = mapped_column(TEXT)
     surface_pressure: Mapped[Optional[float]] = mapped_column(Float)
     surface_temperature: Mapped[Optional[float]] = mapped_column(Float)
-    terraforming_state: Mapped[Optional[str]] = mapped_column(Text)
-    type: Mapped[Optional[str]] = mapped_column(Text)
-    volcanism_type: Mapped[Optional[str]] = mapped_column(Text)
+    terraforming_state: Mapped[Optional[str]] = mapped_column(TEXT)
+    type: Mapped[Optional[str]] = mapped_column(TEXT)
+    volcanism_type: Mapped[Optional[str]] = mapped_column(TEXT)
 
     mean_anomaly_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     distance_to_arrival_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -170,7 +169,7 @@ class SignalsDB(BaseModelWithId):
     body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="signals")
 
-    signal_type: Mapped[Optional[str]] = mapped_column(Text)
+    signal_type: Mapped[Optional[str]] = mapped_column(TEXT)
     count: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -196,12 +195,12 @@ class RingsDB(BaseModelWithId):
     __table_args__ = (UniqueConstraint(*unique_columns, name="_ring_on_body_uc"), {"schema": "core"})
 
     id64: Mapped[int] = mapped_column(BigInteger, nullable=True)
-    name: Mapped[str] = mapped_column(Text, nullable=False)
+    name: Mapped[str] = mapped_column(TEXT, nullable=False)
 
     body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="rings")
 
-    type: Mapped[Optional[str]] = mapped_column(Text)
+    type: Mapped[Optional[str]] = mapped_column(TEXT)
     mass: Mapped[Optional[float]] = mapped_column(Float)
     inner_radius: Mapped[Optional[float]] = mapped_column(Float)
     outer_radius: Mapped[Optional[float]] = mapped_column(Float)
@@ -266,30 +265,30 @@ class StationsDB(BaseModelWithId):
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_edsm: Mapped[Optional[int]] = mapped_column(BigInteger)
-    name: Mapped[str] = mapped_column(Text, nullable=False, index=True)  # Station name is NOT unique
+    name: Mapped[str] = mapped_column(TEXT, nullable=False, index=True)  # Station name is NOT unique
 
     owner_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    owner_type: Mapped[str] = mapped_column(Text, nullable=False, index=True)
+    owner_type: Mapped[str] = mapped_column(TEXT, nullable=False, index=True)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(Text)
-    controlling_faction: Mapped[Optional[str]] = mapped_column(Text)
-    controlling_faction_state: Mapped[Optional[str]] = mapped_column(Text)
+    allegiance: Mapped[Optional[str]] = mapped_column(TEXT)
+    controlling_faction: Mapped[Optional[str]] = mapped_column(TEXT)
+    controlling_faction_state: Mapped[Optional[str]] = mapped_column(TEXT)
     distance_to_arrival: Mapped[Optional[float]] = mapped_column(Float)
     economies: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
-    government: Mapped[Optional[str]] = mapped_column(Text)
+    government: Mapped[Optional[str]] = mapped_column(TEXT)
 
     large_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
     medium_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
     small_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
 
-    primary_economy: Mapped[Optional[str]] = mapped_column(Text)
-    services: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
-    type: Mapped[Optional[str]] = mapped_column(Text)
+    primary_economy: Mapped[Optional[str]] = mapped_column(TEXT)
+    services: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+    type: Mapped[Optional[str]] = mapped_column(TEXT)
 
     # It kind of is a station-level detail...
-    prohibited_commodities: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    prohibited_commodities: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
 
-    carrier_name: Mapped[Optional[str]] = mapped_column(Text)
+    carrier_name: Mapped[Optional[str]] = mapped_column(TEXT)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
     longitude: Mapped[Optional[float]] = mapped_column(Float)
 
@@ -336,6 +335,31 @@ class StationsDB(BaseModelWithId):
             "spansh_updated_at": spansh_station.update_time,
         }
 
+    # @staticmethod
+    # def to_dicts_from_eddn(eddn_model: approachsettlement_v1_0.Model, system_id: int) -> list[dict[str, Any]]:
+    #     dicts = []
+    #     for commodity in eddn_model.message:
+    #         symbol = get_symbol_by_eddn_name(commodity.name)
+    #         if symbol is None:
+    #             logger.warning(
+    #                 "Encountered a commodity in an EDDN Commodity model we didn't know about! "
+    #                 f"Got: '{commodity.name}'"
+    #             )
+    #             continue
+
+    #         dicts.append(
+    #             {
+    #                 "station_id": station_id,
+    #                 "commodity_sym": symbol,
+    #                 "buy_price": commodity.buyPrice,
+    #                 "sell_price": commodity.sellPrice,
+    #                 "supply": commodity.stock,
+    #                 "demand": commodity.demand,
+    #                 "updated_at": eddn_model.message.timestamp,
+    #             }
+    #         )
+    #     return dicts
+
     def __repr__(self) -> str:
         return f"<StationsDB(id={self.id}, name={self.name!r})>"
 
@@ -366,17 +390,17 @@ class CommoditiesDB(BaseModel):
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
 
-    symbol: Mapped[str] = mapped_column(Text, primary_key=True)
-    name: Mapped[str] = mapped_column(Text, nullable=False)
+    symbol: Mapped[str] = mapped_column(TEXT, primary_key=True)
+    name: Mapped[str] = mapped_column(TEXT, nullable=False)
 
     avg_price: Mapped[Optional[int]] = mapped_column(Integer)
     rare_goods: Mapped[Optional[bool]] = mapped_column(Boolean)
     corrosive: Mapped[Optional[bool]] = mapped_column(Boolean)
 
-    category: Mapped[Optional[str]] = mapped_column(Text)
+    category: Mapped[Optional[str]] = mapped_column(TEXT)
     is_mineable: Mapped[Optional[bool]] = mapped_column(Boolean)
-    ring_types: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
-    mining_method: Mapped[Optional[str]] = mapped_column(Text)
+    ring_types: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+    mining_method: Mapped[Optional[str]] = mapped_column(TEXT)
     has_hotspots: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     def __repr__(self) -> str:
@@ -392,7 +416,7 @@ class MarketCommoditiesDB(BaseModelWithId):
     )
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
-    commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("core.commodities.symbol"), nullable=False)
+    commodity_sym: Mapped[str] = mapped_column(TEXT, ForeignKey("core.commodities.symbol"), nullable=False)
 
     buy_price: Mapped[Optional[int]] = mapped_column(Integer)
     sell_price: Mapped[Optional[int]] = mapped_column(Integer)
@@ -418,7 +442,7 @@ class MarketCommoditiesDB(BaseModelWithId):
     def to_dicts_from_eddn(eddn_model: commodity_v3_0.Model, station_id: int) -> list[dict[str, Any]]:
         dicts = []
         for commodity in eddn_model.message.commodities:
-            symbol = get_symbol_by_capi_name(commodity.name)
+            symbol = get_symbol_by_eddn_name(commodity.name)
             if symbol is None:
                 logger.warning(
                     f"Encountered a commodity in an EDDN Commodity model we didn't know about! Got: '{commodity.name}'"
@@ -446,9 +470,9 @@ class ShipsDB(BaseModel):
     __tablename__ = "ships"
     __table_args__ = {"schema": "core"}
 
-    symbol: Mapped[str] = mapped_column(Text, primary_key=True)
+    symbol: Mapped[str] = mapped_column(TEXT, primary_key=True)
 
-    name: Mapped[Optional[str]] = mapped_column(Text)
+    name: Mapped[Optional[str]] = mapped_column(TEXT)
     ship_id: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -473,7 +497,7 @@ class ShipyardShipsDB(BaseModelWithId):
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     ship_sym: Mapped[str] = mapped_column(
-        Text, ForeignKey("core.ships.symbol"), nullable=False
+        TEXT, ForeignKey("core.ships.symbol"), nullable=False
     )  # Small lookup table; no index
 
     def __repr__(self) -> str:
@@ -484,13 +508,13 @@ class ShipModulesDB(BaseModel):
     __tablename__ = "ship_modules"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(TEXT, primary_key=True)
 
     module_id: Mapped[Optional[int]] = mapped_column(Integer)
-    symbol: Mapped[str] = mapped_column(Text)
-    category: Mapped[Optional[str]] = mapped_column(Text)
-    rating: Mapped[Optional[str]] = mapped_column(Text)
-    ship: Mapped[Optional[str]] = mapped_column(Text)
+    symbol: Mapped[str] = mapped_column(TEXT)
+    category: Mapped[Optional[str]] = mapped_column(TEXT)
+    rating: Mapped[Optional[str]] = mapped_column(TEXT)
+    ship: Mapped[Optional[str]] = mapped_column(TEXT)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     @staticmethod
@@ -514,7 +538,7 @@ class OutfittingShipModulesDB(BaseModelWithId):
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     module_name: Mapped[str] = mapped_column(
-        Text, ForeignKey("core.ship_modules.name"), nullable=False
+        TEXT, ForeignKey("core.ship_modules.name"), nullable=False
     )  # Small lookup table; no index
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -529,13 +553,13 @@ class ThargoidWarDB(BaseModelWithId):
 
     system_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.systems.id"), nullable=False, index=True)
 
-    current_state: Mapped[str] = mapped_column(Text)
+    current_state: Mapped[str] = mapped_column(TEXT)
     days_remaining: Mapped[float] = mapped_column(Float)
-    failure_state: Mapped[str] = mapped_column(Text)
+    failure_state: Mapped[str] = mapped_column(TEXT)
     ports_remaining: Mapped[float] = mapped_column(Float)
     progress: Mapped[float] = mapped_column(Float)
     success_reached: Mapped[bool] = mapped_column(Boolean)
-    success_state: Mapped[str] = mapped_column(Text)
+    success_state: Mapped[str] = mapped_column(TEXT)
 
     @staticmethod
     def to_dict_from_spansh(war: ThargoidWarSpansh) -> dict[str, Any]:
@@ -559,10 +583,10 @@ class FactionsDB(BaseModelWithId):
     __tablename__ = "factions"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(TEXT, nullable=False, unique=True)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(Text)
-    government: Mapped[Optional[str]] = mapped_column(Text)
+    allegiance: Mapped[Optional[str]] = mapped_column(TEXT)
+    government: Mapped[Optional[str]] = mapped_column(TEXT)
     is_player: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     faction_presences: Mapped[list["FactionPresencesDB"]] = relationship(back_populates="faction")
@@ -593,12 +617,13 @@ class FactionPresencesDB(BaseModelWithId):
     faction: Mapped["FactionsDB"] = relationship(back_populates="faction_presences")
 
     influence: Mapped[Optional[float]] = mapped_column(Float)
-    state: Mapped[Optional[str]] = mapped_column(Text)
-    happiness: Mapped[Optional[str]] = mapped_column(Text)
+    state: Mapped[Optional[str]] = mapped_column(TEXT)
+    happiness: Mapped[Optional[str]] = mapped_column(TEXT)
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    active_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
-    pending_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
-    recovering_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    active_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+
+    pending_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+    recovering_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
 
     @staticmethod
     def to_dict_from_spansh(spansh_faction: FactionSpansh, system_id: int, faction_id: int) -> dict[str, Any]:
@@ -609,6 +634,46 @@ class FactionPresencesDB(BaseModelWithId):
             "state": spansh_faction.state,
         }
 
+    none_filter_bypass = ["happiness"]
+
+    @staticmethod
+    def to_dicts_from_eddn(
+        eddn_model: journal_v1_0.Model, system_id: int, faction_name_to_id_mapping: dict[str, int]
+    ) -> list[dict[str, Any]]:
+        factions = eddn_model.message.Factions or []
+
+        dicts: list[dict[str, Any]] = []
+        for faction in factions:
+            if faction.Name is None:
+                logger.warning(f"Found a Faction without a Name! {pformat(faction)}")
+                continue
+
+            faction_id = faction_name_to_id_mapping.get(faction.Name)
+            if faction_id is None:
+                logger.warning(
+                    "Found a Faction Name that wasn't in the provided id mapping: "
+                    f"'{faction.Name}' - {pformat(faction_name_to_id_mapping)}"
+                )
+                continue
+            d = {
+                "system_id": system_id,
+                "faction_id": faction_id,
+                "influence": faction.Influence,
+                "state": get_symbol_by_eddn_name(faction.FactionState) if faction.FactionState is not None else None,
+                "happiness": get_symbol_by_eddn_name(faction.Happiness) if faction.Happiness is not None else None,
+                "updated_at": eddn_model.message.timestamp,
+                "active_states": [get_symbol_by_eddn_name(state.State) for state in faction.ActiveStates or []],
+                "pending_states": [get_symbol_by_eddn_name(state.State) for state in faction.PendingStates or []],
+                "recovering_states": [get_symbol_by_eddn_name(state.State) for state in faction.RecoveringStates or []],
+            }
+
+            d_filtered = {k: v for k, v in d.items() if v is not None or k in FactionPresencesDB.none_filter_bypass}
+            if d_filtered.get("happiness") is None:
+                logger.info(pformat(d_filtered))
+            dicts.append(d_filtered)
+
+        return dicts
+
     def __repr__(self) -> str:
         return f"<FactionPresencesDB(id={self.id}, system_id={self.system_id}, faction_id={self.faction_id})>"
 
@@ -618,7 +683,7 @@ class SystemsDB(BaseModelWithId):
     __tablename__ = "systems"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(TEXT, nullable=False, unique=True)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -631,20 +696,20 @@ class SystemsDB(BaseModelWithId):
 
     date: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(Text)
+    allegiance: Mapped[Optional[str]] = mapped_column(TEXT)
     population: Mapped[Optional[int]] = mapped_column(BigInteger)
-    primary_economy: Mapped[Optional[str]] = mapped_column(Text)
-    secondary_economy: Mapped[Optional[str]] = mapped_column(Text)
-    security: Mapped[Optional[str]] = mapped_column(Text)
-    government: Mapped[Optional[str]] = mapped_column(Text)
+    primary_economy: Mapped[Optional[str]] = mapped_column(TEXT)
+    secondary_economy: Mapped[Optional[str]] = mapped_column(TEXT)
+    security: Mapped[Optional[str]] = mapped_column(TEXT)
+    government: Mapped[Optional[str]] = mapped_column(TEXT)
     body_count: Mapped[Optional[int]] = mapped_column(Integer)
-    controlling_power: Mapped[Optional[str]] = mapped_column(Text)
+    controlling_power: Mapped[Optional[str]] = mapped_column(TEXT)
     power_conflict_progress: Mapped[Optional[list[dict[str, float]]]] = mapped_column(JSONB)
-    power_state: Mapped[Optional[str]] = mapped_column(Text)
+    power_state: Mapped[Optional[str]] = mapped_column(TEXT)
     power_state_control_progress: Mapped[Optional[float]] = mapped_column(Float)
     power_state_reinforcement: Mapped[Optional[float]] = mapped_column(Float)
     power_state_undermining: Mapped[Optional[float]] = mapped_column(Float)
-    powers: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    powers: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
     thargoid_war: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
 
     controlling_power_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -668,7 +733,7 @@ class SystemsDB(BaseModelWithId):
         return ("SystemsDB", self.name)
 
     @staticmethod
-    def coords_to_dict_from_spansh(coords: CoordinatesSpansh) -> WKBElement:
+    def coords_spansh_to_wkbelement(coords: CoordinatesSpansh) -> WKBElement:
         return from_shape(Point(coords.x, coords.y, coords.z), srid=0)
 
     @staticmethod
@@ -686,7 +751,7 @@ class SystemsDB(BaseModelWithId):
             "x": spansh_system.coords.x,
             "y": spansh_system.coords.y,
             "z": spansh_system.coords.z,
-            "coords": SystemsDB.coords_to_dict_from_spansh(spansh_system.coords),
+            "coords": SystemsDB.coords_spansh_to_wkbelement(spansh_system.coords),
             "date": spansh_system.date,
             "government": spansh_system.government,
             "id64": spansh_system.id64,
@@ -714,6 +779,78 @@ class SystemsDB(BaseModelWithId):
             "power_state_updated_at": getattr(spansh_system.timestamps, "power_state", None),
             "powers_updated_at": getattr(spansh_system.timestamps, "powers", None),
         }
+
+    @staticmethod
+    def starpos_to_wkbelement(coords: tuple[float, float, float]) -> WKBElement:
+        return from_shape(Point(coords[0], coords[1], coords[2]), srid=0)
+
+    @staticmethod
+    def to_dict_from_eddn(eddn_model: journal_v1_0.Model, controlling_faction_id: int | None) -> dict[str, Any]:
+        """
+        StarSystem='Catun',
+        StarPos=[-4.71875, 25.625, -105.0625],
+        SystemAddress=2621817489755,
+        Body='Catun',
+        BodyID=0,
+        BodyType='Star',
+        Conflicts=[{
+            'Faction1': {'Name': 'Catun PLC', 'Stake': 'Moon Survey', 'WonDays': 0},
+            'Faction2': {'Name': 'Catun Resistance', 'Stake': 'Schunmann Cultivation Holdings', 'WonDays': 0},
+            'Status': 'pending',
+            'WarType': 'civilwar'
+        }],
+        SystemFaction={'FactionState': 'Expansion', 'Name': 'Caballeros de Sion'},
+        """
+        msg = eddn_model.message
+        government = getattr(msg, "SystemGovernment", None)
+        primary_economy = getattr(msg, "SystemEconomy", None)
+        secondary_economy = getattr(msg, "SystemSecondEconomy", None)
+        security = getattr(msg, "SystemSecurity", None)
+
+        starpos = tuple(msg.StarPos)
+        if len(starpos) != 3:
+            logger.warning(f"Got a malformed StarPos value! '{msg.StarPos}' - '{pformat(msg)}'")
+            raise ValueError(f"Malformed StarPos! '{msg.StarPos}'")
+
+        d = {
+            "allegiance": getattr(msg, "SystemAllegiance", None),
+            "controlling_faction_id": controlling_faction_id,
+            "x": starpos[0],
+            "y": starpos[1],
+            "z": starpos[2],
+            "coords": SystemsDB.starpos_to_wkbelement(starpos),
+            "date": msg.timestamp,
+            "government": get_symbol_by_eddn_name(cast(str, government)) if government is not None else None,
+            # "id64": msg.SystemAddress, # Never update id64?
+            "name": msg.StarSystem,
+            "population": getattr(msg, "Population", None),
+            "primary_economy": (
+                get_symbol_by_eddn_name(cast(str, primary_economy)) if primary_economy is not None else None
+            ),
+            "secondary_economy": (
+                get_symbol_by_eddn_name(cast(str, secondary_economy)) if secondary_economy is not None else None
+            ),
+            "security": get_symbol_by_eddn_name(cast(str, security)) if security is not None else None,
+            "controlling_power": getattr(msg, "ControllingPower", None),
+            # "power_conflict_progress": [
+            #     SystemsDB.power_conflict_progress_to_dict_from_spansh(participant)
+            #     for participant in getattr(msg, "power_conflict_progress or []
+            # ],
+            "power_state": getattr(msg, "PowerplayState", None),
+            "power_state_control_progress": getattr(msg, "PowerplayStateControlProgress", None),
+            "power_state_reinforcement": getattr(msg, "PowerplayStateReinforcement", None),
+            "power_state_undermining": getattr(msg, "PowerplayStateUndermining", None),
+            "powers": getattr(msg, "Powers", None),
+            # "thargoid_war": (
+            #   spansh_system.thargoid_war.to_sqlalchemy_dict()
+            #   if spansh_system.thargoid_war is not None else None
+            # ),
+            "controlling_power_updated_at": msg.timestamp,
+            "power_state_updated_at": msg.timestamp,
+            "powers_updated_at": msg.timestamp,
+        }
+
+        return {k: v for k, v in d.items() if v is not None}
 
     def __repr__(self) -> str:
         return f"<SystemsDB(id={self.id}, name={self.name!r})>"

@@ -6,7 +6,7 @@ from src.common.logging import get_logger
 from src.common.timer import Timer
 from src.common.utils import dur_to_interval_str
 from src.postgresql import SessionLocal
-from src.postgresql.db import StationsDB, SystemsDB
+from src.postgresql.db import FactionsDB, StationsDB, SystemsDB
 from src.postgresql.types import (
     HotspotResult,
     MiningAcquisitionResult,
@@ -163,9 +163,8 @@ class SystemsAdapter:
     def get_system(self, system_name: str) -> SystemsDB:
         query = select(SystemsDB).where(SystemsDB.name == system_name)
         db_system = self.session.scalars(query).first()
-        logger.info(db_system)
         if not db_system:
-            raise ValueError("System not found")
+            raise ValueError(f"System '{system_name}' not found")
         return db_system
 
 
@@ -177,5 +176,17 @@ class StationsAdapter:
         query = select(StationsDB).where(StationsDB.name == station_name)
         db_station = self.session.scalars(query).first()
         if not db_station:
-            raise ValueError("Station not found")
+            raise ValueError(f"Station '{station_name}' not found")
+        return db_station
+
+
+class FactionsAdapter:
+    def __init__(self) -> None:
+        self.session = SessionLocal()
+
+    def get_faction(self, faction_name: str) -> FactionsDB:
+        query = select(FactionsDB).where(FactionsDB.name == faction_name)
+        db_station = self.session.scalars(query).first()
+        if not db_station:
+            raise ValueError(f"Faction '{faction_name}' not found")
         return db_station

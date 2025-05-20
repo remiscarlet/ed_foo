@@ -1,3 +1,4 @@
+import re
 from typing import Any, Type
 
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -46,3 +47,16 @@ def upsert_all[T: BaseModel](
     session.commit()
 
     return list(iter(results.all()))
+
+
+dollar_string_to_db_val_re = re.compile(r"\$\w+_(?P<val>.*)")
+
+
+def dollar_string_to_db_val(s: str) -> str:
+    result = dollar_string_to_db_val_re.match(s)
+    if result is None:
+        logger.warning(f"Could not convert dollar string to db val - got malformed dollar string! '{s}'")
+        raise ValueError(f"Malformed dollar string '{s}'")
+    val = result.group("val")
+    val_capitalized = " ".join(list(map(lambda v: v.capitalize(), val.split("_"))))
+    return val_capitalized

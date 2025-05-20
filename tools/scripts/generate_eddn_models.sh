@@ -22,6 +22,7 @@ jq '
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["State"],
         "properties": {
           "State": { "type": "string" }
         }
@@ -31,6 +32,7 @@ jq '
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["State"],
         "properties": {
           "State": { "type": "string" }
         }
@@ -40,6 +42,7 @@ jq '
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["State"],
         "properties": {
           "State": { "type": "string" }
         }

@@ -15,6 +15,9 @@ discord-bot:
 eddn-listener:
 	poetry run cli ingestion eddn-listener
 
+eddn-listener-v:
+	poetry run cli ingestion eddn-listener -v
+
 ## Data DL/Import
 
 download-spansh:

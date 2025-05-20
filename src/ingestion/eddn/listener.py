@@ -1,24 +1,26 @@
 #!python
 import importlib
 import json
-import logging
 import traceback
 import zlib
-from pprint import pformat, pprint
+from pprint import pformat
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import zmq
 from gen.eddn_models import (
+    approachsettlement_v1_0,
     commodity_v3_0,
+    fsssignaldiscovered_v1_0,
+    journal_v1_0,
 )
 from pydantic import BaseModel
 
-from src.common.logging import configure_logger, get_logger
+from src.common.logging import get_logger
 from src.ingestion.eddn.schemas import get_schema_model_mapping
 from src.postgresql import SessionLocal
-from src.postgresql.adapter import StationsAdapter
-from src.postgresql.db import MarketCommoditiesDB
+from src.postgresql.adapter import FactionsAdapter, StationsAdapter, SystemsAdapter
+from src.postgresql.db import FactionPresencesDB, MarketCommoditiesDB, SystemsDB
 from src.postgresql.utils import upsert_all
 
 logger = get_logger(__name__)
@@ -30,7 +32,7 @@ def import_generated_models() -> None:
     for schema, model_file in get_schema_model_mapping().items():
         module_path = f"gen.eddn_models.{model_file}"
         module = importlib.import_module(module_path)
-        pprint(module.Model)  # Ensure model is valid and importable
+        logger.debug(module.Model)  # Ensure model is valid and importable
         module_mapping[schema] = module
 
 
@@ -53,13 +55,18 @@ class EDDNListener:
 
         self.processor_mapping = {
             commodity_v3_0.Model: self.process_commodity_v3_0,
+            # approachsettlement_v1_0.Model: self.process_approachsettlement_v1_0,
+            journal_v1_0.Model: self.process_journal_v1_0,
+            # fsssignaldiscovered_v1_0.Model: self.process_fsssignaldiscovered_v1_0,
         }
 
     def process_commodity_v3_0(self, model: commodity_v3_0.Model) -> None:
+        """
+        Process commodity-v3.0 EDDN messages
+        """
         # May want to filter any stations with "invalid characters" like '$' or ';'
         # Some station names come through like '$EXT_PANEL_ColonisationShip; Skvortsov Territory'
         station_name = model.message.stationName
-        pprint(f"{model.message.systemName} - {station_name} - {len(model.message.commodities)} Commodities")
 
         try:
             station = StationsAdapter().get_station(station_name)
@@ -70,9 +77,96 @@ class EDDNListener:
         commodity_dicts = MarketCommoditiesDB.to_dicts_from_eddn(model, station.id)
         upsert_all(self.session, MarketCommoditiesDB, commodity_dicts)
 
-    def run(self) -> None:
-        configure_logger(logging.INFO)
+        logger.info(
+            "[Market Commodities Updated] "
+            f"{model.message.systemName} - {station_name} - {len(model.message.commodities)} Commodities"
+        )
 
+    @staticmethod
+    def approachsettlement_v1_0_model_to_controlling_faction_id(model: approachsettlement_v1_0.Model) -> int | None:
+        faction_id = None
+        controlling_faction = getattr(model.message, "SystemFaction", None)
+        if controlling_faction is not None:
+            faction_name = controlling_faction.get("Name")
+            faction = FactionsAdapter().get_faction(faction_name)
+            if faction is not None:
+                faction_id = faction.id
+
+        return faction_id
+
+    def process_approachsettlement_v1_0(self, model: approachsettlement_v1_0.Model) -> None:
+        pass
+        # controlling_faction_id = EDDNListener.approachsettlement_v1_0_model_to_controlling_faction_id(model)
+        # system_dict = SystemsDB.to_dict_from_eddn(model, controlling_faction_id)
+        # logger.info(pformat(system_dict))
+
+    @staticmethod
+    def journal_v1_0_model_to_faction_name_to_id_mapping(model: journal_v1_0.Model) -> dict[str, int]:
+        mapping: dict[str, int] = {}
+        for faction in model.message.Factions or []:
+            faction_name = faction.Name
+            if faction_name is None:
+                logger.warning(f"Encountered Faction object with no Name! '{pformat(faction)}'")
+                continue
+            faction_obj = FactionsAdapter().get_faction(faction_name)
+            if faction_obj is not None:
+                mapping[faction_name] = faction_obj.id
+
+        return mapping
+
+    def process_journal_v1_0(self, model: journal_v1_0.Model) -> None:
+        """
+        Process journal-v1.0 EDDN messages
+        """
+        # if model.message.Factions is not None:
+        system_name = cast(str, model.message.StarSystem)
+        try:
+            system = SystemsAdapter().get_system(system_name)
+        except ValueError:
+            # We currently only track systems with population > 0, so plenty of systems won't be found.
+            logger.debug(f"Encountered system we didn't know about! '{system_name}'")
+            return
+
+        faction_id_mapping = EDDNListener.journal_v1_0_model_to_faction_name_to_id_mapping(model)
+        faction_name_mapping = {v: k for k, v in faction_id_mapping.items()}
+
+        controlling_faction_name = getattr(model.message, "SystemFaction", {}).get("Name")
+        controlling_faction_id = (
+            faction_id_mapping.get(cast(str, controlling_faction_name))
+            if controlling_faction_name is not None
+            else None
+        )
+
+        system_dict = SystemsDB.to_dict_from_eddn(model, controlling_faction_id)
+        upsert_all(self.session, SystemsDB, [system_dict])
+        logger.info(f"[System Updated] {system_name}")
+
+        faction_presence_dicts = FactionPresencesDB.to_dicts_from_eddn(model, system.id, faction_id_mapping)
+        try:
+            upsert_all(self.session, FactionPresencesDB, faction_presence_dicts)
+        except Exception:
+            logger.warning(traceback.format_exc())
+            logger.warning(pformat(faction_presence_dicts))
+            logger.warning(pformat(model.message.Factions))
+            return
+
+        for faction in faction_presence_dicts or []:
+            faction_id = faction.get("faction_id") or -1
+            faction_name = faction_name_mapping.get(faction_id)
+            logger.info(f"[Faction Presence Updated] {system_name} - {faction_name} - {faction.get("state")}")
+
+    def process_fsssignaldiscovered_v1_0(self, model: fsssignaldiscovered_v1_0.Model) -> None:
+        for signal in model.message.signals:
+            if signal.SignalType in ["FleetCarrier", "Combat", "ResourceExtraction"]:
+                continue
+            if signal.SpawningPower is None:
+                continue
+            logger.info(pformat(signal))
+            # logger.info(pformat([
+            #     signal.SignalType, signal.SignalName, signal.SpawningPower, signal.SpawningState
+            # ]))
+
+    def run(self) -> None:
         ctx = zmq.Context()
         sub = ctx.socket(zmq.SUB)
         sub.connect("tcp://eddn.edcd.io:9500")
@@ -95,13 +189,16 @@ class EDDNListener:
             try:
                 obj = module.Model.model_validate(d)
             except Exception:
-                traceback.print_exc()
+                logger.error(traceback.format_exc())
                 logger.info(pformat(d))
                 continue
 
             obj_type = type(obj)
             if issubclass(obj_type, BaseModel) and obj_type in self.processor_mapping:
-                self.processor_mapping[obj_type](obj)
+                try:
+                    self.processor_mapping[obj_type](obj)
+                except Exception:
+                    logger.error(traceback.format_exc())
 
 
 def main() -> None:
