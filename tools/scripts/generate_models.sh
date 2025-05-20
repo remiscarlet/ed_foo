@@ -1,11 +1,16 @@
+function copy_schemas {
+    TMP_DIR=${1}
+    IN_DIR=${2}
+
+    mkdir -p $TMP_DIR
+    cp ${IN_DIR}*.json ${TMP_DIR}
+}
+
 function generate_models {
-    TMP_DIR=$(mktemp -d)
+    TMP_DIR=${1}
 
     GEN_DIR=gen/
-
-    IN_DIR=${1}
     OUT_DIR=${GEN_DIR}${2}/
-    cp ${IN_DIR}*.json ${TMP_DIR}
 
     mkdir -p ${GEN_DIR}
     poetry run datamodel-codegen \

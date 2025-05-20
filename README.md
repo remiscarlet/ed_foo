@@ -7,23 +7,25 @@ EKAINE delivers a fully schematized and enriched database optimized for powerful
 
 EKAINE is a **data ingestion, enrichment, analysis, and workflow automation system** for *Elite Dangerous* game data.
 
-It collects, processes, and exposes structured data from external sources like **EDDN** (Live), **Spansh** (Dumps), and **EDSM** (Dumps), and allow interaction with insights via:
+It collects, processes, and exposes structured data from external sources like **EDDN** (Live), **Spansh** (Dumps), and **EDSM** (Dumps), and allows interaction with insights via:
 - Discord bots
 - Webhooks
 - CLI tools
 - REST APIs (Maybe)
 
 ### Features
+Most features are focused on Powerplay 2.0 mechanics.
+
 Major features are split into "queries" and "alerts"
 
-Queries (All queries have configurable arguments/filters):
+#### Queries (All queries have configurable arguments/filters):
 - Get Hotspots for System
 - Get Top N Commodity Prices at Stations for System
 - Get Top Mining Reinforcement Routes Globally
 - Get Mining Reinforcement Routes for System
 - Get Mining Acqusition Routes for System
 
-Alerts (Coming Soon - Relies on EDDN live updates):
+#### Alerts (Coming Soon):
 - Notify When System Enters Boom (Filterable)
 - Notify Systems Being Undermined
 - Notify System Control Point Thresholds ('50%', '75%', etc to 'Min Control Score', 'Fortified', etc)
