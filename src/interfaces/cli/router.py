@@ -9,7 +9,7 @@ from tabulate import tabulate
 from src.common.logging import configure_logger, get_logger
 from src.common.timer import Timer
 from src.common.utils import get_time_since
-from src.ingestion.eddn.listener import eddn_listener
+from src.ingestion.eddn.listener import main as invoke_eddn_listener
 from src.ingestion.spansh.pipeline import SpanshDataPipeline
 from src.postgresql.adapter import (
     ApiCommandAdapter,
@@ -47,7 +47,7 @@ def print_hotspot_results(system_name: str, hotspots: list[HotspotResult]) -> No
 
 
 def run_eddn_listener(args: Namespace) -> None:
-    eddn_listener()
+    invoke_eddn_listener()
 
 
 def run_import_spansh(args: Namespace) -> None:

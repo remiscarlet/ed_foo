@@ -3,11 +3,18 @@ import json
 import logging
 from pathlib import Path
 from pprint import pprint
+from typing import Any, cast
 
 from src.common.constants import EDDN_SCHEMA_MAPPING_FILE, EDDN_SCHEMAS_DIR
 from src.common.logging import configure_logger, get_logger
 
 logger = get_logger(__name__)
+
+
+def get_schema_model_mapping() -> dict[str, Any]:
+    with open(EDDN_SCHEMA_MAPPING_FILE, "r") as f:
+        d = json.load(f)
+    return cast(dict[str, Any], d)
 
 
 def filename_to_model_file(file: Path) -> str:

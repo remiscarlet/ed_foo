@@ -107,12 +107,13 @@ gen-eddn-models:
 gen-metadata-models:
 	./tools/scripts/generate_metadata_models.sh
 
-models: download-eddn-models gen-eddn-models gen-metadata-models
+download-gen-models: download-eddn-models gen-eddn-models gen-metadata-models
 
 gen-eddn-model-mappings:
 	poetry run generate_eddn_schema_mapping
 
-install-models: models gen-eddn-model-mappings
+install-models: download-gen-models gen-eddn-model-mappings
+models: install-models
 
 clean-models:
 	rm -f gen/eddn_schema_to_model_mapping.json

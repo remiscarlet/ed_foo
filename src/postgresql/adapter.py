@@ -176,7 +176,6 @@ class StationsAdapter:
     def get_station(self, station_name: str) -> StationsDB:
         query = select(StationsDB).where(StationsDB.name == station_name)
         db_station = self.session.scalars(query).first()
-        logger.info(db_station)
         if not db_station:
             raise ValueError("Station not found")
         return db_station

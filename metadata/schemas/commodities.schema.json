@@ -3,9 +3,12 @@
     "$id": "commodities.schema.json",
     "type": "object",
     "patternProperties": {
-        "^.*$": {
+        "^.*$": { "$ref": "#/$defs/Commodity" }
+    },
+    "$defs": {
+        "Commodity": {
             "type": "object",
-            "required": ["category", "is_mineable"],
+            "required": ["category", "is_mineable", "id64", "name", "avg_price", "rare_goods", "corrosive"],
             "properties": {
                 "name": { "type": ["string"] },
                 "category": { "$ref": "enums.schema.json#/$defs/CommodityCategory" },

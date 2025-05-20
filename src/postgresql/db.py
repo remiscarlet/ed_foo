@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Optional, Tuple, Union
 
+from gen.eddn_models import commodity_v3_0
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
@@ -21,6 +22,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, foreign, mapped_column, relationship
 
+from src.common.game_constants import get_symbol_by_capi_name
 from src.common.logging import get_logger
 from src.ingestion.spansh.models.body_spansh import (
     AsteroidsSpansh,
@@ -377,20 +379,6 @@ class CommoditiesDB(BaseModel):
     mining_method: Mapped[Optional[str]] = mapped_column(Text)
     has_hotspots: Mapped[Optional[bool]] = mapped_column(Boolean)
 
-    @staticmethod
-    def to_dict_from_spansh(
-        spansh_commodity: CommoditySpansh, station_id: int, commodity_sym: str, market_updated_at: datetime | None
-    ) -> dict[str, Any]:
-        return {
-            "station_id": station_id,
-            "commodity_sym": commodity_sym,
-            "buy_price": spansh_commodity.buy_price,
-            "sell_price": spansh_commodity.sell_price,
-            "supply": spansh_commodity.supply,
-            "demand": spansh_commodity.demand,
-            "updated_at": spansh_commodity.updated_at or market_updated_at,
-        }
-
     def __repr__(self) -> str:
         return f"<CommoditiesDB(id='{self.symbol}', name={self.name!r})>"
 
@@ -411,6 +399,44 @@ class MarketCommoditiesDB(BaseModelWithId):
     supply: Mapped[Optional[int]] = mapped_column(Integer)
     demand: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
+
+    @staticmethod
+    def to_dict_from_spansh(
+        spansh_commodity: CommoditySpansh, station_id: int, commodity_sym: str, market_updated_at: datetime | None
+    ) -> dict[str, Any]:
+        return {
+            "station_id": station_id,
+            "commodity_sym": commodity_sym,
+            "buy_price": spansh_commodity.buy_price,
+            "sell_price": spansh_commodity.sell_price,
+            "supply": spansh_commodity.supply,
+            "demand": spansh_commodity.demand,
+            "updated_at": spansh_commodity.updated_at or market_updated_at,
+        }
+
+    @staticmethod
+    def to_dicts_from_eddn(eddn_model: commodity_v3_0.Model, station_id: int) -> list[dict[str, Any]]:
+        dicts = []
+        for commodity in eddn_model.message.commodities:
+            symbol = get_symbol_by_capi_name(commodity.name)
+            if symbol is None:
+                logger.warning(
+                    f"Encountered a commodity in an EDDN Commodity model we didn't know about! Got: '{commodity.name}'"
+                )
+                continue
+
+            dicts.append(
+                {
+                    "station_id": station_id,
+                    "commodity_sym": symbol,
+                    "buy_price": commodity.buyPrice,
+                    "sell_price": commodity.sellPrice,
+                    "supply": commodity.stock,
+                    "demand": commodity.demand,
+                    "updated_at": eddn_model.message.timestamp,
+                }
+            )
+        return dicts
 
     def __repr__(self) -> str:
         return f"<MarketCommoditiesDB(id={self.id}, station_id={self.station_id}, commodity_sym={self.commodity_sym})>"
