@@ -33,17 +33,6 @@ class ThargoidWarSpansh(BaseSpanshModel):
             self.success_state,
         )
 
-    def to_sqlalchemy_dict(self) -> dict[str, Any]:
-        return {
-            "current_state": self.current_state,
-            "days_remaining": self.days_remaining,
-            "failure_state": self.failure_state,
-            "ports_remaining": self.ports_remaining,
-            "progress": self.progress,
-            "success_reached": self.success_reached,
-            "success_state": self.success_state,
-        }
-
 
 class FactionSpansh(BaseSpanshModel):
     name: str
@@ -56,21 +45,6 @@ class FactionSpansh(BaseSpanshModel):
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (self.__class__, self.name)
 
-    def to_faction_sqlalchemy_dict(self) -> dict[str, Any]:
-        return {
-            "name": self.name,
-            "allegiance": self.allegiance,
-            "government": self.government,
-        }
-
-    def to_faction_presence_sqlalchemy_dict(self, system_id: int, faction_id: int) -> dict[str, Any]:
-        return {
-            "system_id": system_id,
-            "faction_id": faction_id,
-            "influence": self.influence,
-            "state": self.state,
-        }
-
 
 class ControllingFactionSpansh(BaseSpanshModel):
     name: str
@@ -80,23 +54,10 @@ class ControllingFactionSpansh(BaseSpanshModel):
     def to_cache_key_tuple(self) -> Tuple[Any, ...]:
         return (FactionSpansh, self.name)
 
-    def to_sqlalchemy_dict(self) -> dict[str, Any]:
-        return {
-            "name": self.name,
-            "allegiance": self.allegiance,
-            "government": self.government,
-        }
-
 
 class PowerConflictProgressSpansh(BaseSpanshModel):
     power: str
     progress: float
-
-    def to_sqlalchemy_dict(self) -> dict[str, Any]:
-        return {
-            "power": self.power,
-            "progress": self.progress,
-        }
 
 
 class SystemSpansh(BaseSpanshModel):
@@ -174,35 +135,3 @@ class SystemSpansh(BaseSpanshModel):
             stations.append(newest_scs)
 
         return stations
-
-    def to_sqlalchemy_dict(self, controlling_faction_id: int | None) -> dict[str, Any]:
-        return {
-            "allegiance": self.allegiance,
-            "controlling_faction_id": controlling_faction_id,
-            "x": self.coords.x,
-            "y": self.coords.y,
-            "z": self.coords.z,
-            "coords": self.coords.to_sqlalchemy_dict(),
-            "date": self.date,
-            "government": self.government,
-            "id64": self.id64,
-            "name": self.name,
-            "population": self.population,
-            "primary_economy": self.primary_economy,
-            "secondary_economy": self.secondary_economy,
-            "security": self.security,
-            "body_count": self.body_count,
-            "controlling_power": self.controlling_power,
-            "power_conflict_progress": [
-                participant.to_sqlalchemy_dict() for participant in self.power_conflict_progress or []
-            ],
-            "power_state": self.power_state,
-            "power_state_control_progress": self.power_state_control_progress,
-            "power_state_reinforcement": self.power_state_reinforcement,
-            "power_state_undermining": self.power_state_undermining,
-            "powers": self.powers,
-            "thargoid_war": self.thargoid_war.to_sqlalchemy_dict() if self.thargoid_war is not None else None,
-            "controlling_power_updated_at": getattr(self.timestamps, "controlling_power", None),
-            "power_state_updated_at": getattr(self.timestamps, "power_state", None),
-            "powers_updated_at": getattr(self.timestamps, "powers", None),
-        }

@@ -3,9 +3,9 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
-import src.postgresql.postgresql.db  # noqa: F401
+import src.postgresql.db  # noqa: F401
 from alembic import context
-from src.postgresql.postgresql import BaseModel
+from src.postgresql import BaseModel
 
 config = context.config
 fileConfig(config.config_file_name or "")

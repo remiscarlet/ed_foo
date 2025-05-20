@@ -1,9 +1,5 @@
 from datetime import datetime
 
-from geoalchemy2 import WKBElement
-from geoalchemy2.shape import from_shape
-from shapely.geometry import Point
-
 from src.ingestion.spansh.models import BaseSpanshModel
 
 
@@ -11,9 +7,6 @@ class CoordinatesSpansh(BaseSpanshModel):
     x: float
     y: float
     z: float
-
-    def to_sqlalchemy_dict(self) -> WKBElement:
-        return from_shape(Point(self.x, self.y, self.z), srid=0)
 
     def __repr__(self) -> str:
         return f"CoordinatesSpansh(x={self.x}, y={self.y}, z={self.z})"

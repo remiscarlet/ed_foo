@@ -15,6 +15,7 @@ from gen.eddn_models import (
 )
 
 from src.common.constants import EDDN_SCHEMA_MAPPING_FILE
+from src.common.game_constants import get_metadata_by_capi_name
 from src.common.logging import configure_logger, get_logger
 from src.postgresql.adapter import StationsAdapter
 
@@ -82,15 +83,20 @@ def eddn_listener() -> None:
 def process_commodity_v3_0(model: commodity_v3_0.Model) -> None:
     # May want to filter any stations with "invalid characters" like '$' or ';'
     # Some station names come through like '$EXT_PANEL_ColonisationShip; Skvortsov Territory'
-    pprint(f"{model.message.systemName} - {model.message.stationName} - {len(model.message.commodities)} Commodities")
+    station_name = model.message.stationName
+    pprint(f"{model.message.systemName} - {station_name} - {len(model.message.commodities)} Commodities")
 
     try:
-        station = StationsAdapter().get_station(model.message.stationName)
+        station = StationsAdapter().get_station(station_name)
     except ValueError:
-        logger.warning(f"Encountered station name that we don't know about! '{model.message.stationName}'")
+        logger.warning(f"Encountered station name that we don't know about! '{station_name}'")
         return
 
     pprint(station)
+    for commodity in model.message.commodities:
+        metadata = get_metadata_by_capi_name(commodity.name)
+
+    pprint(metadata)
 
 
 # TODO: Consider dependency ordering of inserts for new system/stations

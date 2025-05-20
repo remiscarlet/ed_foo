@@ -27,19 +27,6 @@ class CommoditySpansh(CommodityPriceSpansh):
     def to_cache_key_tuple(self, station_id: int, commodity_symbol: str) -> Tuple[Any, ...]:
         return (self.__class__, station_id, commodity_symbol)
 
-    def to_sqlalchemy_dict(
-        self, station_id: int, commodity_sym: str, market_updated_at: datetime | None
-    ) -> dict[str, Any]:
-        return {
-            "station_id": station_id,
-            "commodity_sym": commodity_sym,
-            "buy_price": self.buy_price,
-            "sell_price": self.sell_price,
-            "supply": self.supply,
-            "demand": self.demand,
-            "updated_at": self.updated_at or market_updated_at,
-        }
-
 
 class MarketSpansh(BaseSpanshModel):
     commodities: list[CommoditySpansh] | None = None
@@ -58,12 +45,6 @@ class ShipModuleSpansh(BaseSpanshModel):
 
     ship: str | None = None
 
-    def to_sqlalchemy_dict(self, station_id: int, module_id: int) -> dict[str, Any]:
-        return {
-            "station_id": station_id,
-            "module_id": module_id,
-        }
-
 
 class OutfittingSpansh(BaseSpanshModel):
     modules: list[ShipModuleSpansh]
@@ -75,12 +56,6 @@ class ShipSpansh(BaseSpanshModel):
     name: str
     ship_id: int
     symbol: str
-
-    def to_sqlalchemy_dict(self, station_id: int, ship_id: int) -> dict[str, Any]:
-        return {
-            "station_id": station_id,
-            "ship_id": ship_id,
-        }
 
 
 class ShipyardSpansh(BaseSpanshModel):
@@ -121,36 +96,3 @@ class StationSpansh(BaseSpanshModel):
     carrier_name: str | None = None
     latitude: float | None = None
     longitude: float | None = None
-
-    def to_sqlalchemy_dict(self, owner_id: int, owner_type: str) -> dict[str, Any]:
-        if self.landing_pads is not None:
-            large_pads = self.landing_pads.get("large", 0)
-            medium_pads = self.landing_pads.get("medium", 0)
-            small_pads = self.landing_pads.get("small", 0)
-        else:
-            large_pads = 0
-            medium_pads = 0
-            small_pads = 0
-        return {
-            "id_spansh": self.id,
-            "owner_id": owner_id,
-            "owner_type": owner_type,
-            "name": self.name,
-            "allegiance": self.allegiance,
-            "controlling_faction": self.controlling_faction,
-            "controlling_faction_state": self.controlling_faction_state,
-            "distance_to_arrival": self.distance_to_arrival,
-            "economies": self.economies,
-            "government": self.government,
-            "large_landing_pads": large_pads,
-            "medium_landing_pads": medium_pads,
-            "small_landing_pads": small_pads,
-            "primary_economy": self.primary_economy,
-            "prohibited_commodities": self.market.prohibited_commodities if self.market is not None else None,
-            "services": self.services,
-            "type": self.type,
-            "carrier_name": self.carrier_name,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "spansh_updated_at": self.update_time,
-        }

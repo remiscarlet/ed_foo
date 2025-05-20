@@ -11,28 +11,6 @@ class SignalsSpansh(BaseSpanshModel):
     updated_at: datetime | None = None
     _validate_updated_at = BaseSpanshModel.flexible_datetime_validator("updated_at")
 
-    def to_sqlalchemy_dicts(self, body_id: int) -> list[dict[str, Any]]:
-        return [
-            {
-                "body_id": body_id,
-                "signal_type": signal_type,
-                "count": count,
-                "updated_at": self.updated_at,
-            }
-            for signal_type, count in self.signals.items()
-        ]
-
-    def to_sqlalchemy_hotspot_dicts(self, ring_id: int) -> list[dict[str, Any]]:
-        return [
-            {
-                "ring_id": ring_id,
-                "commodity_sym": signal_type,
-                "count": count,
-                "updated_at": self.updated_at,
-            }
-            for signal_type, count in self.signals.items()
-        ]
-
 
 class AsteroidsSpansh(BaseSpanshModel):
     name: str
@@ -46,18 +24,6 @@ class AsteroidsSpansh(BaseSpanshModel):
 
     def to_cache_key_tuple(self, spansh_body_id: int) -> Tuple[Any, ...]:
         return ("RingsDB", spansh_body_id, self.name)
-
-    def to_sqlalchemy_dict(self, body_id: int) -> dict[str, Any]:
-        """Returns a RingsDB dict"""
-        return {
-            "body_id": body_id,
-            "id64": self.id64,
-            "name": self.name,
-            "type": self.type,
-            "mass": self.mass,
-            "inner_radius": self.inner_radius,
-            "outer_radius": self.outer_radius,
-        }
 
 
 class BodySpansh(BaseSpanshModel):
@@ -115,47 +81,3 @@ class BodySpansh(BaseSpanshModel):
     timestamps: TimestampsSpansh | None = None
     type: str | None = None
     volcanism_type: str | None = None
-
-    def to_sqlalchemy_dict(self, system_id: int) -> dict[str, Any]:
-        return {
-            "system_id": system_id,
-            "id64": self.id64,
-            "body_id": self.body_id,
-            "name": self.name,
-            "absolute_magnitude": self.absolute_magnitude,
-            "age": self.age,
-            "arg_of_periapsis": self.arg_of_periapsis,
-            "ascending_node": self.ascending_node,
-            "atmosphere_composition": self.atmosphere_composition,
-            "atmosphere_type": self.atmosphere_type,
-            "axial_tilt": self.axial_tilt,
-            "distance_to_arrival": self.distance_to_arrival,
-            "earth_masses": self.earth_masses,
-            "gravity": self.gravity,
-            "is_landable": self.is_landable,
-            "luminosity": self.luminosity,
-            "main_star": self.main_star,
-            "materials": self.materials,
-            "mean_anomaly": self.mean_anomaly,
-            "orbital_eccentricity": self.orbital_eccentricity,
-            "orbital_inclination": self.orbital_inclination,
-            "orbital_period": self.orbital_period,
-            "parents": self.parents,
-            "radius": self.radius,
-            "reserve_level": self.reserve_level,
-            "rotational_period": self.rotational_period,
-            "rotational_period_tidally_locked": self.rotational_period_tidally_locked,
-            "semi_major_axis": self.semi_major_axis,
-            "solar_masses": self.solar_masses,
-            "solar_radius": self.solar_radius,
-            "solid_composition": self.solid_composition,
-            "spectral_class": self.spectral_class,
-            "sub_type": self.sub_type,
-            "surface_pressure": self.surface_pressure,
-            "surface_temperature": self.surface_temperature,
-            "terraforming_state": self.terraforming_state,
-            "type": self.type,
-            "volcanism_type": self.volcanism_type,
-            "mean_anomaly_updated_at": getattr(self.timestamps, "mean_anomaly", None),
-            "distance_to_arrival_updated_at": getattr(self.timestamps, "distance_to_arrival", None),
-        }

@@ -1,5 +1,5 @@
 from src.ingestion.spansh.models.station_spansh import StationSpansh
-from src.postgresql.postgresql.db import StationsDB
+from src.postgresql.db import StationsDB
 
 
 def test_validate_station_cache_keys_match() -> None:
