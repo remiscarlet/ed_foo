@@ -7,18 +7,20 @@ from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 from sqlalchemy import (
+    ARRAY,
     BigInteger,
     Boolean,
     DateTime,
     Float,
     ForeignKey,
     Integer,
+    Text,
     UniqueConstraint,
     and_,
     literal,
     select,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TEXT
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, foreign, mapped_column, relationship
 
 from src.common.game_constants import get_symbol_by_eddn_name
@@ -50,7 +52,7 @@ class BodiesDB(BaseModelWithId):
         {"schema": "core"},
     )
 
-    name: Mapped[str] = mapped_column(TEXT, nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -75,33 +77,33 @@ class BodiesDB(BaseModelWithId):
     age: Mapped[Optional[int]] = mapped_column(Integer)
     arg_of_periapsis: Mapped[Optional[float]] = mapped_column(Float)
     ascending_node: Mapped[Optional[float]] = mapped_column(Float)
-    atmosphere_type: Mapped[Optional[str]] = mapped_column(TEXT)
+    atmosphere_type: Mapped[Optional[str]] = mapped_column(Text)
     axial_tilt: Mapped[Optional[float]] = mapped_column(Float)
     distance_to_arrival: Mapped[Optional[float]] = mapped_column(Float)
     earth_masses: Mapped[Optional[float]] = mapped_column(Float)
     gravity: Mapped[Optional[float]] = mapped_column(Float)
     is_landable: Mapped[Optional[bool]] = mapped_column(Boolean)
-    luminosity: Mapped[Optional[str]] = mapped_column(TEXT)
+    luminosity: Mapped[Optional[str]] = mapped_column(Text)
     main_star: Mapped[Optional[bool]] = mapped_column(Boolean)
     mean_anomaly: Mapped[Optional[float]] = mapped_column(Float)
     orbital_eccentricity: Mapped[Optional[float]] = mapped_column(Float)
     orbital_inclination: Mapped[Optional[float]] = mapped_column(Float)
     orbital_period: Mapped[Optional[float]] = mapped_column(Float)
     radius: Mapped[Optional[float]] = mapped_column(Float)
-    reserve_level: Mapped[Optional[str]] = mapped_column(TEXT)
+    reserve_level: Mapped[Optional[str]] = mapped_column(Text)
     rotational_period: Mapped[Optional[float]] = mapped_column(Float)
     rotational_period_tidally_locked: Mapped[Optional[bool]] = mapped_column(Boolean)
     semi_major_axis: Mapped[Optional[float]] = mapped_column(Float)
     solar_masses: Mapped[Optional[float]] = mapped_column(Float)
     solar_radius: Mapped[Optional[float]] = mapped_column(Float)
     solid_composition: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
-    spectral_class: Mapped[Optional[str]] = mapped_column(TEXT)
-    sub_type: Mapped[Optional[str]] = mapped_column(TEXT)
+    spectral_class: Mapped[Optional[str]] = mapped_column(Text)
+    sub_type: Mapped[Optional[str]] = mapped_column(Text)
     surface_pressure: Mapped[Optional[float]] = mapped_column(Float)
     surface_temperature: Mapped[Optional[float]] = mapped_column(Float)
-    terraforming_state: Mapped[Optional[str]] = mapped_column(TEXT)
-    type: Mapped[Optional[str]] = mapped_column(TEXT)
-    volcanism_type: Mapped[Optional[str]] = mapped_column(TEXT)
+    terraforming_state: Mapped[Optional[str]] = mapped_column(Text)
+    type: Mapped[Optional[str]] = mapped_column(Text)
+    volcanism_type: Mapped[Optional[str]] = mapped_column(Text)
 
     mean_anomaly_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     distance_to_arrival_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -169,7 +171,7 @@ class SignalsDB(BaseModelWithId):
     body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="signals")
 
-    signal_type: Mapped[Optional[str]] = mapped_column(TEXT)
+    signal_type: Mapped[Optional[str]] = mapped_column(Text)
     count: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -195,12 +197,12 @@ class RingsDB(BaseModelWithId):
     __table_args__ = (UniqueConstraint(*unique_columns, name="_ring_on_body_uc"), {"schema": "core"})
 
     id64: Mapped[int] = mapped_column(BigInteger, nullable=True)
-    name: Mapped[str] = mapped_column(TEXT, nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
 
     body_id: Mapped[int] = mapped_column(ForeignKey("core.bodies.id"), nullable=False, index=True)
     body: Mapped["BodiesDB"] = relationship(back_populates="rings")
 
-    type: Mapped[Optional[str]] = mapped_column(TEXT)
+    type: Mapped[Optional[str]] = mapped_column(Text)
     mass: Mapped[Optional[float]] = mapped_column(Float)
     inner_radius: Mapped[Optional[float]] = mapped_column(Float)
     outer_radius: Mapped[Optional[float]] = mapped_column(Float)
@@ -265,30 +267,30 @@ class StationsDB(BaseModelWithId):
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_edsm: Mapped[Optional[int]] = mapped_column(BigInteger)
-    name: Mapped[str] = mapped_column(TEXT, nullable=False, index=True)  # Station name is NOT unique
+    name: Mapped[str] = mapped_column(Text, nullable=False, index=True)  # Station name is NOT unique
 
     owner_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    owner_type: Mapped[str] = mapped_column(TEXT, nullable=False, index=True)
+    owner_type: Mapped[str] = mapped_column(Text, nullable=False, index=True)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(TEXT)
-    controlling_faction: Mapped[Optional[str]] = mapped_column(TEXT)
-    controlling_faction_state: Mapped[Optional[str]] = mapped_column(TEXT)
+    allegiance: Mapped[Optional[str]] = mapped_column(Text)
+    controlling_faction: Mapped[Optional[str]] = mapped_column(Text)
+    controlling_faction_state: Mapped[Optional[str]] = mapped_column(Text)
     distance_to_arrival: Mapped[Optional[float]] = mapped_column(Float)
     economies: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
-    government: Mapped[Optional[str]] = mapped_column(TEXT)
+    government: Mapped[Optional[str]] = mapped_column(Text)
 
     large_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
     medium_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
     small_landing_pads: Mapped[Optional[int]] = mapped_column(Integer)
 
-    primary_economy: Mapped[Optional[str]] = mapped_column(TEXT)
-    services: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
-    type: Mapped[Optional[str]] = mapped_column(TEXT)
+    primary_economy: Mapped[Optional[str]] = mapped_column(Text)
+    services: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    type: Mapped[Optional[str]] = mapped_column(Text)
 
     # It kind of is a station-level detail...
-    prohibited_commodities: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+    prohibited_commodities: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
 
-    carrier_name: Mapped[Optional[str]] = mapped_column(TEXT)
+    carrier_name: Mapped[Optional[str]] = mapped_column(Text)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
     longitude: Mapped[Optional[float]] = mapped_column(Float)
 
@@ -390,17 +392,17 @@ class CommoditiesDB(BaseModel):
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
 
-    symbol: Mapped[str] = mapped_column(TEXT, primary_key=True)
-    name: Mapped[str] = mapped_column(TEXT, nullable=False)
+    symbol: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
 
     avg_price: Mapped[Optional[int]] = mapped_column(Integer)
     rare_goods: Mapped[Optional[bool]] = mapped_column(Boolean)
     corrosive: Mapped[Optional[bool]] = mapped_column(Boolean)
 
-    category: Mapped[Optional[str]] = mapped_column(TEXT)
+    category: Mapped[Optional[str]] = mapped_column(Text)
     is_mineable: Mapped[Optional[bool]] = mapped_column(Boolean)
-    ring_types: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
-    mining_method: Mapped[Optional[str]] = mapped_column(TEXT)
+    ring_types: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    mining_method: Mapped[Optional[str]] = mapped_column(Text)
     has_hotspots: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     def __repr__(self) -> str:
@@ -416,7 +418,7 @@ class MarketCommoditiesDB(BaseModelWithId):
     )
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
-    commodity_sym: Mapped[str] = mapped_column(TEXT, ForeignKey("core.commodities.symbol"), nullable=False)
+    commodity_sym: Mapped[str] = mapped_column(Text, ForeignKey("core.commodities.symbol"), nullable=False)
 
     buy_price: Mapped[Optional[int]] = mapped_column(Integer)
     sell_price: Mapped[Optional[int]] = mapped_column(Integer)
@@ -470,9 +472,9 @@ class ShipsDB(BaseModel):
     __tablename__ = "ships"
     __table_args__ = {"schema": "core"}
 
-    symbol: Mapped[str] = mapped_column(TEXT, primary_key=True)
+    symbol: Mapped[str] = mapped_column(Text, primary_key=True)
 
-    name: Mapped[Optional[str]] = mapped_column(TEXT)
+    name: Mapped[Optional[str]] = mapped_column(Text)
     ship_id: Mapped[Optional[int]] = mapped_column(Integer)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -497,7 +499,7 @@ class ShipyardShipsDB(BaseModelWithId):
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     ship_sym: Mapped[str] = mapped_column(
-        TEXT, ForeignKey("core.ships.symbol"), nullable=False
+        Text, ForeignKey("core.ships.symbol"), nullable=False
     )  # Small lookup table; no index
 
     def __repr__(self) -> str:
@@ -508,13 +510,13 @@ class ShipModulesDB(BaseModel):
     __tablename__ = "ship_modules"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(TEXT, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, primary_key=True)
 
     module_id: Mapped[Optional[int]] = mapped_column(Integer)
-    symbol: Mapped[str] = mapped_column(TEXT)
-    category: Mapped[Optional[str]] = mapped_column(TEXT)
-    rating: Mapped[Optional[str]] = mapped_column(TEXT)
-    ship: Mapped[Optional[str]] = mapped_column(TEXT)
+    symbol: Mapped[str] = mapped_column(Text)
+    category: Mapped[Optional[str]] = mapped_column(Text)
+    rating: Mapped[Optional[str]] = mapped_column(Text)
+    ship: Mapped[Optional[str]] = mapped_column(Text)
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
     @staticmethod
@@ -538,7 +540,7 @@ class OutfittingShipModulesDB(BaseModelWithId):
 
     station_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.stations.id"), nullable=False, index=True)
     module_name: Mapped[str] = mapped_column(
-        TEXT, ForeignKey("core.ship_modules.name"), nullable=False
+        Text, ForeignKey("core.ship_modules.name"), nullable=False
     )  # Small lookup table; no index
     updated_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
 
@@ -553,13 +555,13 @@ class ThargoidWarDB(BaseModelWithId):
 
     system_id: Mapped[int] = mapped_column(Integer, ForeignKey("core.systems.id"), nullable=False, index=True)
 
-    current_state: Mapped[str] = mapped_column(TEXT)
+    current_state: Mapped[str] = mapped_column(Text)
     days_remaining: Mapped[float] = mapped_column(Float)
-    failure_state: Mapped[str] = mapped_column(TEXT)
+    failure_state: Mapped[str] = mapped_column(Text)
     ports_remaining: Mapped[float] = mapped_column(Float)
     progress: Mapped[float] = mapped_column(Float)
     success_reached: Mapped[bool] = mapped_column(Boolean)
-    success_state: Mapped[str] = mapped_column(TEXT)
+    success_state: Mapped[str] = mapped_column(Text)
 
     @staticmethod
     def to_dict_from_spansh(war: ThargoidWarSpansh) -> dict[str, Any]:
@@ -583,10 +585,10 @@ class FactionsDB(BaseModelWithId):
     __tablename__ = "factions"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(TEXT, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(TEXT)
-    government: Mapped[Optional[str]] = mapped_column(TEXT)
+    allegiance: Mapped[Optional[str]] = mapped_column(Text)
+    government: Mapped[Optional[str]] = mapped_column(Text)
     is_player: Mapped[Optional[bool]] = mapped_column(Boolean)
 
     faction_presences: Mapped[list["FactionPresencesDB"]] = relationship(back_populates="faction")
@@ -617,13 +619,13 @@ class FactionPresencesDB(BaseModelWithId):
     faction: Mapped["FactionsDB"] = relationship(back_populates="faction_presences")
 
     influence: Mapped[Optional[float]] = mapped_column(Float)
-    state: Mapped[Optional[str]] = mapped_column(TEXT)
-    happiness: Mapped[Optional[str]] = mapped_column(TEXT)
+    state: Mapped[Optional[str]] = mapped_column(Text)
+    happiness: Mapped[Optional[str]] = mapped_column(Text)
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    active_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
 
-    pending_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
-    recovering_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+    active_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    pending_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
+    recovering_states: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
 
     @staticmethod
     def to_dict_from_spansh(spansh_faction: FactionSpansh, system_id: int, faction_id: int) -> dict[str, Any]:
@@ -681,7 +683,7 @@ class SystemsDB(BaseModelWithId):
     __tablename__ = "systems"
     __table_args__ = {"schema": "core"}
 
-    name: Mapped[str] = mapped_column(TEXT, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
 
     id64: Mapped[Optional[int]] = mapped_column(BigInteger)
     id_spansh: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -694,20 +696,20 @@ class SystemsDB(BaseModelWithId):
 
     date: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    allegiance: Mapped[Optional[str]] = mapped_column(TEXT)
+    allegiance: Mapped[Optional[str]] = mapped_column(Text)
     population: Mapped[Optional[int]] = mapped_column(BigInteger)
-    primary_economy: Mapped[Optional[str]] = mapped_column(TEXT)
-    secondary_economy: Mapped[Optional[str]] = mapped_column(TEXT)
-    security: Mapped[Optional[str]] = mapped_column(TEXT)
-    government: Mapped[Optional[str]] = mapped_column(TEXT)
+    primary_economy: Mapped[Optional[str]] = mapped_column(Text)
+    secondary_economy: Mapped[Optional[str]] = mapped_column(Text)
+    security: Mapped[Optional[str]] = mapped_column(Text)
+    government: Mapped[Optional[str]] = mapped_column(Text)
     body_count: Mapped[Optional[int]] = mapped_column(Integer)
-    controlling_power: Mapped[Optional[str]] = mapped_column(TEXT)
+    controlling_power: Mapped[Optional[str]] = mapped_column(Text)
     power_conflict_progress: Mapped[Optional[list[dict[str, float]]]] = mapped_column(JSONB)
-    power_state: Mapped[Optional[str]] = mapped_column(TEXT)
+    power_state: Mapped[Optional[str]] = mapped_column(Text)
     power_state_control_progress: Mapped[Optional[float]] = mapped_column(Float)
     power_state_reinforcement: Mapped[Optional[float]] = mapped_column(Float)
     power_state_undermining: Mapped[Optional[float]] = mapped_column(Float)
-    powers: Mapped[Optional[list[str]]] = mapped_column(ARRAY(TEXT))
+    powers: Mapped[Optional[list[str]]] = mapped_column(ARRAY(Text))
     thargoid_war: Mapped[Optional[dict[str, float]]] = mapped_column(JSONB)
 
     controlling_power_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)

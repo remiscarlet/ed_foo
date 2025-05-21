@@ -1,7 +1,7 @@
 import os
 from typing import Any, Tuple
 
-from sqlalchemy import create_engine
+from sqlalchemy import Integer, create_engine
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -24,7 +24,7 @@ class BaseModel(DeclarativeBase):
 
 class BaseModelWithId(BaseModel):
     __abstract__ = True
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://e_kaine:e_kaine_pw@localhost:5432/e_kaine")

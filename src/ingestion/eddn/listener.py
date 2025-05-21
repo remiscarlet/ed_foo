@@ -16,7 +16,6 @@ from gen.eddn_models import (
 )
 from pydantic import BaseModel
 
-from src.common.game_constants import get_symbol_by_eddn_name
 from src.common.logging import get_logger
 from src.ingestion.eddn.schemas import get_schema_model_mapping
 from src.postgresql import SessionLocal
@@ -55,10 +54,10 @@ class EDDNListener:
         self.session = SessionLocal()
 
         self.processor_mapping = {
-            commodity_v3_0.Model: self.process_commodity_v3_0,
+            # commodity_v3_0.Model: self.process_commodity_v3_0,
             # approachsettlement_v1_0.Model: self.process_approachsettlement_v1_0,
-            journal_v1_0.Model: self.process_journal_v1_0,
-            # fsssignaldiscovered_v1_0.Model: self.process_fsssignaldiscovered_v1_0,
+            # journal_v1_0.Model: self.process_journal_v1_0,
+            fsssignaldiscovered_v1_0.Model: self.process_fsssignaldiscovered_v1_0,
         }
 
     def process_commodity_v3_0(self, model: commodity_v3_0.Model) -> None:
@@ -168,8 +167,12 @@ class EDDNListener:
     def process_fsssignaldiscovered_v1_0(self, model: fsssignaldiscovered_v1_0.Model) -> None:
         for signal in model.message.signals:
             # logger.info(pformat(signal))
-            if signal.SignalType == "ResourceExtraction":
-                logger.info(pformat([signal.SignalType, signal.SignalName, get_symbol_by_eddn_name(signal.SignalName)]))
+            # if signal.SignalType == "ResourceExtraction":
+            #     logger.info(pformat(
+            #         [signal.SignalType, signal.SignalName, get_symbol_by_eddn_name(signal.SignalName)]
+            #     ))
+            # if signal.TimeRemaining != None:
+            logger.info(pformat(signal))
 
             # if signal.SignalType in [
             # .    "FleetCarrier", "Combat", "ResourceExtraction", "StationCoriolis",
@@ -198,7 +201,7 @@ class EDDNListener:
             d = json.loads(zlib.decompress(msg[0]))
             schema = d.get("$schemaRef")
             if schema is None:
-                logger.warning("Could not find a valid $schema field in decoded EDDN message!")
+                logger.warning("Could not find a valid $schemaRef field in decoded EDDN message!")
                 logger.warning(pformat(d))
                 continue
 
