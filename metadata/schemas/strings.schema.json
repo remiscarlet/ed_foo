@@ -3,6 +3,18 @@
     "$id": "strings.schema.json",
     "type": "object",
     "patternProperties": {
-        "^.*$": { "type": "string" }
+        "^.*$": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        }
     }
 }

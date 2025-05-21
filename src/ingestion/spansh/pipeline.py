@@ -395,6 +395,7 @@ class SpanshDataLayerPartitioner:
                 name = values.get("name")
                 if name is None:
                     raise ValueError("Got a commodity with a None name!")
+
                 category = values.get("category")
                 if category is None:
                     raise ValueError("Got a commodity with a None category!")

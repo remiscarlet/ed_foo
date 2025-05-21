@@ -1,5 +1,5 @@
 [project]
-name = "ed_foo"
+name = "ekaine"
 version = "0.1.0"
 description = ""
 authors = [
@@ -58,7 +58,7 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "ed_foo"
+name = "ekaine"
 version = "0.1.0"
 description = ""
 authors = ["remiscarlet <remilia@scarl.et>"]

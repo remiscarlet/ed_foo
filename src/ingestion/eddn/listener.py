@@ -16,6 +16,7 @@ from gen.eddn_models import (
 )
 from pydantic import BaseModel
 
+from src.common.game_constants import get_symbol_by_eddn_name
 from src.common.logging import get_logger
 from src.ingestion.eddn.schemas import get_schema_model_mapping
 from src.postgresql import SessionLocal
@@ -63,6 +64,10 @@ class EDDNListener:
     def process_commodity_v3_0(self, model: commodity_v3_0.Model) -> None:
         """
         Process commodity-v3.0 EDDN messages
+
+        Updates:
+        - MarketCommoditiesDB
+
         """
         # May want to filter any stations with "invalid characters" like '$' or ';'
         # Some station names come through like '$EXT_PANEL_ColonisationShip; Skvortsov Territory'
@@ -117,6 +122,11 @@ class EDDNListener:
     def process_journal_v1_0(self, model: journal_v1_0.Model) -> None:
         """
         Process journal-v1.0 EDDN messages
+
+        Updates:
+        - SystemsDB
+        - FactionPresencesDB
+
         """
         # if model.message.Factions is not None:
         system_name = cast(str, model.message.StarSystem)
@@ -157,14 +167,21 @@ class EDDNListener:
 
     def process_fsssignaldiscovered_v1_0(self, model: fsssignaldiscovered_v1_0.Model) -> None:
         for signal in model.message.signals:
-            if signal.SignalType in ["FleetCarrier", "Combat", "ResourceExtraction"]:
-                continue
-            if signal.SpawningPower is None:
-                continue
-            logger.info(pformat(signal))
+            # logger.info(pformat(signal))
+            if signal.SignalType == "ResourceExtraction":
+                logger.info(pformat([signal.SignalType, signal.SignalName, get_symbol_by_eddn_name(signal.SignalName)]))
+
+            # if signal.SignalType in [
+            # .    "FleetCarrier", "Combat", "ResourceExtraction", "StationCoriolis",
+            #      "Installation", "NavBeacon", "StationMegaShip", "Outpost"]:
+            #     continue
+            # if signal.SignalType == "USS":
+            #     logger.info(pformat(signal))
             # logger.info(pformat([
             #     signal.SignalType, signal.SignalName, signal.SpawningPower, signal.SpawningState
             # ]))
+            # if signal.SpawningPower is not None or signal.OpposingPower is not None:
+            #     logger.info(pformat(signal))
 
     def run(self) -> None:
         ctx = zmq.Context()
@@ -196,6 +213,7 @@ class EDDNListener:
             obj_type = type(obj)
             if issubclass(obj_type, BaseModel) and obj_type in self.processor_mapping:
                 try:
+                    logger.trace(d)
                     self.processor_mapping[obj_type](obj)
                 except Exception:
                     logger.error(traceback.format_exc())

@@ -1,0 +1,93 @@
+---
+Unidentified Signal Source: USS
+Generic Signal Source: GenericSignalSource
+Nav Beacon: MULTIPLAYER_SCENARIO42_TITLE
+Compromised Nav Beacon: MULTIPLAYER_SCENARIO80_TITLE
+Resource Extraction: MULTIPLAYER_SCENARIO14_TITLE
+Resource Extraction Low: MULTIPLAYER_SCENARIO77_TITLE
+Resource Extraction High: MULTIPLAYER_SCENARIO78_TITLE
+Resource Extraction Hazardous: MULTIPLAYER_SCENARIO79_TITLE
+Salvageable Wreckage: MULTIPLAYER_SCENARIO81_TITLE
+Combat Zone High: Warzone_PointRace_High
+Combat Zone Medium: Warzone_PointRace_Med
+Combat Zone Low: Warzone_PointRace_Low
+Combat Zone Thargoid: Warzone_TG
+Combat Zone Thargoid High: Warzone_TG_High
+Combat Zone Thargoid Medium: Warzone_TG_Med
+Combat Zone Thargoid Low: Warzone_TG_Low
+Combat Zone Thargoid Very High: Warzone_TG_VeryHigh
+Aftermath: [USS_Type_Aftermath, USS_SalvageHaulageWreckage]
+Anomaly: USS_Type_Anomaly
+Ceremonial: [USS_Type_Ceremonial, USS_CeremonialComms]
+Convoy: [USS_Type_Convoy, USS_ConvoyDispersalPattern]
+Degraded Emissions: [USS_Type_Salvage, SS_DegradedEmissions]
+Distress: [USS_Type_DistressSignal, USS_DistressCall]
+Encoded Emissions: USS_Type_ValuableSalvage
+
+High Grade Emissions:
+  - USS_Type_VeryValuableSalvage
+  - USS_HighGradeEmissions
+
+Mission Target: USS_Type_MissionTarget
+Non Human: [USS_Type_NonHuman, USS_NonHumanSignalSource]
+Trading Beacon: [USS_Type_TradingBeacon, USS_TradingBeacon]
+Weapons Fire: [USS_Type_WeaponsFire, USS_WeaponsFire]
+Power Convoy: [USS_Type_PowerConvoy, USS_PowerConvoy]
+Power Emmissions: [USS_Type_PowerEmissions, USS_PowerEmissions]
+
+Powerplay Convoy Distress Signal:
+  - USS_Type_PowerplayConvoyDistressSignal
+  - USS_PowerplayConvoyDistressSignal
+
+Power Weapons Fire: [USS_Type_PowerWeaponsFire, USS_PowerWeaponsFire]
+Unregistered Comms Beacon: NumberStation
+Listening Post: ListeningPost
+Cap Ship: FIXED_EVENT_CAPSHIP
+Checkpoint: FIXED_EVENT_CHECKPOINT
+Convoy Beacon: FIXED_EVENT_CONVOY
+Debris Field: FIXED_EVENT_DEBRIS
+Distribution Center: FIXED_EVENT_DISTRIBUTIONCENTRE
+Pirate Attack T5: FIXED_EVENT_HIGHTHREATSCENARIO_T5
+Pirate Attack T6: FIXED_EVENT_HIGHTHREATSCENARIO_T6
+Pirate Attack T7: FIXED_EVENT_HIGHTHREATSCENARIO_T7
+Notable Stellar Phenomena Cloud: Fixed_Event_Life_Cloud
+Notable Stellar Phenomena Ring: Fixed_Event_Life_Ring
+Ancient Probe: FIXED_EVENT_PROBE
+Attack Aftermath: AttackAftermath
+Aftermath Large: Aftermath_Large
+Biological: SAA_SignalType_Biological
+Geological: SAA_SignalType_Geological
+Guardian: SAA_SignalType_Guardian
+Human: SAA_SignalType_Human
+Thargoid: SAA_SignalType_Thargoid
+Planet Anomaly: SAA_SignalType_PlanetAnomaly
+Other: SAA_SignalType_Other
+Ancient Guardian Ruins: Ancient
+Guardian Structure Tiny: Ancient_Tiny
+Guardian Structure Small: Ancient_Small
+Guardian Structure Medium: Ancient_Medium
+Thargoid Barnacle: Settlement_Unflattened_Unknown
+Thargoid Crash Site: Settlement_Unflattened_WreckedUnknown
+Thargoid Spire Site: Settlement_Unflattened_TGMegaBarnacle
+Abandoned Buggy: Abandoned_Buggy
+Active Power Source: Perimeter
+Crashed Ship: CrashedShip
+Damaged Eagle Assassination: Damaged_Eagle_Assassination
+Damaged Sidewinder Assassination: Damaged_Sidewinder_Assassination
+Damaged Eagle: Damaged_Eagle
+Damaged Sidewinder: Damaged_Sidewinder
+Smugglers Cache: Smugglers_Cache
+Cargo: Cargo
+Trap Cargo: Trap_Cargo
+Trap Data: Trap_Data
+Wreckage Ancient Probe: Wreckage_AncientProbe
+Wreckage Buggy: Wreckage_Buggy
+Wreckage Cargo: Wreckage_Cargo
+Wreckage Probe: Wreckage_Probe
+Wreckage Satellite: Wreckage_Satellite
+Wrecks Eagle: Wrecks_Eagle
+Wrecks Sidewinder: Wrecks_Sidewinder
+Armed Revolt: Gro_controlScenarioTitle
+Colonization Beacon Deployment Site: EXT_PANEL_ColonisationBeacon_DeploymentSite
+Colonization Beacon: EXT_PANEL_ColonisationBeacon_Site
+Colonization Ship: EXT_PANEL_ColonisationShip

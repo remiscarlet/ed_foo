@@ -668,8 +668,6 @@ class FactionPresencesDB(BaseModelWithId):
             }
 
             d_filtered = {k: v for k, v in d.items() if v is not None or k in FactionPresencesDB.none_filter_bypass}
-            if d_filtered.get("happiness") is None:
-                logger.info(pformat(d_filtered))
             dicts.append(d_filtered)
 
         return dicts

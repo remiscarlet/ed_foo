@@ -18,6 +18,9 @@ eddn-listener:
 eddn-listener-v:
 	poetry run cli ingestion eddn-listener -v
 
+eddn-listener-vv:
+	poetry run cli ingestion eddn-listener -vv
+
 ## Data DL/Import
 
 download-spansh:
