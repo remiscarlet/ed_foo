@@ -11,6 +11,7 @@ import zmq
 from gen.eddn_models import (
     approachsettlement_v1_0,
     commodity_v3_0,
+    fssbodysignals_v1_0,
     fsssignaldiscovered_v1_0,
     journal_v1_0,
 )
@@ -21,6 +22,7 @@ from src.ingestion.eddn.schemas import get_schema_model_mapping
 from src.postgresql import SessionLocal
 from src.postgresql.adapter import FactionsAdapter, StationsAdapter, SystemsAdapter
 from src.postgresql.db import FactionPresencesDB, MarketCommoditiesDB, SystemsDB
+from src.postgresql.timeseries import SignalsTimeseries
 from src.postgresql.utils import upsert_all
 
 logger = get_logger(__name__)
@@ -54,10 +56,11 @@ class EDDNListener:
         self.session = SessionLocal()
 
         self.processor_mapping = {
-            # commodity_v3_0.Model: self.process_commodity_v3_0,
+            commodity_v3_0.Model: self.process_commodity_v3_0,
             # approachsettlement_v1_0.Model: self.process_approachsettlement_v1_0,
-            # journal_v1_0.Model: self.process_journal_v1_0,
+            journal_v1_0.Model: self.process_journal_v1_0,
             fsssignaldiscovered_v1_0.Model: self.process_fsssignaldiscovered_v1_0,
+            # fssbodysignals_v1_0.Model: self.process_fssbodysignals_v1_0,
         }
 
     def process_commodity_v3_0(self, model: commodity_v3_0.Model) -> None:
@@ -165,26 +168,49 @@ class EDDNListener:
             logger.info(f"[Faction Presence Updated] {system_name} - {faction_name} - {faction.get("state")}")
 
     def process_fsssignaldiscovered_v1_0(self, model: fsssignaldiscovered_v1_0.Model) -> None:
-        for signal in model.message.signals:
-            # logger.info(pformat(signal))
-            # if signal.SignalType == "ResourceExtraction":
-            #     logger.info(pformat(
-            #         [signal.SignalType, signal.SignalName, get_symbol_by_eddn_name(signal.SignalName)]
-            #     ))
-            # if signal.TimeRemaining != None:
-            logger.info(pformat(signal))
+        """
+        Process fsssignaldiscovered-v1.0 EDDN messages
 
-            # if signal.SignalType in [
-            # .    "FleetCarrier", "Combat", "ResourceExtraction", "StationCoriolis",
-            #      "Installation", "NavBeacon", "StationMegaShip", "Outpost"]:
-            #     continue
-            # if signal.SignalType == "USS":
-            #     logger.info(pformat(signal))
-            # logger.info(pformat([
-            #     signal.SignalType, signal.SignalName, signal.SpawningPower, signal.SpawningState
-            # ]))
-            # if signal.SpawningPower is not None or signal.OpposingPower is not None:
-            #     logger.info(pformat(signal))
+        Updates:
+        - SignalsTimeseries
+
+        """
+        system_name = cast(str, model.message.StarSystem)
+        try:
+            system = SystemsAdapter().get_system(system_name)
+        except ValueError:
+            # We currently only track systems with population > 0, so plenty of systems won't be found.
+            logger.debug(f"Encountered system we didn't know about! '{system_name}'")
+            return
+
+        signal_timeseries_dicts = SignalsTimeseries.to_dicts_from_fsssignaldiscovered_v1_0(model, system.id)
+        # logger.info(pformat(signal_timeseries_dicts))
+
+        upsert_all(self.session, SignalsTimeseries, signal_timeseries_dicts)
+        for signal in signal_timeseries_dicts or []:
+            logger.info(
+                "[Signals Timeseries Updated] "
+                f"{system_name} - {pformat([signal.get("signal_type"), signal.get("signal_name")])}"
+            )
+
+    def process_fssbodysignals_v1_0(self, model: fssbodysignals_v1_0.Model) -> None:
+        """
+        Process fssbodysignals-v1.0 EDDN messages
+
+        Updates:
+        - ???
+
+        """
+        system_name = cast(str, model.message.StarSystem)
+        try:
+            system = SystemsAdapter().get_system(system_name)
+        except ValueError:
+            # We currently only track systems with population > 0, so plenty of systems won't be found.
+            logger.debug(f"Encountered system we didn't know about! '{system_name}'")
+            return
+
+        logger.info(system)
+        logger.info(model.message)
 
     def run(self) -> None:
         ctx = zmq.Context()

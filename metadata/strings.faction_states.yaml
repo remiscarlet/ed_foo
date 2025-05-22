@@ -1,40 +1,108 @@
 ---
-None: None
-Boom: Boom  # Economic state
-Bust: Bust  # Economic state
-Civil Liberty: CivilLiberty  # Security state
-Civil Unrest: CivilUnrest  # Security state
-Civil War: CivilWar  # Conflict state
-Election: Election  # Conflict state
-Expansion: Expansion  # Movement state
-Famine: Famine  # Economic state
-Investment: Investment  # Economic state
-Lockdown: Lockdown  # Security state
-Outbreak: Outbreak  # Other state (disease)
-Retreat: Retreat  # Movement state
-War: War  # Conflict state
+None:
+  - None
+  - FactionState_None_desc
+Boom:
+  - Boom
+  - FactionState_Boom_desc
+Bust:
+  - Bust
+  - FactionState_Bust_desc
+Civil Liberty:
+  - CivilLiberty
+  - FactionState_CivilLiberty_desc
+Civil Unrest:
+  - CivilUnrest
+  - FactionState_CivilUnrest_desc
+Civil War:
+  - CivilWar
+  - FactionState_CivilWar_desc
+Election:
+  - Election
+  - FactionState_Election_desc
+Expansion:
+  - Expansion
+  - FactionState_Expansion_desc
+Famine:
+  - Famine
+  - FactionState_Famine_desc
+Investment:
+  - Investment
+  - FactionState_Investment_desc
+Lockdown:
+  - Lockdown
+  - FactionState_Lockdown_desc
+Outbreak:
+  - Outbreak
+  - FactionState_Outbreak_desc
+Retreat:
+  - Retreat
+  - FactionState_Retreat_desc
+War:
+  - War
+  - FactionState_War_desc
 
 # April 2019 Update
-Drought: Drought  # Other state
-Incursion: Incursion  # Other state (Thargoids)
-Pirate Attack: PirateAttack  # Other state (pirates)
+Drought:
+  - Drought
+  - FactionState_Drought_desc
+Incursion:
+  - Incursion
+  - FactionState_Incursion_desc
+Pirate Attack:
+  - PirateAttack
+  - FactionState_PirateAttack_desc
 
 # January 2020 Update
-Blight: Blight
-Cold War: ColdWar
-Colonisation: Colonisation
-Historic Event: HistoricEvent
-Infrastructure Failure: InfrastructureFailure
-Natural Disaster: NaturalDisaster
-Public Holiday: PublicHoliday
-Revolution: Revolution
-Technological Leap: TechnologicalLeap
-Terrorism: Terrorism
-Trade War: TradeWar
+Blight:
+  - Blight
+  - FactionState_Blight_desc
+Cold War:
+  - ColdWar
+  - FactionState_ColdWar_desc
+Colonisation:
+  - Colonisation
+  - FactionState_Colonisation_desc
+Historic Event:
+  - HistoricEvent
+  - FactionState_HistoricEvent_desc
+Infrastructure Failure:
+  - InfrastructureFailure
+  - FactionState_InfrastructureFailure_desc
+Natural Disaster:
+  - NaturalDisaster
+  - FactionState_NaturalDisaster_desc
+Public Holiday:
+  - PublicHoliday
+  - FactionState_PublicHoliday_desc
+Revolution:
+  - Revolution
+  - FactionState_Revolution_desc
+Technological Leap:
+  - TechnologicalLeap
+  - FactionState_TechnologicalLeap_desc
+Terrorism:
+  - Terrorism
+  - FactionState_Terrorism_desc
+Trade War:
+  - TradeWar
+  - FactionState_TradeWar_desc
 
-#: May 2023 Update - Thargoid War States
-Thargoid Probing: Thargoid_Probing  # Thargoid Alert
-Thargoid Harvest: Thargoid_Harvest  # Thargoid Invasion
-Thargoid Controlled: Thargoid_Controlled  # Thargoid Controlled
-Thargoid Stronghold: Thargoid_Stronghold  # Thargoid Maelstrom
-Thargoid Recovery: Thargoid_Recovery  # Post-Thargoid Recovery
+#:
+  - May
+  - FactionState_May_desc
+Thargoid Probing:
+  - Thargoid_Probing
+  - FactionState_Thargoid_Probing_desc
+Thargoid Harvest:
+  - Thargoid_Harvest
+  - FactionState_Thargoid_Harvest_desc
+Thargoid Controlled:
+  - Thargoid_Controlled
+  - FactionState_Thargoid_Controlled_desc
+Thargoid Stronghold:
+  - Thargoid_Stronghold
+  - FactionState_Thargoid_Stronghold_desc
+Thargoid Recovery:
+  - Thargoid_Recovery
+  - FactionState_Thargoid_Recovery_desc

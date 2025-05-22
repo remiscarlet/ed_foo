@@ -20,7 +20,7 @@ Aftermath: [USS_Type_Aftermath, USS_SalvageHaulageWreckage]
 Anomaly: USS_Type_Anomaly
 Ceremonial: [USS_Type_Ceremonial, USS_CeremonialComms]
 Convoy: [USS_Type_Convoy, USS_ConvoyDispersalPattern]
-Degraded Emissions: [USS_Type_Salvage, SS_DegradedEmissions]
+Degraded Emissions: [USS_Type_Salvage, USS_DegradedEmissions]
 Distress: [USS_Type_DistressSignal, USS_DistressCall]
 Encoded Emissions: USS_Type_ValuableSalvage
 
