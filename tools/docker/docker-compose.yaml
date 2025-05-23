@@ -22,15 +22,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      GF_PANELS_ENABLE_ALPHA: true
-      GF_DATABASE_TYPE: postgres
-      GF_DATABASE_HOST: postgres
-      GF_DATABASE_NAME: e_kaine
-      GF_DATABASE_USER: e_kaine
-      GF_DATABASE_PASSWORD: e_kaine_pw
     ports: [3000:3000]
-    volumes: [grafana-data:/var/lib/grafana]
+    volumes:
+      - ./grafana/conf/grafana.ini:/etc/grafana/grafana.ini
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
 
   # api:
   #   container_name: ekaine_api

@@ -48,10 +48,14 @@ def process_system_entities(
     )
 
     system_dict = SystemsDB.to_dict_from_eddn(model, controlling_faction_id)
-    upsert_all(session, SystemsDB, [system_dict])
+    systems = upsert_all(session, SystemsDB, [system_dict])
     logger.info(f"[System DB Updated] {system.name}")
 
-    system_dict = SystemsTimeseries.to_dict_from_eddn(model, controlling_faction_id)
+    if len(systems) == 0:
+        raise RuntimeError("Upserted a system but got no object back!")
+    system = systems[0]
+
+    system_dict = SystemsTimeseries.to_dict_from_eddn(model, system.id, controlling_faction_id)
     upsert_all(session, SystemsTimeseries, [system_dict])
 
 

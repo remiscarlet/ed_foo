@@ -269,6 +269,7 @@ class SystemsTimeseries(BaseModel):
     )
 
     id: Mapped[int] = mapped_column(Integer, autoincrement=True)
+    system_id: Mapped[int] = mapped_column(Integer, nullable=False)
     timestamp: Mapped[datetime] = mapped_column(DateTime, index=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -293,7 +294,9 @@ class SystemsTimeseries(BaseModel):
     is_backfilled: Mapped[bool] = mapped_column(Boolean)
 
     @staticmethod
-    def to_dict_from_eddn(eddn_model: journal_v1_0.Model, controlling_faction_id: int | None) -> dict[str, Any]:
+    def to_dict_from_eddn(
+        eddn_model: journal_v1_0.Model, system_id: int, controlling_faction_id: int | None
+    ) -> dict[str, Any]:
         msg = eddn_model.message
         government = getattr(msg, "SystemGovernment", None)
         primary_economy = getattr(msg, "SystemEconomy", None)
@@ -301,6 +304,7 @@ class SystemsTimeseries(BaseModel):
         security = getattr(msg, "SystemSecurity", None)
 
         d = {
+            "system_id": system_id,
             "timestamp": msg.timestamp,
             "allegiance": getattr(msg, "SystemAllegiance", None),
             "controlling_faction_id": controlling_faction_id,

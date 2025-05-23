@@ -61,6 +61,7 @@ def upgrade() -> None:
     op.create_table(
         "systems",
         sa.Column("id", sa.Integer(), nullable=False, autoincrement=True),
+        sa.Column("system_id", sa.Integer(), nullable=False),
         sa.Column("timestamp", sa.DateTime(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("allegiance", sa.Text(), nullable=True),
