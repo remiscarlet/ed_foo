@@ -31,13 +31,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -56,161 +49,715 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "distance"
+              "options": "target_population"
             },
             "properties": [
-              {
-                "id": "custom.width",
-                "value": 89
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "ring_names"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 157
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "sell_price"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 91
-              },
               {
                 "id": "unit",
                 "value": "locale"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "station_name"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 222
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "demand"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 77
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "target_system"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 192
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "ring_types"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 113
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "commodity"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 94
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "vector_system"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 188
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "commodities"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 121
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 17,
+        "h": 16,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 5,
+      "id": 7,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": [
+        "nestedObjects": [],
+        "tables": [
           {
-            "desc": false,
-            "displayName": "vector_system"
+            "actionsColumnConfig": {
+              "alignment": "start",
+              "fontSize": "md",
+              "label": "",
+              "width": {
+                "auto": false,
+                "value": 100
+              }
+            },
+            "addRow": {
+              "enabled": false,
+              "permission": {
+                "mode": "",
+                "userRole": []
+              },
+              "request": {
+                "datasource": "",
+                "payload": {}
+              }
+            },
+            "deleteRow": {
+              "enabled": false,
+              "permission": {
+                "mode": "",
+                "userRole": []
+              },
+              "request": {
+                "datasource": "",
+                "payload": {}
+              }
+            },
+            "expanded": true,
+            "items": [
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "vector_system",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": true
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "target_unoccupied_system",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": true
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "mineables",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": false
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "distance",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": false
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "target_population",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": true
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "target_body_count",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": false
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "target_controlling_faction_state",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": true
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 20,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "target_primary_economy",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": true
+                },
+                "type": "auto"
+              },
+              {
+                "aggregation": "none",
+                "appearance": {
+                  "alignment": "start",
+                  "background": {
+                    "applyToRow": false
+                  },
+                  "colors": {},
+                  "header": {
+                    "fontSize": "md"
+                  },
+                  "width": {
+                    "auto": true,
+                    "min": 125,
+                    "value": 100
+                  },
+                  "wrap": true
+                },
+                "columnTooltip": "",
+                "edit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false,
+                  "permission": {
+                    "mode": "",
+                    "userRole": []
+                  }
+                },
+                "enabled": true,
+                "field": {
+                  "name": "target_pcp",
+                  "source": "A"
+                },
+                "fileCell": {
+                  "size": "md",
+                  "text": "Download",
+                  "variant": "primary"
+                },
+                "filter": {
+                  "enabled": false,
+                  "mode": "client",
+                  "variable": ""
+                },
+                "footer": [],
+                "gauge": {
+                  "mode": "basic",
+                  "valueDisplayMode": "text",
+                  "valueSize": 14
+                },
+                "group": false,
+                "label": "",
+                "newRowEdit": {
+                  "editor": {
+                    "type": "string"
+                  },
+                  "enabled": false
+                },
+                "objectId": "",
+                "pin": "",
+                "preformattedStyle": false,
+                "scale": "auto",
+                "showingRows": 20,
+                "sort": {
+                  "descFirst": false,
+                  "enabled": true
+                },
+                "type": "rich_text"
+              }
+            ],
+            "name": "Table",
+            "pagination": {
+              "defaultPageSize": 10,
+              "enabled": false,
+              "mode": "client"
+            },
+            "rowHighlight": {
+              "backgroundColor": "transparent",
+              "columnId": "",
+              "enabled": false,
+              "scrollTo": "",
+              "smooth": false,
+              "variable": ""
+            },
+            "showHeader": true,
+            "update": {
+              "datasource": "",
+              "payload": {}
+            }
           }
-        ]
+        ],
+        "toolbar": {
+          "alignment": "left"
+        }
       },
-      "pluginVersion": "12.0.1",
+      "pluginVersion": "2.6.0",
       "targets": [
         {
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "with acquisition_vectors as (\n    select *\n    from derived.get_systems_with_power_and_state('Nakato Kaine', array ['Fortified', 'Stronghold'])\n), unoccupied_systems as (\n    select *\n    from core.systems\n    where 'Nakato Kaine' = any(powers)\n    and power_state = 'Unoccupied'\n), all_acquisition_routes as (\n\tselect\n\t\tav.name as acquisition_vector,\n\t\tav.id as acquisition_vector_id,\n\t\tav.power_state as vector_state,\n\t\tus.name as acquisition_target,\n\t\tus.id as acquisition_target_id,\n\t\tus.power_state as target_state,\n\t\tst_3ddistance(av.coords, us.coords) as distance\n\tfrom acquisition_vectors as av\n\tjoin unoccupied_systems as us on st_3ddwithin(\n\t\tav.coords, \n\t\tus.coords, \n\t\tcase when av.power_state = 'Stronghold' then 30 else 20 end\n\t)\n), acquisition_routes_with_hotspots as (\n\tselect *\n\tfrom all_acquisition_routes aar\n\tjoin derived.hotspot_ring_view hrv on hrv.system_name = aar.acquisition_vector\n\twhere hrv.commodity in ('Monazite', 'Platinum')\n), acquisition_routes_with_hotspots_and_markets as (\n\tselect *\n\tfrom acquisition_routes_with_hotspots arh\n\tjoin derived.station_commodities_view scv on arh.acquisition_target = scv.system_name\n\twhere arh.commodity = scv.commodity_sym\n\tand scv.updated_at > (NOW() - interval '2 days')\n), ranked_stations AS (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY acquisition_vector, acquisition_target, commodity\n      ORDER BY sell_price DESC NULLS LAST\n    ) AS station_rank\n  FROM acquisition_routes_with_hotspots_and_markets\n), top_station_rows AS (\n  SELECT *\n  FROM ranked_stations\n  WHERE station_rank <= 1\n)\nSELECT\n  concat(acquisition_vector, ' (', vector_state, ')') as vector_system,\n  acquisition_target as target_unoccupied_system,\n  concat(round(min(distance)::numeric, 2), ' LY') AS distance,\n  commodity,\n  station_name, sell_price, demand, updated_at\nFROM top_station_rows\nGROUP BY\n  acquisition_vector, vector_state, acquisition_target, commodity, station_name, sell_price, demand, updated_at\nORDER BY acquisition_vector, acquisition_target;",
+          "rawSql": "with acquisition_vectors as (\n    select *\n    from derived.get_systems_with_power_and_state('Nakato Kaine', array ['Fortified', 'Stronghold'])\n), unoccupied_systems as (\n    select *\n    from core.systems\n    where 'Nakato Kaine' = any(powers)\n    and power_state = 'Unoccupied'\n), all_acquisition_routes as (\n\tselect\n\t\tav.name as acquisition_vector,\n\t\tav.id as acquisition_vector_id,\n\t\tav.power_state as vector_state,\n\t\tus.name as acquisition_target,\n\t\tus.id as acquisition_target_id,\n\t\tus.power_state as target_state,\n\t\tus.population as target_population,\n\t\tus.body_count as target_body_count,\n\t\tus.primary_economy as target_primary_economy,\n\t\tus.power_conflict_progress as target_pcp,\n\t\tus.controlling_faction_id,\n\t\tst_3ddistance(av.coords, us.coords) as distance\n\tfrom acquisition_vectors as av\n\tjoin unoccupied_systems as us on st_3ddwithin(\n\t\tav.coords, \n\t\tus.coords, \n\t\tcase when av.power_state = 'Stronghold' then 30 else 20 end\n\t)\n), acquisition_routes_with_hotspots as (\n\tselect *\n\tfrom all_acquisition_routes aar\n\tjoin derived.hotspot_ring_view hrv on hrv.system_name = aar.acquisition_vector\n\twhere hrv.commodity in ('Monazite', 'Platinum')\n), acquisition_routes_with_hotspots_and_markets as (\n\tselect *\n\tfrom acquisition_routes_with_hotspots arh\n\tjoin derived.station_commodities_view scv on arh.acquisition_target = scv.system_name\n\twhere arh.commodity = scv.commodity_sym\n\tand scv.updated_at > (NOW() - interval '2 days')\n), ranked_stations AS (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY acquisition_vector, acquisition_target, commodity\n      ORDER BY sell_price DESC NULLS LAST\n    ) AS station_rank\n  FROM acquisition_routes_with_hotspots_and_markets\n), top_station_rows AS (\n  SELECT *\n  FROM ranked_stations\n  WHERE station_rank <= 1\n)\nSELECT\n  concat(tsr.acquisition_vector, ' (', tsr.vector_state, ')') as vector_system,\n  tsr.acquisition_target as target_unoccupied_system,\n  array_agg(tsr.commodity) as mineables,\n  concat(round(min(tsr.distance)::numeric, 2), ' LY') AS distance,\n\ttsr.target_population,\n\ttsr.target_body_count,\n\tfp.state as target_controlling_faction_state,\n\ttsr.target_primary_economy,\n\t(\n\t\tSELECT\n  \t\tstring_agg(power || ' (' || ROUND(progress::numeric * 100, 1) || '%)', '<br>') AS powers_inline\n\t\tFROM jsonb_to_recordset(tsr.target_pcp::jsonb)\n  \t\tAS x(power TEXT, progress FLOAT)\n\t) as target_pcp\nFROM top_station_rows tsr\njoin core.faction_presences fp on tsr.controlling_faction_id = fp.faction_id and tsr.acquisition_target_id = fp.system_id\nGROUP BY\n  tsr.acquisition_vector, tsr.vector_state, tsr.acquisition_target,\n\ttsr.target_population, tsr.target_body_count, tsr.target_primary_economy, tsr.target_pcp,\n\tfp.state\nORDER BY tsr.acquisition_vector, tsr.acquisition_target;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -231,8 +778,8 @@
           }
         }
       ],
-      "title": "Kaine Mining Acquisition Routes",
-      "type": "table"
+      "title": "Kaine Mining Acquisition Routes (Summarized)",
+      "type": "volkovlabs-table-panel"
     },
     {
       "datasource": {
@@ -286,7 +833,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 157
+                "value": 301
               }
             ]
           },
@@ -372,7 +919,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 16
       },
       "id": 6,
       "options": {
@@ -388,8 +935,8 @@
         "showHeader": true,
         "sortBy": [
           {
-            "desc": true,
-            "displayName": "sell_price"
+            "desc": false,
+            "displayName": "vector_system"
           }
         ]
       },
@@ -557,7 +1104,7 @@
         "h": 4,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 24
       },
       "id": 4,
       "options": {
@@ -640,7 +1187,7 @@
         "h": 13,
         "w": 17,
         "x": 0,
-        "y": 29
+        "y": 28
       },
       "id": 1,
       "options": {
@@ -704,5 +1251,5 @@
   "timezone": "browser",
   "title": "Global Dashboard",
   "uid": "9f40134c-084d-4b71-8490-a3d927e35053",
-  "version": 21
+  "version": 28
 }
