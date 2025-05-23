@@ -33,10 +33,11 @@ def upgrade() -> None:
         sa.Column("influence", sa.Float(), nullable=True),
         sa.Column("state", sa.Text(), nullable=True),
         sa.Column("happiness", sa.Text(), nullable=True),
-        sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("active_states", sa.ARRAY(sa.Text()), nullable=True),
         sa.Column("pending_states", sa.ARRAY(sa.Text()), nullable=True),
         sa.Column("recovering_states", sa.ARRAY(sa.Text()), nullable=True),
+        sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("is_backfilled", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("id", "timestamp"),
         schema="timescaledb",
     )
@@ -76,6 +77,20 @@ def upgrade() -> None:
         sa.Column("power_state_reinforcement", sa.Float(), nullable=True),
         sa.Column("power_state_undermining", sa.Float(), nullable=True),
         sa.Column("powers", sa.ARRAY(sa.Text()), nullable=True),
+        sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("is_backfilled", sa.Boolean(), nullable=False),
+        sa.PrimaryKeyConstraint("id", "timestamp"),
+        schema="timescaledb",
+    )
+    op.create_table(
+        "power_conflict_progress",
+        sa.Column("id", sa.Integer(), nullable=False, autoincrement=True),
+        sa.Column("timestamp", sa.DateTime(), nullable=False),
+        sa.Column("system_id", sa.Integer(), nullable=False),
+        sa.Column("power_name", sa.Text(), nullable=False),
+        sa.Column("progress", sa.Float(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), nullable=False),
+        sa.Column("is_backfilled", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("id", "timestamp"),
         schema="timescaledb",
     )
@@ -85,6 +100,9 @@ def upgrade() -> None:
     )
     op.execute("SELECT create_hypertable('timescaledb.signals', by_range('timestamp'), if_not_exists => TRUE);")
     op.execute("SELECT create_hypertable('timescaledb.systems', by_range('timestamp'), if_not_exists => TRUE);")
+    op.execute(
+        "SELECT create_hypertable('timescaledb.power_conflict_progress', by_range('timestamp'), if_not_exists => TRUE);"
+    )
 
 
 def downgrade() -> None:
