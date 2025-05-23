@@ -15,27 +15,46 @@ services:
       retries: 15
     ports: [5432:5432]
     volumes: [pgdata:/var/lib/postgresql/data]
-  api:
-    container_name: ekaine_api
-    build:
-      context: ../../
-      dockerfile: tools/docker/e_kaine/Dockerfile
+  grafana:
+    container_name: ekaine_grafana
+    image: grafana/grafana-enterprise
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://e_kaine:e_kaine_pw@db:5432/e_kaine
-    ports: [8000:8000]
-    command:
-      - poetry
-      - run
-      - uvicorn
-      - src.app.main:app
-      - --host
-      - 0.0.0.0
-      - --port
-      - '8000'
-      - --reload
+      GF_PANELS_ENABLE_ALPHA: true
+      GF_DATABASE_TYPE: postgres
+      GF_DATABASE_HOST: postgres
+      GF_DATABASE_NAME: e_kaine
+      GF_DATABASE_USER: e_kaine
+      GF_DATABASE_PASSWORD: e_kaine_pw
+    ports: [3000:3000]
+    volumes: [grafana-data:/var/lib/grafana]
+
+  # api:
+  #   container_name: ekaine_api
+  #   build:
+  #     context: ../../
+  #     dockerfile: tools/docker/e_kaine/Dockerfile
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_URL: postgres://e_kaine:e_kaine_pw@db:5432/e_kaine
+  #   ports: [8000:8000]
+  #   command:
+  #     - poetry
+  #     - run
+  #     - uvicorn
+  #     - src.app.main:app
+  #     - --host
+  #     - 0.0.0.0
+  #     - --port
+  #     - '8000'
+  #     - --reload
 
 volumes:
   pgdata:
+  pg-data:
+  grafana-data:
