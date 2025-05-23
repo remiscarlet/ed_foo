@@ -52,6 +52,26 @@ make run-pipeline
 make eddn-listener
 ```
 
+```
+[2025-05-22 23:54:12][INFO]: [System DB Updated] Eorasa
+[2025-05-22 23:54:12][INFO]: [Faction Presence DB + Timeseries Updated] Eorasa - 6 factions
+[2025-05-22 23:54:12][INFO]: [System DB Updated] HIP 80870
+[2025-05-22 23:54:12][INFO]: [Faction Presence DB + Timeseries Updated] HIP 80870 - 4 factions
+[2025-05-22 23:54:13][INFO]: [Signals Timeseries Updated] Eorasa - 5 Signals
+[2025-05-22 23:54:14][INFO]: [Market Commodities DB Updated] Ackcanphi - X4F-W5B - 0 Commodities
+[2025-05-22 23:54:15][INFO]: [Signals Timeseries Updated] Konggul - 11 Signals
+[2025-05-22 23:54:16][INFO]: [Signals Timeseries Updated] Tiangchi - 41 Signals
+[2025-05-22 23:54:17][INFO]: [Signals Timeseries Updated] Barathaona - 33 Signals
+[2025-05-22 23:54:17][INFO]: [System DB Updated] HIP 4005
+[2025-05-22 23:54:17][INFO]: [Faction Presence DB + Timeseries Updated] HIP 4005 - 6 factions
+[2025-05-22 23:54:17][INFO]: [Faction Presence DB + Timeseries Updated] Barathaona - 7 factions
+[2025-05-22 23:54:18][INFO]: [Market Commodities DB Updated] Winiama - T9Y-T5G - 1 Commodities
+[2025-05-22 23:54:18][INFO]: [Signals Timeseries Updated] Aries Dark Region JI-J b9-1 - 3 Signals
+[2025-05-22 23:54:18][INFO]: [System DB Updated] Aries Dark Region JI-J b9-1
+[2025-05-22 23:54:18][INFO]: [Market Commodities DB Updated] HIP 50653 - Hand Landing - 148 Commodities
+[2025-05-22 23:54:18][INFO]: [Signals Timeseries Updated] Col 285 Sector LH-M c7-10 - 6 Signals
+```
+
 ### Adhoc SQL Queries
 ```
 make pg-shell

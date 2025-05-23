@@ -72,6 +72,9 @@ class SignalsTimeseries(BaseModel):
     ) -> list[dict[str, Any]]:
         dicts = []
         for signal in model.message.signals:
+            if "Warzone_PointRace" in signal.SignalName:
+                # Ignore for now - spammy
+                continue
             signal_name = get_symbol_by_eddn_name(signal.SignalName) or signal.SignalName
             if len(signal_name) and signal_name[0] == "$":
                 logger.warning(

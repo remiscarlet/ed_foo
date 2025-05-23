@@ -1,6 +1,7 @@
 from typing import Sequence
 
 from sqlalchemy import RowMapping, select, text
+from sqlalchemy.orm import Session
 
 from src.common.logging import get_logger
 from src.common.timer import Timer
@@ -157,8 +158,8 @@ class ApiCommandAdapter:
 
 
 class SystemsAdapter:
-    def __init__(self) -> None:
-        self.session = SessionLocal()
+    def __init__(self, session: Session | None = None) -> None:
+        self.session = session or SessionLocal()
 
     def get_system(self, system_name: str) -> SystemsDB:
         query = select(SystemsDB).where(SystemsDB.name == system_name)
