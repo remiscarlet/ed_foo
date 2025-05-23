@@ -51,6 +51,8 @@ dependencies = [
     "types-shapely (>=2.1.0.20250418,<3.0.0.0)",
     "interactions-py (>=5.14.0,<6.0.0)",
     "pydantic (>=2.11.4,<3.0.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "matplotlib (>=3.10.3,<4.0.0)",
 ]
 
 [build-system]
