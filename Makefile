@@ -8,6 +8,10 @@ install:
 setup: install install-models up alembic-upgrade
 setup-container: install-models alembic-upgrade
 
+# Also need to create config.yaml and optionally .env PG_PORT override file
+run-prod:
+	build up
+
 ## Discord
 discord-bot:
 	python src/interfaces/discord/bot.py
