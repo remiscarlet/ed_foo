@@ -8,12 +8,6 @@ from types import ModuleType
 from typing import Any, Callable
 
 import zmq
-from gen.eddn_models import (
-    approachsettlement_v1_0,
-    commodity_v3_0,
-    fsssignaldiscovered_v1_0,
-    journal_v1_0,
-)
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -22,6 +16,12 @@ from ekaine.ingestion.eddn import processors
 from ekaine.ingestion.eddn.schemas import get_schema_model_mapping
 from ekaine.postgresql import SessionLocal
 from ekaine.postgresql.adapter import FactionsAdapter
+from gen.eddn_models import (
+    approachsettlement_v1_0,
+    commodity_v3_0,
+    fsssignaldiscovered_v1_0,
+    journal_v1_0,
+)
 
 logger = get_logger(__name__)
 

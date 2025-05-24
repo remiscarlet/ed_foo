@@ -5,7 +5,8 @@
 install:
 	poetry install
 
-setup: install up alembic-upgrade install-models
+setup: install install-models up alembic-upgrade
+setup-container: install-models alembic-upgrade
 
 ## Discord
 discord-bot:
@@ -36,6 +37,9 @@ import-spansh-vv:
 	poetry run cli ingestion import-spansh -vv
 
 run-pipeline: download-spansh import-spansh-v
+
+hydrate-db:
+	./tools/scripts/hydrate_postgres.sh
 
 ## Code Quality
 
@@ -68,10 +72,20 @@ lint-fix-check:
 	poetry run flake8 src/ -v
 	poetry run mypy src/
 
+## Docker (Builds/Images)
+.PHONY: build_app
+build_app:
+	docker build -f tools/docker/ekaine/Dockerfile \
+		--no-cache \
+		--tag='remiscarlet/ekaine' \
+		.
+
+build: build_app
+
 ## Docker (Dev Only)
 
 pg-shell: # "Lightweight" PG shell for convenience
-	poetry run pgcli "postgres://ekaine:ekaine_pw@localhost:5432/ekaine"
+	poetry run pgcli "postgresql://ekaine:ekaine_pw@localhost:5432/ekaine"
 
 nuke-db:
 	docker stop ekaine_db
@@ -105,6 +119,8 @@ alembic-revision:
 download-eddn-models:
 	mkdir -p data
 	git clone https://github.com/EDCD/EDDN.git -b live data/eddn/ 2>/dev/null || true
+	ls -al .
+	ls -al data
 	git -C data/eddn pull
 
 gen-eddn-models:
@@ -122,10 +138,9 @@ install-models: download-gen-models gen-eddn-model-mappings
 models: install-models
 
 clean-models:
-	rm -f gen/eddn_schema_to_model_mapping.json
-	rm -rf gen/generate_eddn_models
-	rm -rf gen/eddn_models
+	rm -f src/gen/eddn_schema_to_model_mapping.json
+	rm -rf src/gen/generate_eddn_models
+	rm -rf src/gen/eddn_models
 	rm -rf data/eddn
 	rm -rf data/eddn_schemas_patched
 # make nuke-db; make up-db; sleep 1; make alembic-upgrade; make alembic-revision; make alembic-upgrade;
-

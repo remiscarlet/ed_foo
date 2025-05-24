@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source tools/scripts/generate_models.sh
 
 TMP_DIR=$(mktemp -d)

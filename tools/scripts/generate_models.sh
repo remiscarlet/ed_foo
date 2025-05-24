@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function copy_schemas {
     TMP_DIR=${1}
     IN_DIR=${2}
@@ -9,7 +11,7 @@ function copy_schemas {
 function generate_models {
     TMP_DIR=${1}
 
-    GEN_DIR=gen/
+    GEN_DIR=src/gen/
     OUT_DIR=${GEN_DIR}${2}/
 
     mkdir -p ${GEN_DIR}

@@ -2,7 +2,6 @@ import traceback
 from pprint import pformat
 from typing import cast
 
-from gen.eddn_models import journal_v1_0
 from sqlalchemy.orm import Session
 
 from ekaine.common.logging import get_logger
@@ -14,6 +13,7 @@ from ekaine.postgresql.timeseries import (
     SystemsTimeseries,
 )
 from ekaine.postgresql.utils import upsert_all
+from gen.eddn_models import journal_v1_0
 
 logger = get_logger(__name__)
 

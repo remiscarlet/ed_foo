@@ -28,28 +28,35 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/var/lib/grafana/dashboards
+  setup:
+    container_name: ekaine_setup
+    image: remiscarlet/ekaine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:5432/ekaine
+    entrypoint: ["bash", "-c", "pwd && ls -al && make setup-container && make hydrate-db"]
+    restart: "no"
+    volumes:
+      - ../../tools/:/app/tools
+      - ../../src/:/app/src
+      - ../../Makefile:/app/Makefile
 
-  # api:
-  #   container_name: ekaine_api
-  #   build:
-  #     context: ../../
-  #     dockerfile: tools/docker/ekaine/Dockerfile
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   environment:
-  #     DATABASE_URL: postgres://ekaine:ekaine_pw@db:5432/ekaine
-  #   ports: [8000:8000]
-  #   command:
-  #     - poetry
-  #     - run
-  #     - uvicorn
-  #     - ekaine.app.main:app
-  #     - --host
-  #     - 0.0.0.0
-  #     - --port
-  #     - '8000'
-  #     - --reload
+  app:
+    container_name: ekaine_app
+    image: remiscarlet/ekaine
+    stdin_open: true
+    tty: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      #setup:
+      #  condition: service_completed_successfully
+    #command: ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+    environment:
+      DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:5432/ekaine
+    ports: [8000:8000]
 
 volumes:
   pgdata:

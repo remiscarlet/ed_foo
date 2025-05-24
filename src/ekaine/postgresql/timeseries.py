@@ -2,7 +2,6 @@ from datetime import datetime
 from pprint import pformat
 from typing import Any, Optional, cast
 
-from gen.eddn_models import fsssignaldiscovered_v1_0, journal_v1_0
 from sqlalchemy import (
     ARRAY,
     BigInteger,
@@ -20,6 +19,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ekaine.common.game_constants import get_symbol_by_eddn_name
 from ekaine.common.logging import get_logger
 from ekaine.postgresql import BaseModel
+from gen.eddn_models import fsssignaldiscovered_v1_0, journal_v1_0
 
 logger = get_logger(__name__)
 

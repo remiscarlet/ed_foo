@@ -1,7 +1,7 @@
 data/
 dist/
 logs/
-gen/
+src/gen/
 __pycache__/
 .DS_STORE
 config.yaml

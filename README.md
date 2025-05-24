@@ -96,17 +96,17 @@ make lint-fix-check
 ```
 
 ### Interesting Locations (For Now)
-- `src/interfaces/discord/bot.py`
+- `src/ekaine/interfaces/discord/bot.py`
   - Discord bot entrypoint
-- `src/postgresql/`
+- `src/ekaine/postgresql/`
   - Any and all database-specific things like SQL files, sqlalchemy schemas, etc
   - Except DB migrations.
-- `src/alembic/`
+- `src/ekaine/alembic/`
   - Stores all DB migrations
-- `src/ingestion/`
+- `src/ekaine/ingestion/`
+  - EDDN live update listener
   - Data ingestion logic
   - Spansh dump data DL/import pipeline
-  - WIP EDDN live update listener
 
 ### DB Schema
 - See https://dbdiagram.io/d/EKAINE-680e5f821ca52373f58ba72d

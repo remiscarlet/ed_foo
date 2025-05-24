@@ -1,10 +1,10 @@
 from typing import cast
 
-from gen.eddn_models import fssbodysignals_v1_0
 from sqlalchemy.orm import Session
 
 from ekaine.common.logging import get_logger
 from ekaine.postgresql.adapter import SystemsAdapter
+from gen.eddn_models import fssbodysignals_v1_0
 
 logger = get_logger(__name__)
 

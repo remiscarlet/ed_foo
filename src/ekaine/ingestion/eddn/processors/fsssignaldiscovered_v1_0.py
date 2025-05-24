@@ -1,12 +1,12 @@
 from typing import cast
 
-from gen.eddn_models import fsssignaldiscovered_v1_0
 from sqlalchemy.orm import Session
 
 from ekaine.common.logging import get_logger
 from ekaine.postgresql.adapter import SystemsAdapter
 from ekaine.postgresql.timeseries import SignalsTimeseries
 from ekaine.postgresql.utils import upsert_all
+from gen.eddn_models import fsssignaldiscovered_v1_0
 
 logger = get_logger(__name__)
 

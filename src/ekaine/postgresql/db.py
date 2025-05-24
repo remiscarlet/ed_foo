@@ -2,7 +2,6 @@ from datetime import datetime
 from pprint import pformat
 from typing import Any, Optional, Tuple, Union, cast
 
-from gen.eddn_models import commodity_v3_0, journal_v1_0
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
@@ -40,6 +39,7 @@ from ekaine.ingestion.spansh.models.system_spansh import (
     ThargoidWarSpansh,
 )
 from ekaine.postgresql import BaseModel, BaseModelWithId
+from gen.eddn_models import commodity_v3_0, journal_v1_0
 
 logger = get_logger(__name__)
 

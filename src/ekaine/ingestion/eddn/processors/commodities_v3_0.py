@@ -1,10 +1,10 @@
-from gen.eddn_models import commodity_v3_0
 from sqlalchemy.orm import Session
 
 from ekaine.common.logging import get_logger
 from ekaine.postgresql.adapter import StationsAdapter
 from ekaine.postgresql.db import MarketCommoditiesDB
 from ekaine.postgresql.utils import upsert_all
+from gen.eddn_models import commodity_v3_0
 
 logger = get_logger(__name__)
 

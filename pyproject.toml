@@ -65,7 +65,7 @@ version = "0.1.0"
 description = ""
 authors = ["remiscarlet <remilia@scarl.et>"]
 packages = [
-    { include = "ekaine", from = "src" }
+    { include = "ekaine", from = "src" },
 ]
 
 [tool.poetry.group.dev.dependencies]

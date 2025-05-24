@@ -2,12 +2,12 @@ from pathlib import Path
 from pprint import pformat
 
 import yaml
-from gen.metadata_models.commodities_schema import Commodity as CommodityModel
-from gen.metadata_models.commodities_schema import Model as CommoditiesByNameModel
-from gen.metadata_models.strings_schema import Model as StringMappingModel
 
 from ekaine.common.constants import COMMODITIES_YAML_FMT, METADATA_DIR, STRINGS_YAML_FMT
 from ekaine.common.logging import get_logger
+from gen.metadata_models.commodities_schema import Commodity as CommodityModel
+from gen.metadata_models.commodities_schema import Model as CommoditiesByNameModel
+from gen.metadata_models.strings_schema import Model as StringMappingModel
 
 logger = get_logger(__name__)
 
