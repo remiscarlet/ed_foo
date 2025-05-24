@@ -59,6 +59,10 @@ services:
     environment:
       DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:5432/ekaine
     ports: [8000:8000]
+    volumes:
+      - ../../tools/:/app/tools
+      - ../../src/:/app/src
+      - ../../Makefile:/app/Makefile
 
 volumes:
   pg-data:

@@ -32,7 +32,7 @@ STRINGS_SCHEMA = METADATA_SCHEMAS_DIR / "strings.schema.json"
 STRINGS_YAML_FMT = "strings.*.yaml"
 
 # EDDN
-GEN_DIR = REL_ROOT_PATH / "gen"  # Hehe...
+GEN_DIR = REL_ROOT_PATH / "src" / "gen"  # Hehe...
 EDDN_SCHEMAS_DIR = DATA_DIR / "eddn" / "schemas"
 EDDN_SCHEMA_MAPPING_FILE = GEN_DIR / "eddn_schema_to_model_mapping.json"
 
