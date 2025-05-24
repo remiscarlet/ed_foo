@@ -71,7 +71,7 @@ lint-fix-check:
 ## Docker (Dev Only)
 
 pg-shell: # "Lightweight" PG shell for convenience
-	poetry run pgcli "postgres://e_kaine:e_kaine_pw@localhost:5432/e_kaine"
+	poetry run pgcli "postgres://ekaine:ekaine_pw@localhost:5432/ekaine"
 
 nuke-db:
 	docker stop ekaine_db

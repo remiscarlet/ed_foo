@@ -5,11 +5,11 @@ services:
     image: timescale/timescaledb-ha:pg17
     restart: always
     environment:
-      POSTGRES_USER: e_kaine
-      POSTGRES_PASSWORD: e_kaine_pw
-      POSTGRES_DB: e_kaine
+      POSTGRES_USER: ekaine
+      POSTGRES_PASSWORD: ekaine_pw
+      POSTGRES_DB: ekaine
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "e_kaine"]
+      test: ["CMD-SHELL", "pg_isready", "-d", "ekaine"]
       interval: 10s
       timeout: 10s
       retries: 15
@@ -33,18 +33,18 @@ services:
   #   container_name: ekaine_api
   #   build:
   #     context: ../../
-  #     dockerfile: tools/docker/e_kaine/Dockerfile
+  #     dockerfile: tools/docker/ekaine/Dockerfile
   #   depends_on:
   #     postgres:
   #       condition: service_healthy
   #   environment:
-  #     DATABASE_URL: postgres://e_kaine:e_kaine_pw@db:5432/e_kaine
+  #     DATABASE_URL: postgres://ekaine:ekaine_pw@db:5432/ekaine
   #   ports: [8000:8000]
   #   command:
   #     - poetry
   #     - run
   #     - uvicorn
-  #     - src.app.main:app
+  #     - ekaine.app.main:app
   #     - --host
   #     - 0.0.0.0
   #     - --port

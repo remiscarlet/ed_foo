@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.postgresql import SessionLocal
+from ekaine.postgresql import SessionLocal
 
 session = SessionLocal()
 with session.connection() as conn:

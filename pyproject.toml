@@ -64,7 +64,9 @@ name = "ekaine"
 version = "0.1.0"
 description = ""
 authors = ["remiscarlet <remilia@scarl.et>"]
-packages = [{ include = "src" }]
+packages = [
+    { include = "ekaine", from = "src" }
+]
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.15.0"
@@ -78,9 +80,9 @@ pgcli = "^4.3.0"
 datamodel-code-generator = {extras = ["debug"], version = "^0.30.1"}
 
 [tool.poetry.scripts]
-main = "src.main:main"
-cli = "src.main:cli"
-generate_eddn_schema_mapping = "src.ingestion.eddn.schemas:generate_mapping"
+main = "ekaine.main:main"
+cli = "ekaine.main:cli"
+generate_eddn_schema_mapping = "ekaine.ingestion.eddn.schemas:generate_mapping"
 lint_metadata = "tools.scripts.validate_yaml_schema:main"
 
 [tool.isort]

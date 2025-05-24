@@ -5,7 +5,7 @@ import jsonschema
 import yaml
 from jsonschema import Draft202012Validator, RefResolver
 
-from src.common.constants import (
+from ekaine.common.constants import (
     COMMODITIES_SCHEMA,
     COMMODITIES_YAML_FMT,
     ENUMS_SCHEMA,
