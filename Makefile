@@ -94,14 +94,8 @@ nuke-db:
 up:
 	docker compose -f tools/docker/docker-compose.yaml up --build -d
 
-up-prod:
-	docker compose -f tools/docker/docker-compose.yaml -f tools/docker/docker-compose.prod.overrides.yaml up --build -d
-
 down:
 	docker compose -f tools/docker/docker-compose.yaml down
-
-down-prod:
-	docker compose -f tools/docker/docker-compose.yaml -f tools/docker/docker-compose.prod.overrides.yaml down
 
 up-db:
 	docker compose -f tools/docker/docker-compose.yaml up --build -d postgres
