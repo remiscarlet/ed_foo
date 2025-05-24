@@ -13,8 +13,9 @@ services:
       interval: 10s
       timeout: 10s
       retries: 15
-    ports: [5432:5432]
+    ports: ["${PG_PORT:-5432}:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
+
   grafana:
     container_name: ekaine_grafana
     image: grafana/grafana-enterprise
@@ -28,6 +29,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/var/lib/grafana/dashboards
+
   setup:
     container_name: ekaine_setup
     image: remiscarlet/ekaine
@@ -35,7 +37,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:5432/ekaine
+      DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:${PG_PORT:-5432}/ekaine
     entrypoint: ["bash", "-c", "pwd && ls -al && make setup-container && make hydrate-db"]
     restart: "no"
     volumes:
@@ -51,11 +53,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      #setup:
-      #  condition: service_completed_successfully
-    #command: ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+      setup:
+       condition: service_completed_successfully
+    command: ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
     environment:
-      DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:5432/ekaine
+      DATABASE_URL: postgresql://ekaine:ekaine_pw@postgres:${PG_PORT:-5432}/ekaine
     ports: [8000:8000]
 
 volumes:

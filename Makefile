@@ -85,7 +85,7 @@ build: build_app
 ## Docker (Dev Only)
 
 pg-shell: # "Lightweight" PG shell for convenience
-	poetry run pgcli "postgresql://ekaine:ekaine_pw@localhost:5432/ekaine"
+	poetry run pgcli "postgresql://ekaine:ekaine_pw@localhost::${PG_PORT:-5432}/ekaine"
 
 nuke-db:
 	docker stop ekaine_db
@@ -94,8 +94,14 @@ nuke-db:
 up:
 	docker compose -f tools/docker/docker-compose.yaml up --build -d
 
+up-prod:
+	docker compose -f tools/docker/docker-compose.yaml -f tools/docker/docker-compose.prod.overrides.yaml up --build -d
+
 down:
 	docker compose -f tools/docker/docker-compose.yaml down
+
+down-prod:
+	docker compose -f tools/docker/docker-compose.yaml -f tools/docker/docker-compose.prod.overrides.yaml down
 
 up-db:
 	docker compose -f tools/docker/docker-compose.yaml up --build -d postgres
